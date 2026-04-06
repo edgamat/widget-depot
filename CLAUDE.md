@@ -4,6 +4,12 @@ This file contains standing instructions for Claude Code when working in this re
 
 ---
 
+## Plan Mode
+
+Do not explore the codebase during planning unless the task requires it or the user explicitly asks. If the user's request is self-contained (e.g., breaking down a story, writing a plan from a spec), go straight to planning.
+
+---
+
 ## The Local Workflow:
 
 - You create an issue in GitHub (via the web UI or `gh issue create`)
@@ -64,9 +70,4 @@ A clear description of the feature, bug fix, or task.
 
 ## General Coding Conventions
 
-> **TODO:** Fill in your project-specific standards here. Examples:
-> - Language and framework versions
-> - Folder structure conventions
-> - Naming conventions (files, variables, functions)
-> - Testing requirements (frameworks, minimum coverage, etc.)
-> - Linting / formatting rules
+> refer to the [architecture](./docs/standards/architecture.md) for the solution structure and technologies to use.
