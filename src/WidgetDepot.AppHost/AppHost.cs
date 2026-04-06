@@ -1,7 +1,12 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+var postgres = builder.AddPostgres("postgres")
+    .AddDatabase("widgetdepot");
+
 var apiService = builder.AddProject<Projects.WidgetDepot_ApiService>("apiservice")
-    .WithHttpHealthCheck("/health");
+    .WithHttpHealthCheck("/health")
+    .WithReference(postgres)
+    .WaitFor(postgres);
 
 builder.AddProject<Projects.WidgetDepot_Web>("webfrontend")
     .WithExternalHttpEndpoints()

@@ -13,4 +13,8 @@
     <ProjectReference Include="..\WidgetDepot.Web\WidgetDepot.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.2.1" />
+  </ItemGroup>
+
 </Project>

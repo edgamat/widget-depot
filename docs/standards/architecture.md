@@ -15,6 +15,7 @@ The solution is a .NET 10 Blazor Web App using Vertical Slice Architecture. It i
 | Project | Type | Purpose |
 |---|---|---|
 | `WidgetDepot.Web` | Blazor Web App | Main application — UI, routing, and feature slices |
+| `WidgetDepot.ApiService` | ASP.NET Core API | Backend API and EF Core data layer |
 | `WidgetDepot.AppHost` | .NET Aspire AppHost | Local orchestration (database, app, services) |
 | `WidgetDepot.ServiceDefaults` | .NET Aspire ServiceDefaults | Shared Aspire defaults (OpenTelemetry, health checks, service discovery) |
 | `WidgetDepot.Tests` | xUnit Test Project | Unit and integration tests |
@@ -34,9 +35,13 @@ WidgetDepot.sln
 │   │   │   ├── Orders/
 │   │   │   ├── Admin/
 │   │   │   └── ProblemReports/
-│   │   ├── Data/                         # EF Core DbContext and migrations
 │   │   ├── Components/                   # Shared Blazor components and layouts
 │   │   ├── wwwroot/                      # Static assets
+│   │   ├── appsettings.json
+│   │   └── Program.cs
+│   │
+│   ├── WidgetDepot.ApiService/           # Backend API service
+│   │   ├── Data/                         # EF Core DbContext and migrations
 │   │   ├── appsettings.json
 │   │   └── Program.cs
 │   │
@@ -61,11 +66,11 @@ Each feature slice lives entirely within its own folder under `Features/`. A typ
 Features/Catalog/
 ├── CatalogPage.razor           # Blazor page component
 ├── CatalogPage.razor.cs        # Code-behind (if needed)
-├── CatalogService.cs           # Business logic / data access for this slice
-└── CatalogModels.cs            # DTOs, view models, form models
+├── CatalogService.cs           # Calls ApiService and handles UI logic for this slice
+└── CatalogModels.cs            # DTOs and view models for this slice
 ```
 
-Slices do not share services or models with each other except through the shared `Data/` layer (EF Core entities and DbContext).
+Slices do not share services or models with each other. Each slice calls ApiService APIs independently and works with DTOs returned from the backend.
 
 ---
 
@@ -88,6 +93,7 @@ Slices do not share services or models with each other except through the shared
 
 ## Notes
 
+- Web and ApiService are separate projects with clear separation: Web calls ApiService APIs and works with DTOs. Web does not directly reference the Data layer.
 - No MediatR dependency. Feature handlers are plain C# classes called directly.
 - Health check endpoints are included in the application.
 - Trunk-based development on `main`.
