@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "src/WidgetDepot.AppHost/WidgetDepot.AppHost.csproj"
+  }
+}
