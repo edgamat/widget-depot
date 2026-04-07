@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.SearchWidgets;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 
 builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
+builder.Services.AddScoped<SearchWidgetsHandler>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -34,6 +36,13 @@ if (app.Environment.IsDevelopment())
 string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
 
 app.MapGet("/", () => "API service is running. Navigate to /weatherforecast to see sample data.");
+
+app.MapGet("/widgets/search", async (string? term, SearchWidgetsHandler handler) =>
+{
+    var results = await handler.HandleAsync(new SearchWidgetsQuery(term));
+    return Results.Ok(results);
+})
+.WithName("SearchWidgets");
 
 app.MapGet("/weatherforecast", () =>
 {
