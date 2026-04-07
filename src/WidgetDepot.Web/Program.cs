@@ -1,4 +1,5 @@
 using WidgetDepot.Web.Components;
+using WidgetDepot.Web.Features.Catalog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,9 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient<CatalogService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"));
 
 var app = builder.Build();
 
