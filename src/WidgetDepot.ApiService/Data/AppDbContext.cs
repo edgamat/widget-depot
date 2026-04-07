@@ -13,10 +13,17 @@ public class AppDbContext : DbContext
     {
     }
 
+    public DbSet<Widget> Widgets => Set<Widget>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure entities here as features are added
+        modelBuilder.Entity<Widget>(entity =>
+        {
+            entity.HasIndex(w => w.Sku).IsUnique();
+            entity.Property(w => w.Weight).HasPrecision(10, 3);
+            entity.Property(w => w.Price).HasPrecision(10, 2);
+        });
     }
 }

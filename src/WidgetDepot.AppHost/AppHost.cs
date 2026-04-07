@@ -1,6 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
+    .WithDataVolume()
     .AddDatabase("widgetdepot");
 
 var apiService = builder.AddProject<Projects.WidgetDepot_ApiService>("apiservice")
