@@ -1,0 +1,80 @@
+@page "/catalog"
+@rendermode InteractiveServer
+@inject CatalogService CatalogService
+
+<PageTitle>Widget Catalog</PageTitle>
+
+<h1>Widget Catalog</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-auto">
+        <input type="text" class="form-control" placeholder="Search widgets..."
+               @bind="searchTerm" @bind:event="oninput" @onkeydown="HandleKeyDown" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" @onclick="ExecuteSearch">Search</button>
+    </div>
+</div>
+
+@if (hasSearched)
+{
+    @if (results.Count == 0)
+    {
+        <p class="text-muted">No results found.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Manufacturer</th>
+                    <th>Weight</th>
+                    <th>Price</th>
+                    <th>Date Available</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var widget in results)
+                {
+                    <tr>
+                        <td>@widget.Sku</td>
+                        <td>@widget.Name</td>
+                        <td>@widget.Description</td>
+                        <td>@widget.Manufacturer</td>
+                        <td>@widget.Weight</td>
+                        <td>@widget.Price.ToString("C")</td>
+                        <td>@widget.DateAvailable.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private string? searchTerm;
+    private IReadOnlyList<WidgetResult> results = [];
+    private bool hasSearched;
+
+    private async Task ExecuteSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            results = [];
+            hasSearched = false;
+            return;
+        }
+
+        results = await CatalogService.SearchAsync(searchTerm);
+        hasSearched = true;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await ExecuteSearch();
+    }
+}
