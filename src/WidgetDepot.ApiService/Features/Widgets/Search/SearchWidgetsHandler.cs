@@ -25,8 +25,8 @@ public class SearchWidgetsHandler(AppDbContext db)
         var term = query.Term.Trim();
 
         return await db.Widgets
-            .Where(w => EF.Functions.ILike(w.Name, $"%{term}%") ||
-                        EF.Functions.ILike(w.Description, $"%{term}%"))
+            .Where(w => EF.Functions.Like(w.Name, $"%{term}%") ||
+                        EF.Functions.Like(w.Description, $"%{term}%"))
             .Select(w => new WidgetResult(
                 w.Id,
                 w.Sku,
