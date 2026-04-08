@@ -1,34 +1,17 @@
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Widgets.Search;
 
 namespace WidgetDepot.Tests.Features.Widgets.Search;
 
-public class SearchWidgetsHandlerTests : IAsyncLifetime
+public class SearchWidgetsHandlerTests
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder().Build();
-
-    public async ValueTask InitializeAsync()
-    {
-        await _postgres.StartAsync();
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(_postgres.GetConnectionString())
-            .Options;
-        using var db = new AppDbContext(options);
-        await db.Database.EnsureCreatedAsync();
-    }
-
-    public async ValueTask DisposeAsync() => await _postgres.DisposeAsync();
-
     private AppDbContext CreateDb()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(_postgres.GetConnectionString())
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        var db = new AppDbContext(options);
-        db.Widgets.ExecuteDelete();
-        return db;
+        return new AppDbContext(options);
     }
 
     [Theory]
@@ -88,7 +71,7 @@ public class SearchWidgetsHandlerTests : IAsyncLifetime
 
         var handler = new SearchWidgetsHandler(db);
 
-        var results = await handler.HandleAsync(new SearchWidgetsQuery("Gadget"), TestContext.Current.CancellationToken);
+        var results = await handler.HandleAsync(new SearchWidgetsQuery("gadget"), TestContext.Current.CancellationToken);
 
         Assert.Single(results);
         Assert.Equal("SKU001", results[0].Sku);

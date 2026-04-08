@@ -22,11 +22,11 @@ public class SearchWidgetsHandler(AppDbContext db)
         if (string.IsNullOrWhiteSpace(query.Term))
             return [];
 
-        var term = query.Term.Trim();
+        var term = query.Term.Trim().ToLower();
 
         return await db.Widgets
-            .Where(w => EF.Functions.Like(w.Name, $"%{term}%") ||
-                        EF.Functions.Like(w.Description, $"%{term}%"))
+            .Where(w => w.Name.ToLower().Contains(term) ||
+                        w.Description.ToLower().Contains(term))
             .Select(w => new WidgetResult(
                 w.Id,
                 w.Sku,
