@@ -3,5 +3,5 @@
   <Project Path="src/WidgetDepot.AppHost/WidgetDepot.AppHost.csproj" />
   <Project Path="src/WidgetDepot.ServiceDefaults/WidgetDepot.ServiceDefaults.csproj" />
   <Project Path="src/WidgetDepot.Web/WidgetDepot.Web.csproj" />
-  <Project Path="test/WidgetDepot.Tests/WidgetDepot.Tests.csproj" />
+  <Project Path="tests/WidgetDepot.Tests/WidgetDepot.Tests.csproj" />
 </Solution>
