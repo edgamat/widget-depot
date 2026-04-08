@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WidgetDepot.ApiService.Data;
-using WidgetDepot.ApiService.Features.SearchWidgets;
+using WidgetDepot.ApiService.Features.Widgets.Search;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,36 +33,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
+app.MapGet("/", () => "API service is running.");
 
-app.MapGet("/", () => "API service is running. Navigate to /weatherforecast to see sample data.");
-
-app.MapGet("/widgets/search", async (string? term, SearchWidgetsHandler handler) =>
-{
-    var results = await handler.HandleAsync(new SearchWidgetsQuery(term));
-    return Results.Ok(results);
-})
-.WithName("SearchWidgets");
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapApiEndpoints();
 
 app.MapDefaultEndpoints();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

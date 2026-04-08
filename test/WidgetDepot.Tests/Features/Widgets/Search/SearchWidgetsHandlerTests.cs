@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WidgetDepot.ApiService.Data;
-using WidgetDepot.ApiService.Features.SearchWidgets;
+using WidgetDepot.ApiService.Features.Widgets.Search;
 
-namespace WidgetDepot.Tests.Features.SearchWidgets;
+namespace WidgetDepot.Tests.Features.Widgets.Search;
 
 public class SearchWidgetsHandlerTests
 {
@@ -25,7 +25,8 @@ public class SearchWidgetsHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var handler = new SearchWidgetsHandler(db);
-        var results = await handler.HandleAsync(new SearchWidgetsQuery(term));
+
+        var results = await handler.HandleAsync(new SearchWidgetsQuery(term), TestContext.Current.CancellationToken);
 
         Assert.Empty(results);
     }

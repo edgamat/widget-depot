@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WidgetDepot.ApiService.Data;
 
-namespace WidgetDepot.ApiService.Features.SearchWidgets;
+namespace WidgetDepot.ApiService.Features.Widgets.Search;
 
 public record SearchWidgetsQuery(string? Term);
 
@@ -17,7 +17,7 @@ public record WidgetResult(
 
 public class SearchWidgetsHandler(AppDbContext db)
 {
-    public async Task<IReadOnlyList<WidgetResult>> HandleAsync(SearchWidgetsQuery query)
+    public async Task<IReadOnlyList<WidgetResult>> HandleAsync(SearchWidgetsQuery query, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(query.Term))
             return [];
@@ -36,6 +36,6 @@ public class SearchWidgetsHandler(AppDbContext db)
                 w.Weight,
                 w.Price,
                 w.DateAvailable))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }
