@@ -22,6 +22,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Widget>(entity =>
         {
             entity.HasIndex(w => w.Sku).IsUnique();
+            entity.Property(w => w.Name).UseCollation("C");
+            entity.Property(w => w.Description).UseCollation("C");
             entity.Property(w => w.Weight).HasPrecision(10, 3);
             entity.Property(w => w.Price).HasPrecision(10, 2);
         });
