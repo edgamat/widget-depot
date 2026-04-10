@@ -1,0 +1,82 @@
+@page "/admin/catalog-import"
+@rendermode InteractiveServer
+@inject CatalogImportService CatalogImportService
+
+<PageTitle>Catalog Import</PageTitle>
+
+<h1>Catalog Import</h1>
+
+<div class="mb-3">
+    <InputFile OnChange="HandleFileSelected" accept=".csv" class="form-control" />
+</div>
+
+<button class="btn btn-primary" @onclick="HandleImport" disabled="@(selectedFile is null || isImporting)">
+    @if (isImporting)
+    {
+        <span>Importing...</span>
+    }
+    else
+    {
+        <span>Import</span>
+    }
+</button>
+
+@if (importResult is not null)
+{
+    <div class="alert alert-success mt-4">
+        <strong>Import complete.</strong>
+        <ul class="mb-0 mt-2">
+            <li>Inserted: @importResult.Inserted</li>
+            <li>Updated: @importResult.Updated</li>
+            <li>Skipped: @importResult.Skipped</li>
+        </ul>
+    </div>
+}
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger mt-4">@errorMessage</div>
+}
+
+@code {
+    private IBrowserFile? selectedFile;
+    private ImportResult? importResult;
+    private string? errorMessage;
+    private bool isImporting;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        importResult = null;
+        errorMessage = null;
+    }
+
+    private async Task HandleImport()
+    {
+        if (selectedFile is null)
+            return;
+
+        isImporting = true;
+        importResult = null;
+        errorMessage = null;
+
+        try
+        {
+            await using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            var result = await CatalogImportService.ImportAsync(stream, selectedFile.Name);
+
+            if (result is null)
+                errorMessage = "Import failed. Please check that the CSV file has the correct format.";
+            else
+                importResult = result;
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred during import.";
+        }
+        finally
+        {
+            isImporting = false;
+        }
+    }
+}

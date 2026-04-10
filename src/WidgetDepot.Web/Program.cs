@@ -1,4 +1,5 @@
 using WidgetDepot.Web.Components;
+using WidgetDepot.Web.Features.Admin.CatalogImport;
 using WidgetDepot.Web.Features.Catalog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient<CatalogService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"));
+
+builder.Services.AddHttpClient<CatalogImportService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
 
 var app = builder.Build();
