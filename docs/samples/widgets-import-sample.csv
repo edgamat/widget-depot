@@ -1,0 +1,13 @@
+SKU,Name,Description,Manufacturer,Weight,Price,Date Available
+WGT-001,Flux Capacitor,Enables time travel when 1.21 gigawatts applied,Outatime Industries,1.21,9999.99,2025-10-26
+WGT-002,Turbo Encabulator,Automatically synchronises cardinal grammeters,Rockwell Automation,4.50,349.00,2025-01-15
+WGT-003,Sonic Screwdriver,Unlocks almost anything except deadlock seals,Gallifrey Tech,0.18,89.95,2024-06-01
+WGT-004,Infinite Improbability Drive,Passes through every conceivable point simultaneously,Sirius Cybernetics,42.00,1.00,2025-03-07
+WGT-005,Dilithium Crystal,Regulates matter/antimatter annihilation reaction,Federation Surplus,0.75,4200.00,2026-01-01
+,Missing SKU Widget,This row should be skipped,Acme Corp,1.00,19.99,2025-01-01
+WGT-007,,Missing Name Widget — skipped,Acme Corp,1.00,19.99,2025-01-01
+WGT-008,Missing Price Widget,This row should be skipped,Acme Corp,1.00,,2025-01-01
+WGT-009,Bad Price Widget,Price is not a decimal — skipped,Acme Corp,1.00,not-a-price,2025-01-01
+WGT-010,Bad Date Widget,Date is not valid — skipped,Acme Corp,1.00,49.99,not-a-date
+WGT-011,Phaser Type II,Adjustable beam from stun to disintegrate,Federation Surplus,0.62,599.00,2025-11-30
+WGT-012,Gravity Boots,Walk on any surface regardless of orientation,Aperture Science,2.30,129.99,2025-08-15
