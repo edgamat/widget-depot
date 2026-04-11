@@ -11,7 +11,7 @@ public static class SearchWidgetEndpoint
             return Results.Ok(results);
         })
         .WithName("SearchWidgets");
-        
+
         return app;
     }
 }

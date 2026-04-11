@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "dotnet format",
+            "timeout": 60,
+            "statusMessage": "Running dotnet format..."
+          },
+          {
+            "type": "command",
+            "if": "Bash(gh pr create*)",
+            "command": "dotnet format",
+            "timeout": 60,
+            "statusMessage": "Running dotnet format..."
+          }
+        ]
+      }
+    ]
+  }
+}
