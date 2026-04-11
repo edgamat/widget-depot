@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Widgets.Search;
 
