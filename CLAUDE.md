@@ -1,6 +1,14 @@
 # CLAUDE.md
 
-This file contains standing instructions for Claude Code when working in this repository.
+This is a public-facing widget ordering application using ASP.NET Blazor 10.0 and Postgres.
+
+---
+
+## Key Commands
+
+- `dotnet build` for building the application
+- `dotnet test` for running the test suite
+- `aspire run` for running the application
 
 ---
 
