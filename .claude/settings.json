@@ -7,19 +7,13 @@
           {
             "type": "command",
             "if": "Bash(git commit*)",
-            "command": "dotnet format",
-            "timeout": 60,
-            "statusMessage": "Running dotnet format..."
-          },
-          {
-            "type": "command",
-            "if": "Bash(gh pr create*)",
-            "command": "dotnet format",
+            "command": "dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations",
             "timeout": 60,
             "statusMessage": "Running dotnet format..."
           }
         ]
       }
     ]
-  }
+  },
+  "plansDirectory": ".plans"
 }
