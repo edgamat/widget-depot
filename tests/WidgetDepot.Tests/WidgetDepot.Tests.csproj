@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WidgetDepot.AppHost\WidgetDepot.AppHost.csproj" />
     <ProjectReference Include="..\..\src\WidgetDepot.ApiService\WidgetDepot.ApiService.csproj" />
+    <ProjectReference Include="..\..\src\WidgetDepot.Web\WidgetDepot.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

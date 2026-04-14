@@ -1,4 +1,5 @@
 using WidgetDepot.Web.Components;
+using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
 using WidgetDepot.Web.Features.Catalog;
 
@@ -15,6 +16,9 @@ builder.Services.AddHttpClient<CatalogService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
 
 builder.Services.AddHttpClient<CatalogImportService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"));
+
+builder.Services.AddHttpClient<RegisterService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
 
 var app = builder.Build();
