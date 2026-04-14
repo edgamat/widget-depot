@@ -25,8 +25,7 @@ public class RegisterService(HttpClient httpClient)
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             using var doc = JsonDocument.Parse(body);
 
-            if (doc.RootElement.TryGetProperty("extensions", out var extensions) &&
-                extensions.TryGetProperty("errorCode", out var errorCode) &&
+            if (doc.RootElement.TryGetProperty("errorCode", out var errorCode) &&
                 errorCode.GetString() == "EmailAlreadyRegistered")
             {
                 return new RegisterResult.EmailAlreadyRegistered();

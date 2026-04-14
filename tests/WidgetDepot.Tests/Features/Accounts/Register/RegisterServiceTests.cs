@@ -38,9 +38,7 @@ public class RegisterServiceTests
     {
         var body = """
             {
-              "extensions": {
                 "errorCode": "EmailAlreadyRegistered"
-              }
             }
             """;
         var service = CreateService(HttpStatusCode.Conflict, body);
@@ -61,7 +59,7 @@ public class RegisterServiceTests
     [Fact]
     public async Task RegisterAsync_ConflictWithOtherErrorCode_ReturnsFailure()
     {
-        var body = """{"extensions": {"errorCode": "OtherError"}}""";
+        var body = """{"errorCode": "OtherError"}""";
         var service = CreateService(HttpStatusCode.Conflict, body);
         var form = new RegisterFormModel
         {
