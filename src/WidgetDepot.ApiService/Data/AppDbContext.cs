@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Widget> Widgets => Set<Widget>();
+    public DbSet<Customer> Customers => Set<Customer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +27,11 @@ public class AppDbContext : DbContext
             entity.Property(w => w.Description).UseCollation("C");
             entity.Property(w => w.Weight).HasPrecision(10, 3);
             entity.Property(w => w.Price).HasPrecision(10, 2);
+        });
+
+        modelBuilder.Entity<Customer>(entity =>
+        {
+            entity.HasIndex(c => c.Email).IsUnique();
         });
     }
 }

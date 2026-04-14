@@ -7,7 +7,7 @@
           {
             "type": "command",
             "if": "Bash(git commit*)",
-            "command": "dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations",
+            "command": "dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations && git add -u",
             "timeout": 60,
             "statusMessage": "Running dotnet format..."
           }
