@@ -16,6 +16,7 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
+builder.Services.AddAuthorization();
 
 builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
 builder.Services.AddScoped<SearchWidgetsHandler>();
