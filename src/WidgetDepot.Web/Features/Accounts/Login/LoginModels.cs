@@ -12,9 +12,11 @@ public class LoginFormModel
     public string Password { get; set; } = string.Empty;
 }
 
+public record LoginResponse(int CustomerId, string Email, string FirstName);
+
 public abstract record LoginResult
 {
-    public record Success(int CustomerId, string Email, string FirstName) : LoginResult;
+    public record Success(LoginResponse Customer) : LoginResult;
     public record InvalidCredentials : LoginResult;
     public record Failure : LoginResult;
 }

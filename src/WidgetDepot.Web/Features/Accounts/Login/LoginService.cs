@@ -17,15 +17,8 @@ public class LoginService(HttpClient httpClient)
 
         if (response.IsSuccessStatusCode)
         {
-            var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            using var doc = JsonDocument.Parse(body);
-            var root = doc.RootElement;
-
-            var customerId = root.GetProperty("customerId").GetInt32();
-            var email = root.GetProperty("email").GetString() ?? string.Empty;
-            var firstName = root.GetProperty("firstName").GetString() ?? string.Empty;
-
-            return new LoginResult.Success(customerId, email, firstName);
+            var customer = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken);
+            return new LoginResult.Success(customer!);
         }
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)

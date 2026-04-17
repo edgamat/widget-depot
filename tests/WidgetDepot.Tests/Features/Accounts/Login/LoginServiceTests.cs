@@ -24,9 +24,9 @@ public class LoginServiceTests
         var result = await service.LoginAsync(form, TestContext.Current.CancellationToken);
 
         var success = result.ShouldBeOfType<LoginResult.Success>();
-        success.CustomerId.ShouldBe(42);
-        success.Email.ShouldBe("jane@example.com");
-        success.FirstName.ShouldBe("Jane");
+        success.Customer.CustomerId.ShouldBe(42);
+        success.Customer.Email.ShouldBe("jane@example.com");
+        success.Customer.FirstName.ShouldBe("Jane");
     }
 
     [Fact]
