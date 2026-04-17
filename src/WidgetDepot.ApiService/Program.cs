@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.Register;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
@@ -17,6 +18,7 @@ builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
 builder.Services.AddScoped<SearchWidgetsHandler>();
 builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();
+builder.Services.AddScoped<LoginHandler>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
