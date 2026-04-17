@@ -1,6 +1,10 @@
+using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 using WidgetDepot.Web.Components;
+using WidgetDepot.Web.Features.Accounts.Login;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
 using WidgetDepot.Web.Features.Catalog;
@@ -30,6 +34,9 @@ builder.Services.AddHttpClient<CatalogImportService>(client =>
 builder.Services.AddHttpClient<RegisterService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
 
+builder.Services.AddHttpClient<LoginService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"));
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -52,5 +59,19 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.MapDefaultEndpoints();
+
+app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName) =>
+{
+    var claims = new List<Claim>
+    {
+        new(ClaimTypes.NameIdentifier, customerId.ToString()),
+        new(ClaimTypes.Email, email),
+        new(ClaimTypes.Name, firstName)
+    };
+    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    var principal = new ClaimsPrincipal(identity);
+    await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+    return Results.Redirect("/");
+});
 
 app.Run();
