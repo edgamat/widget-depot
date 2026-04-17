@@ -6,7 +6,7 @@
 - You tell Claude Code: "Let's work on issue #12"
 - Claude Code reads the issue with `gh issue view 12`, understands the task, and starts working
 - As work progresses, it (or you) can post progress updates as issue comments with `gh issue comment`
-- When done, Claude Code opens a PR linked to the issue with `gh pr create`
+- When done, Claude Code pushes the commits to the remote repo and then Claude Code opens a PR linked to the issue with `gh pr create`
 - You review, merge, and the issue closes automatically
 
 ## GitHub CLI Usage
