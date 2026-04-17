@@ -1,4 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(git push*)",
+      "Bash(gh issue view*)",
+      "Bash(gh pr create*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -6,8 +15,8 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git commit*)",
             "command": "dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations && git add -u",
+            "if": "Bash(git commit*)",
             "timeout": 60,
             "statusMessage": "Running dotnet format..."
           }
