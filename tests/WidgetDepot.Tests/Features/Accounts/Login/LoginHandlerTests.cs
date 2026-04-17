@@ -74,4 +74,17 @@ public class LoginHandlerTests
 
         result.ShouldBeOfType<LoginError.InvalidCredentials>();
     }
+
+    [Fact]
+    public async Task HandleAsync_DatabaseThrows_ReturnsFailure()
+    {
+        var db = CreateDb();
+        db.Dispose();
+        var handler = new LoginHandler(db);
+        var request = new LoginRequest("jane@example.com", "P@ssw0rd!");
+
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<LoginError.Failure>();
+    }
 }
