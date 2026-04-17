@@ -20,6 +20,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/accounts/login";
     });
 builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -71,6 +72,12 @@ app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, st
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
     var principal = new ClaimsPrincipal(identity);
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+    return Results.Redirect("/");
+});
+
+app.MapGet("/accounts/logout", async (HttpContext context) =>
+{
+    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.Redirect("/");
 });
 
