@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 using WidgetDepot.Web.Components;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
@@ -7,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/accounts/login";
+    });
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -33,6 +42,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapStaticAssets();
 
