@@ -1,11 +1,16 @@
+using System.Security.Claims;
+
 namespace WidgetDepot.ApiService.Features.Accounts.Profile;
 
 public static class ProfileEndpoint
 {
     public static IEndpointRouteBuilder MapProfile(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/accounts/profile/{customerId:int}", async (int customerId, ProfileHandler handler, CancellationToken cancellationToken) =>
+        app.MapGet("/accounts/profile", async (ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
         {
+            if (!TryGetCustomerId(user, out var customerId))
+                return Results.Unauthorized();
+
             var result = await handler.GetAsync(customerId, cancellationToken);
 
             return result switch
@@ -15,10 +20,14 @@ public static class ProfileEndpoint
                 _ => Results.Problem(statusCode: 500)
             };
         })
-        .WithName("GetProfile");
+        .WithName("GetProfile")
+        .RequireAuthorization();
 
-        app.MapPut("/accounts/profile/{customerId:int}", async (int customerId, UpdateProfileRequest request, ProfileHandler handler, CancellationToken cancellationToken) =>
+        app.MapPut("/accounts/profile", async (UpdateProfileRequest request, ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
         {
+            if (!TryGetCustomerId(user, out var customerId))
+                return Results.Unauthorized();
+
             var result = await handler.UpdateAsync(customerId, request, cancellationToken);
 
             return result switch
@@ -32,8 +41,15 @@ public static class ProfileEndpoint
                 _ => Results.Problem(statusCode: 500)
             };
         })
-        .WithName("UpdateProfile");
+        .WithName("UpdateProfile")
+        .RequireAuthorization();
 
         return app;
+    }
+
+    private static bool TryGetCustomerId(ClaimsPrincipal user, out int customerId)
+    {
+        var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return int.TryParse(claim, out customerId);
     }
 }
