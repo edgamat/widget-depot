@@ -6,9 +6,9 @@ public static class ProfileEndpoint
 {
     public static IEndpointRouteBuilder MapProfile(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/accounts/profile", async (ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
+        app.MapGet("/accounts/profile", async (ClaimsPrincipal user, HttpContext httpContext, ProfileHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!TryGetCustomerId(user, out var customerId))
+            if (!TryGetCustomerId(user, httpContext, out var customerId))
                 return Results.Unauthorized();
 
             var result = await handler.GetAsync(customerId, cancellationToken);
@@ -23,9 +23,9 @@ public static class ProfileEndpoint
         .WithName("GetProfile")
         .RequireAuthorization();
 
-        app.MapPut("/accounts/profile", async (UpdateProfileRequest request, ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
+        app.MapPut("/accounts/profile", async (UpdateProfileRequest request, ClaimsPrincipal user, HttpContext httpContext, ProfileHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!TryGetCustomerId(user, out var customerId))
+            if (!TryGetCustomerId(user, httpContext, out var customerId))
                 return Results.Unauthorized();
 
             var result = await handler.UpdateAsync(customerId, request, cancellationToken);
@@ -47,9 +47,15 @@ public static class ProfileEndpoint
         return app;
     }
 
-    private static bool TryGetCustomerId(ClaimsPrincipal user, out int customerId)
+    private static bool TryGetCustomerId(ClaimsPrincipal user, HttpContext httpContext, out int customerId)
     {
         var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(claim, out customerId);
+        if (int.TryParse(claim, out customerId))
+            return true;
+
+        // Service-to-service fallback: Web app forwards the authenticated customer's ID via header.
+        // The ApiService is not externally exposed in Aspire, so this header is trusted.
+        var header = httpContext.Request.Headers["X-Customer-Id"].FirstOrDefault();
+        return int.TryParse(header, out customerId);
     }
 }

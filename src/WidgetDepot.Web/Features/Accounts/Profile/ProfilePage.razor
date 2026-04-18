@@ -1,0 +1,136 @@
+@page "/accounts/profile"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@attribute [Authorize]
+@inject ProfileService ProfileService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Profile</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1>Profile</h1>
+
+        @if (isLoading)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            @if (errorMessage is not null)
+            {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+
+            <EditForm Model="form" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <InputText id="firstName" class="form-control" @bind-Value="form.FirstName" />
+                    <ValidationMessage For="() => form.FirstName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <InputText id="lastName" class="form-control" @bind-Value="form.LastName" />
+                    <ValidationMessage For="() => form.LastName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email Address</label>
+                    <InputText id="email" type="email" class="form-control" @bind-Value="form.Email" />
+                    <ValidationMessage For="() => form.Email" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span>Saving...</span>
+                    }
+                    else
+                    {
+                        <span>Save</span>
+                    }
+                </button>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    private readonly ProfileFormModel form = new();
+    private string? errorMessage;
+    private bool isLoading = true;
+    private bool isSubmitting;
+    private int customerId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        customerId = int.Parse(authState.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        try
+        {
+            var result = await ProfileService.GetProfileAsync(customerId);
+
+            switch (result)
+            {
+                case ProfileGetResult.Success success:
+                    form.FirstName = success.Profile.FirstName;
+                    form.LastName = success.Profile.LastName;
+                    form.Email = success.Profile.Email;
+                    break;
+                default:
+                    errorMessage = "Unable to load your profile. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Unable to load your profile. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await ProfileService.UpdateProfileAsync(customerId, form);
+
+            switch (result)
+            {
+                case ProfileUpdateResult.Success success:
+                    var url = $"/accounts/do-update-profile?customerId={customerId}&firstName={Uri.EscapeDataString(success.Profile.FirstName)}&email={Uri.EscapeDataString(success.Profile.Email)}";
+                    NavigationManager.NavigateTo(url, forceLoad: true);
+                    break;
+                case ProfileUpdateResult.DuplicateEmail:
+                    errorMessage = "An account with this email address already exists.";
+                    break;
+                default:
+                    errorMessage = "An unexpected error occurred. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

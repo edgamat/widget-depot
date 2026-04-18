@@ -5,8 +5,11 @@
       "Skill(update-config:*)",
       "Bash(git push*)",
       "Bash(gh issue view*)",
+      "Bash(gh repo view*)",
       "Bash(gh pr create*)",
-      "Bash(git commit*)"
+      "Bash(git commit*)",
+      "Bash(find /home/matt/Source/widget-depot/*)",
+      "Bash(git restore *)"
     ]
   },
   "hooks": {
