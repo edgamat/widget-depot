@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Accounts.Login;
+using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<SearchWidgetsHandler>();
 builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<ProfileHandler>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
