@@ -1,4 +1,5 @@
 using WidgetDepot.ApiService.Features.Accounts.Login;
+using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
 
@@ -11,6 +12,7 @@ public static class AccountEndpointExtensions
         app.MapRegister();
         app.MapLogin();
         app.MapProfile();
+        app.MapPasswordChange();
 
         return app;
     }

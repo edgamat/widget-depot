@@ -4,6 +4,7 @@
       "Skill(update-config)",
       "Skill(update-config:*)",
       "Bash(git push*)",
+      "Bash(git pull)",
       "Bash(gh issue view*)",
       "Bash(gh pr create*)",
       "Bash(git commit*)",
