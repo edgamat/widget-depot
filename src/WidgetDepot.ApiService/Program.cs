@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Accounts.Login;
+using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
 using WidgetDepot.ApiService.Features.Widgets.Import;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<ProfileHandler>();
+builder.Services.AddScoped<PasswordChangeHandler>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
