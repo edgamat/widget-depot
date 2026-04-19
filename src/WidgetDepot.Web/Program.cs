@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 using WidgetDepot.Web.Components;
 using WidgetDepot.Web.Features.Accounts.Login;
+using WidgetDepot.Web.Features.Accounts.Profile;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
 using WidgetDepot.Web.Features.Catalog;
+using WidgetDepot.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<CookieForwardingHandler>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -37,6 +41,10 @@ builder.Services.AddHttpClient<RegisterService>(client =>
 
 builder.Services.AddHttpClient<LoginService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
+
+builder.Services.AddHttpClient<ProfileService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
 
 var app = builder.Build();
 
@@ -61,7 +69,7 @@ app.MapRazorComponents<App>()
 
 app.MapDefaultEndpoints();
 
-app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName) =>
+app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName, string? returnUrl) =>
 {
     var claims = new List<Claim>
     {
@@ -72,7 +80,10 @@ app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, st
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
     var principal = new ClaimsPrincipal(identity);
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-    return Results.Redirect("/");
+    var target = !string.IsNullOrEmpty(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative)
+        ? returnUrl
+        : "/";
+    return Results.Redirect(target);
 });
 
 app.MapGet("/accounts/logout", async (HttpContext context) =>
