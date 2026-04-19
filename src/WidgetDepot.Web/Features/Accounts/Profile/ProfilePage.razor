@@ -1,0 +1,138 @@
+@page "/accounts/profile"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ProfileService ProfileService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>My Profile</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1>My Profile</h1>
+
+        @if (showSaveConfirmation)
+        {
+            <div class="alert alert-success">
+                Your profile has been updated.
+            </div>
+        }
+
+        @if (errorMessage is not null)
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+
+        @if (isLoading)
+        {
+            <p>Loading...</p>
+        }
+        else if (loadFailed)
+        {
+            <div class="alert alert-danger">Unable to load your profile. Please try again later.</div>
+        }
+        else
+        {
+            <EditForm Model="form" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <InputText id="firstName" class="form-control" @bind-Value="form.FirstName" />
+                    <ValidationMessage For="() => form.FirstName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <InputText id="lastName" class="form-control" @bind-Value="form.LastName" />
+                    <ValidationMessage For="() => form.LastName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email Address</label>
+                    <InputText id="email" type="email" class="form-control" @bind-Value="form.Email" />
+                    <ValidationMessage For="() => form.Email" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span>Saving...</span>
+                    }
+                    else
+                    {
+                        <span>Save</span>
+                    }
+                </button>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "saved")]
+    public bool showSaveConfirmation { get; set; }
+
+    private readonly ProfileFormModel form = new();
+    private string? errorMessage;
+    private bool isLoading = true;
+    private bool loadFailed;
+    private bool isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProfileService.LoadAsync();
+
+        switch (result)
+        {
+            case LoadProfileResult.Success success:
+                form.FirstName = success.Profile.FirstName;
+                form.LastName = success.Profile.LastName;
+                form.Email = success.Profile.Email;
+                break;
+            default:
+                loadFailed = true;
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await ProfileService.UpdateAsync(form);
+
+            switch (result)
+            {
+                case UpdateProfileResult.Success success:
+                    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                    var customerId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+                    var url = $"/accounts/do-signin?customerId={Uri.EscapeDataString(customerId)}&email={Uri.EscapeDataString(success.Profile.Email)}&firstName={Uri.EscapeDataString(success.Profile.FirstName)}&returnUrl={Uri.EscapeDataString("/accounts/profile?saved=true")}";
+                    NavigationManager.NavigateTo(url, forceLoad: true);
+                    break;
+                case UpdateProfileResult.DuplicateEmail:
+                    errorMessage = "An account with this email address already exists.";
+                    break;
+                default:
+                    errorMessage = "An unexpected error occurred. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
