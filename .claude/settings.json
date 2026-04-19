@@ -6,7 +6,8 @@
       "Bash(git push*)",
       "Bash(gh issue view*)",
       "Bash(gh pr create*)",
-      "Bash(git commit*)"
+      "Bash(git commit*)",
+      "Bash(git stash *)"
     ]
   },
   "hooks": {
