@@ -4,6 +4,8 @@
 
 - You create an issue in GitHub (via the web UI or `gh issue create`)
 - You tell Claude Code: "Let's work on issue #12"
+- Claude Code checks out the main branch and pulls down the latest commits.
+- Claude Code creates a branch named `issue-<number>-short-description` before making any changes
 - Claude Code reads the issue with `gh issue view 12`, understands the task, and starts working
 - As work progresses, it (or you) can post progress updates as issue comments with `gh issue comment`
 - When done, Claude Code pushes the commits to the remote repo and then Claude Code opens a PR linked to the issue with `gh pr create`
@@ -17,7 +19,7 @@
 - Post a comment on the issue when starting work: "Starting work on this issue"
 - Post progress comments on the issue as significant steps are completed
 - Check off acceptance criteria checkboxes in the issue as each one is completed using `gh issue edit`
-- When work is complete, open a PR using `gh pr create` with "Closes #<number>" in the body
+- When work is complete, push the commits to the remote repo and open a PR using `gh pr create` with "Closes #<number>" in the body
 - Never commit directly to main
 
 ---
