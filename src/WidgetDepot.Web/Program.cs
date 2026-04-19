@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 
 using WidgetDepot.Web.Components;
 using WidgetDepot.Web.Features.Accounts.Login;
+using WidgetDepot.Web.Features.Accounts.PasswordChange;
 using WidgetDepot.Web.Features.Accounts.Profile;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
@@ -47,6 +48,10 @@ builder.Services.AddHttpClient<LoginService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
 
 builder.Services.AddHttpClient<ProfileService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
+
+builder.Services.AddHttpClient<PasswordChangeService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"))
     .AddHttpMessageHandler<CookieForwardingHandler>();
 
