@@ -65,7 +65,8 @@ Each feature slice lives entirely within its own folder under `Features/`. A typ
 ```
 Features/Catalog/
 ├── CatalogPage.razor           # Blazor page component
-├── CatalogPage.razor.cs        # Code-behind (if needed)
+├── CatalogPage.razor.cs        # Code-behind
+├── CatalogPage.razor.css       # CSS rules
 ├── CatalogService.cs           # Calls ApiService and handles UI logic for this slice
 └── CatalogModels.cs            # DTOs and view models for this slice
 ```
@@ -81,7 +82,7 @@ Slices do not share services or models with each other. Each slice calls ApiServ
 | UI Framework | Blazor Web App (.NET 10) |
 | CSS | Bootstrap 5.3 |
 | Database | PostgreSQL via EF Core |
-| Authentication | Azure Entra (OIDC); disabled locally |
+| Authentication | Individual authentication (cookies) |
 | Local hosting | .NET Aspire |
 | Logging / Tracing | OpenTelemetry + `ILogger<T>` |
 | Testing | xUnit |

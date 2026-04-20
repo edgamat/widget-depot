@@ -34,8 +34,8 @@ When breaking down stories into tasks, the coding tasks should include unit test
 
 ## General Coding Conventions
 
-> refer to the [architecture](./docs/standards/architecture.md) for the solution structure and technologies to use.
+Refer to the [architecture](./docs/standards/architecture.md) for the solution structure and technologies to use.
 
-> refer to the [testing](./docs/standards/testing.md) for testing packages and conventions.
+When writing C# classes, you MUST read and follow [code-design](./docs/standards/code-design.md) before writing any code.
 
-> refer to the [code-design](./docs/standards/code-design.md) for guidance on C# class design.
+When writing C# unit tests, you MUST read and follow [testing](./docs/standards/testing.md) before writing any code.

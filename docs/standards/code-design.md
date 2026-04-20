@@ -6,7 +6,7 @@ This document describes the approach and conventions for code design in the Widg
 
 ## Approach
 
-- Attempt to adhere to the SOLID priciples
+- Attempt to adhere to the SOLID principles
 
 | Principle | Summary |
 | --------- | ------- |
@@ -18,10 +18,12 @@ This document describes the approach and conventions for code design in the Widg
 
 - Keep the number of dependencies of a class to a minimum. Write unit tests to guide your work. If a class is hard to test, it probably needs to be changed. 
 
-- Prefer pure functions/methods where possible. Try to keep the side-affects out of the core business logic. This typically leads to better design and makes things ealier to test.
+- Prefer pure functions/methods where possible. Try to keep the side-affects out of the core business logic. This typically leads to better design and makes things easier to test.
 
 ## C# Specifics
 
+- Use file-scoped namespaces
 - Don't use primary constructors
 - Don't use the null-forgiving operator (!) where possible (obey the compiler).
 - All methods that return an awaitable task should include an `Async` suffix in their name. Note, this does not apply to unit test methods
+- Remove unused using directives
