@@ -19,7 +19,7 @@ stored on the order.
 
 **In scope:**
 - Step 3 of the wizard: display of the calculated shipping estimate
-- Calling the third-party shipping API with total widget weight and destination address to obtain the estimate
+- Calling the third-party shipping API on every arrival at step 3 to obtain a fresh estimate (including when resuming a draft that already has a stored estimate), overwriting any previously stored value
 - Storing the estimated shipping cost (`ShippingEstimate`, decimal) on the `Order` entity
 - EF Core migration for the new column if not already present
 - A "Back" button that returns to step 2
@@ -28,7 +28,6 @@ stored on the order.
 
 **Out of scope:**
 - Actual payment or charge (WDI does not process payments)
-- Re-calculating the estimate if the customer goes back and changes widgets or address (the estimate is fetched once on arrival at this step)
 - Displaying a guaranteed shipping date
 
 ## Developer Notes
@@ -43,7 +42,7 @@ stored on the order.
 ## Acceptance Criteria
 
 - [ ] Step 3 is only reachable after step 2 has been completed (order has addresses)
-- [ ] On arrival at step 3, the system calls the third-party shipping API and displays the returned estimate
+- [ ] On arrival at step 3, the system **always** calls the third-party shipping API for a fresh estimate and displays the result, overwriting any previously stored estimate
 - [ ] The displayed estimate shows the cost in dollars (or the appropriate currency)
 - [ ] If the API call fails, an error message is shown and a "Retry" option is available; the wizard does not advance
 - [ ] The estimated shipping cost is stored on the order

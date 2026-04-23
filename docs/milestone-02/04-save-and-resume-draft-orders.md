@@ -18,13 +18,12 @@ longer want. Draft orders expire automatically after 30 days (story 06).
 **In scope:**
 - An authenticated page at `/orders` listing the customer's draft orders
 - Each row displays: order ID, number of widgets, created date, expiry date (created + 30 days)
-- A "Continue" action per row that returns the customer to the correct wizard step (the first step that is incomplete)
+- A "Resume" action per row that always returns the customer to step 1 of the wizard
 - A "Delete" action per row that removes the draft order after confirmation
 - An empty state message when the customer has no draft orders
 
 **Out of scope:**
 - Listing submitted orders (not part of this milestone)
-- Editing widgets or addresses on a draft that has already progressed past those steps (deferred)
 - Pagination (if needed it can be added later)
 
 ## Developer Notes
@@ -32,7 +31,7 @@ longer want. Draft orders expire automatically after 30 days (story 06).
 - New feature slice: `WidgetDepot.Web/Features/Orders/List/`
 - New API endpoint: `WidgetDepot.ApiService/Features/Orders/GetDrafts/` (returns drafts for the authenticated customer)
 - New API endpoint: `WidgetDepot.ApiService/Features/Orders/DeleteDraft/`
-- The "correct wizard step" for resuming is determined by which data is missing: no addresses → step 2; no shipping estimate → step 3; all complete → step 3 (re-review before submitting)
+- "Resume" always navigates to `/orders/{orderId}/step1`; the customer works through the wizard from step 1 each time they resume a draft
 - Delete should be a soft confirmation (e.g., a modal or inline confirmation prompt) to prevent accidental removal
 - Patterns to follow: Vertical Slice Architecture; EF Core for data access; Bootstrap 5.3 for layout; no MediatR
 
@@ -41,7 +40,7 @@ longer want. Draft orders expire automatically after 30 days (story 06).
 - [ ] An unauthenticated visitor attempting to navigate to `/orders` is redirected to login
 - [ ] An authenticated customer with no draft orders sees an empty state message
 - [ ] An authenticated customer with draft orders sees each draft listed with: order ID, widget count, created date, and expiry date
-- [ ] Clicking "Continue" on a draft navigates the customer back into the wizard at the appropriate incomplete step, with previously entered data still present
+- [ ] Clicking "Resume" on a draft navigates the customer to step 1 of the wizard, with previously selected widgets pre-populated
 - [ ] Clicking "Delete" on a draft prompts the customer to confirm before deleting
 - [ ] Confirming the delete removes the draft order and it no longer appears in the list
 - [ ] Unit tests are written where appropriate
