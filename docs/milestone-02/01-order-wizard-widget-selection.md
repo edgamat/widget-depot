@@ -30,7 +30,6 @@ This story also introduces the core `Order` and `OrderItem` data model.
 - Address entry (step 2, story 02)
 - Shipping cost estimate (step 3, story 03)
 - Submitting the order (story 05)
-- Editing an existing draft's widget selection after leaving this step (deferred)
 
 ## Developer Notes
 
