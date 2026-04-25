@@ -55,22 +55,6 @@ public class CreateDraftOrderHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_ValidRequest_CapturesWidgetWeightAtOrderTime()
-    {
-        using var db = CreateDb();
-        db.Widgets.Add(new Widget { Id = 1, Name = "Sprocket", Sku = "SPR-001", Weight = 2.75m });
-        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        var handler = new CreateDraftOrderHandler(db);
-        var request = new CreateDraftOrderRequest([new CreateDraftOrderItemRequest(1, 1)]);
-
-        await handler.HandleAsync(1, request, TestContext.Current.CancellationToken);
-
-        var order = await db.Orders.Include(o => o.Items).FirstAsync(TestContext.Current.CancellationToken);
-        order.Items.First().WidgetWeight.ShouldBe(2.75m);
-    }
-
-    [Fact]
     public async Task HandleAsync_UnknownWidgetId_ReturnsWidgetNotFound()
     {
         using var db = CreateDb();

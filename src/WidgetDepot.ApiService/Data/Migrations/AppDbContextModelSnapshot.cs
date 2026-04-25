@@ -96,10 +96,6 @@ namespace WidgetDepot.ApiService.Data.Migrations
                     b.Property<int>("WidgetId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("WidgetWeight")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("numeric(10,3)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");

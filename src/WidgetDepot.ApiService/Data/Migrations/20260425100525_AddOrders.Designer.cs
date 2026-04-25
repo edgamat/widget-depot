@@ -12,7 +12,7 @@ using WidgetDepot.ApiService.Data;
 namespace WidgetDepot.ApiService.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260425085731_AddOrders")]
+    [Migration("20260425100525_AddOrders")]
     partial class AddOrders
     {
         /// <inheritdoc />
@@ -98,10 +98,6 @@ namespace WidgetDepot.ApiService.Data.Migrations
 
                     b.Property<int>("WidgetId")
                         .HasColumnType("integer");
-
-                    b.Property<decimal>("WidgetWeight")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("numeric(10,3)");
 
                     b.HasKey("Id");
 

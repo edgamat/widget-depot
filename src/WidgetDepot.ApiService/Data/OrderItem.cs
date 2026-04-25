@@ -6,5 +6,4 @@ public class OrderItem
     public int OrderId { get; set; }
     public int WidgetId { get; set; }
     public int Quantity { get; set; }
-    public decimal WidgetWeight { get; set; }
 }

@@ -43,9 +43,5 @@ public class AppDbContext : DbContext
                   .HasForeignKey(oi => oi.OrderId);
         });
 
-        modelBuilder.Entity<OrderItem>(entity =>
-        {
-            entity.Property(oi => oi.WidgetWeight).HasPrecision(10, 3);
-        });
     }
 }

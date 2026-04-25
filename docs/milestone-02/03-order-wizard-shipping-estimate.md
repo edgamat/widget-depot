@@ -35,7 +35,7 @@ stored on the order.
 - New feature slice: `WidgetDepot.Web/Features/Orders/Create/Step3/`
 - New API endpoint: `WidgetDepot.ApiService/Features/Orders/CalculateShipping/`
 - The shipping API client should be implemented behind an interface (e.g., `IShippingApiClient`) so it can be substituted in tests without calling the real API
-- Total weight is calculated as the sum of (`OrderItem.WidgetWeight` × `OrderItem.Quantity`) across all items
+- Total weight is calculated as the sum of (`Widget.Weight` × `OrderItem.Quantity`) across all items, by joining `OrderItem` to the `Widget` catalog at the time the shipping estimate is requested
 - If the shipping API call fails, show an error message and allow the customer to retry; do not advance the wizard
 - Patterns to follow: Vertical Slice Architecture; EF Core for data access; Bootstrap 5.3 for layout; no MediatR
 

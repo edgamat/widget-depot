@@ -37,8 +37,7 @@ public class CreateDraftOrderHandler(AppDbContext db)
             order.Items.Add(new OrderItem
             {
                 WidgetId = item.WidgetId,
-                Quantity = item.Quantity,
-                WidgetWeight = widget.Weight
+                Quantity = item.Quantity
             });
         }
 
