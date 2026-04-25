@@ -36,7 +36,6 @@ This story also introduces the core `Order` and `OrderItem` data model.
 - New feature slice: `WidgetDepot.Web/Features/Orders/Create/Step1/`
 - New API endpoint: `WidgetDepot.ApiService/Features/Orders/CreateDraft/`
 - New entities in `WidgetDepot.ApiService/Data/`: `Order.cs`, `OrderItem.cs`; add `DbSet<Order>` and `DbSet<OrderItem>` to `AppDbContext`; create a new EF Core migration
-- `WidgetWeight` on `OrderItem` should be captured at order time (denormalized) so that the shipping estimate is stable even if the catalog later changes
 - Order status should be modelled as an enum: `Draft = 0`, `Submitted = 1`, `Cancelled = 2`
 - Patterns to follow: Vertical Slice Architecture; EF Core for data access; Bootstrap 5.3 for layout; no MediatR
 - The widget search on this page can reuse the same API endpoint used by the public catalog

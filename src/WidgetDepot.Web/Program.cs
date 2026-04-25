@@ -11,6 +11,7 @@ using WidgetDepot.Web.Features.Accounts.Profile;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
 using WidgetDepot.Web.Features.Catalog;
+using WidgetDepot.Web.Features.Orders.Create.Step1;
 using WidgetDepot.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,10 @@ builder.Services.AddHttpClient<ProfileService>(client =>
     .AddHttpMessageHandler<CookieForwardingHandler>();
 
 builder.Services.AddHttpClient<PasswordChangeService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
+
+builder.Services.AddHttpClient<Step1Service>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"))
     .AddHttpMessageHandler<CookieForwardingHandler>();
 

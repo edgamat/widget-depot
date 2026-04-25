@@ -15,6 +15,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Widget> Widgets => Set<Widget>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,5 +35,13 @@ public class AppDbContext : DbContext
         {
             entity.HasIndex(c => c.Email).IsUnique();
         });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasMany(o => o.Items)
+                  .WithOne()
+                  .HasForeignKey(oi => oi.OrderId);
+        });
+
     }
 }

@@ -33,7 +33,7 @@ orders list with "Resume" action), and the step 2 page from story 02 to accept a
 ## Developer Notes
 
 - New feature slice: `WidgetDepot.Web/Features/Orders/Edit/Step1/` (or reuse the story 01 step 1 component with an `orderId` parameter — developer's choice)
-- New API endpoint: `WidgetDepot.ApiService/Features/Orders/UpdateDraftItems/` — deletes existing `OrderItem` rows for the order and inserts the new set; recaptures `WidgetWeight` at update time (same denormalization as story 01)
+- New API endpoint: `WidgetDepot.ApiService/Features/Orders/UpdateDraftItems/` — deletes existing `OrderItem` rows for the order and inserts the new set
 - On load, fetch the current `OrderItem` rows for the draft to populate the widget selection UI
 - "Continue" calls `UpdateDraftItems`, then navigates to step 2 with the `orderId`
 - Only orders in `Draft` status owned by the authenticated customer may be edited; return a typed error otherwise

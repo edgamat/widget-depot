@@ -20,9 +20,7 @@ Do not explore the codebase during planning unless the task requires it or the u
 
 ## Agile Process
 
-When breaking down stories into tasks, assume the story as well as the associated tasks all should be added to GitHub as issues. Link the tasks to the story by referring to them in the issue created for the story.
-
-When breaking down stories into tasks, the coding tasks should include unit tests, rather than having separate unit tests tasks for the story. Each issue created for a task should include an acceptance criterion indicating that unit tests should be written where appropriate.
+TBD 
 
 ---
 

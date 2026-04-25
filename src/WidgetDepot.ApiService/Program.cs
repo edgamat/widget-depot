@@ -7,6 +7,7 @@ using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
+using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
 
@@ -38,6 +39,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
+builder.Services.AddScoped<CreateDraftOrderHandler>();
 builder.Services.AddScoped<SearchWidgetsHandler>();
 builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();
