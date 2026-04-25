@@ -1,0 +1,211 @@
+@page "/orders/new"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Create.Step1
+@inject Step1Service Step1Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>New Order</PageTitle>
+
+<h1>New Order</h1>
+<p class="text-muted lead">Step 1 of 3: Select Widgets</p>
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <h2 class="h5">Search Widgets</h2>
+
+        <div class="row g-2 mb-3">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="Search by name or description..."
+                       @bind="searchTerm" @bind:event="oninput" @onkeydown="HandleKeyDown" />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-secondary" @onclick="ExecuteSearch">Search</button>
+            </div>
+        </div>
+
+        @if (hasSearched)
+        {
+            @if (searchResults.Count == 0)
+            {
+                <p class="text-muted">No results found.</p>
+            }
+            else
+            {
+                <table class="table table-sm table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var widget in searchResults)
+                        {
+                            <tr>
+                                <td>@widget.Sku</td>
+                                <td>@widget.Name</td>
+                                <td>@widget.Description</td>
+                                <td>@widget.Price.ToString("C")</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => AddWidget(widget)">
+                                        Add
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+    </div>
+
+    <div class="col-md-5">
+        <h2 class="h5">Order Summary</h2>
+
+        @if (selectedItems.Count == 0)
+        {
+            <p class="text-muted">No widgets added yet.</p>
+        }
+        else
+        {
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Widget</th>
+                        <th>Qty</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in selectedItems)
+                    {
+                        <tr>
+                            <td>
+                                <div>@item.Name</div>
+                                <small class="text-muted">@item.Sku</small>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm" style="width: 75px"
+                                       min="1" value="@item.Quantity"
+                                       @onchange="e => UpdateQuantity(item, e)" />
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveWidget(item)">
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (errorMessage is not null)
+        {
+            <div class="alert alert-danger mt-2">@errorMessage</div>
+        }
+
+        <div class="mt-3">
+            <button class="btn btn-primary" @onclick="HandleContinue"
+                    disabled="@(selectedItems.Count == 0 || isSubmitting)">
+                @(isSubmitting ? "Saving..." : "Continue")
+            </button>
+            @if (selectedItems.Count == 0)
+            {
+                <p class="text-muted small mt-1">Add at least one widget to continue.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? searchTerm;
+    private IReadOnlyList<WidgetSearchResult> searchResults = [];
+    private bool hasSearched;
+    private readonly List<OrderItemModel> selectedItems = [];
+    private string? errorMessage;
+    private bool isSubmitting;
+
+    private async Task ExecuteSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            searchResults = [];
+            hasSearched = false;
+            return;
+        }
+
+        searchResults = await Step1Service.SearchWidgetsAsync(searchTerm);
+        hasSearched = true;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await ExecuteSearch();
+    }
+
+    private void AddWidget(WidgetSearchResult widget)
+    {
+        var existing = selectedItems.FirstOrDefault(i => i.WidgetId == widget.Id);
+        if (existing is not null)
+        {
+            existing.Quantity += 1;
+            return;
+        }
+
+        selectedItems.Add(new OrderItemModel
+        {
+            WidgetId = widget.Id,
+            Sku = widget.Sku,
+            Name = widget.Name,
+            Weight = widget.Weight,
+            Quantity = 1
+        });
+    }
+
+    private void RemoveWidget(OrderItemModel item)
+    {
+        selectedItems.Remove(item);
+    }
+
+    private void UpdateQuantity(OrderItemModel item, ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var qty) && qty >= 1)
+            item.Quantity = qty;
+    }
+
+    private async Task HandleContinue()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await Step1Service.CreateDraftAsync(selectedItems);
+
+            switch (result)
+            {
+                case CreateDraftResult.Success success:
+                    NavigationManager.NavigateTo($"/orders/{success.OrderId}/address");
+                    break;
+                default:
+                    errorMessage = "An unexpected error occurred. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
