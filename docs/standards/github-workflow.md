@@ -47,7 +47,7 @@ git fetch --prune
 - Check off acceptance criteria checkboxes in the issue as each one is completed using `gh issue edit`
 - When work is complete, push the commits to the remote repo and open a PR using `gh pr create` with "Closes #<number>" in the body
 - Never commit directly to main, and never edit files while checked out on `main`
-- When specifying `--repo`, always use `$(gh repo view --json nameWithOwner -q .nameWithOwner)` — never parse the repo name from `git remote get-url origin`
+- When specifying `--repo`, always run `gh repo view --json nameWithOwner -q .nameWithOwner` as a separate command first to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
 
 ---
 
@@ -57,7 +57,8 @@ git fetch --prune
 # GitHub
 gh issue list                              # See all open issues
 gh issue create                            # Create a new issue interactively
-gh issue view 12 --repo $(gh repo view --json nameWithOwner -q .nameWithOwner)  # Read issue #12
+gh repo view --json nameWithOwner -q .nameWithOwner  # Get repo name (run this first)
+gh issue view 12 --repo edgamat/widget-depot        # Read issue #12 (use literal repo name from above)
 gh issue comment 12 --body "..."           # Add a comment to issue #12
 gh issue close 12                          # Close issue #12
 gh pr create --title "..." --body "Closes #12"  # Open a PR linked to an issue
