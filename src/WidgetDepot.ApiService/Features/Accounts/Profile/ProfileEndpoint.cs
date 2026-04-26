@@ -8,7 +8,7 @@ public static class ProfileEndpoint
     {
         app.MapGet("/accounts/profile", async (ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!TryGetCustomerId(user, out var customerId))
+            if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
             var result = await handler.GetAsync(customerId, cancellationToken);
@@ -25,7 +25,7 @@ public static class ProfileEndpoint
 
         app.MapPut("/accounts/profile", async (UpdateProfileRequest request, ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!TryGetCustomerId(user, out var customerId))
+            if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
             var result = await handler.UpdateAsync(customerId, request, cancellationToken);
@@ -45,11 +45,5 @@ public static class ProfileEndpoint
         .RequireAuthorization();
 
         return app;
-    }
-
-    private static bool TryGetCustomerId(ClaimsPrincipal user, out int customerId)
-    {
-        var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(claim, out customerId);
     }
 }
