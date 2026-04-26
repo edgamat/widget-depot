@@ -12,7 +12,7 @@ public static class CreateDraftOrderEndpoint
             CreateDraftOrderHandler handler,
             CancellationToken cancellationToken) =>
         {
-            if (!TryGetCustomerId(user, out var customerId))
+            if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
             var result = await handler.HandleAsync(customerId, request, cancellationToken);
@@ -28,11 +28,5 @@ public static class CreateDraftOrderEndpoint
         .RequireAuthorization();
 
         return app;
-    }
-
-    private static bool TryGetCustomerId(ClaimsPrincipal user, out int customerId)
-    {
-        var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(claim, out customerId);
     }
 }

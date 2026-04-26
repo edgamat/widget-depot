@@ -24,6 +24,22 @@ TBD
 
 ---
 
+## Before editing any file
+
+Branch creation is a **precondition**, not a step. Before the first Edit or Write tool call in any task, all of the following must be true:
+
+1. Run `git branch --show-current` to confirm the current branch.
+2. If the current branch is `main`, **stop** and create a new branch first:
+   - `git checkout main`
+   - `git pull`
+   - `git checkout -b <branch-name>`
+3. Only then proceed with edits.
+
+**Never run Edit or Write tools while checked out on `main` or on a stale task branch.** If you notice mid-task that you are on the wrong branch, stop and switch before making further changes.
+
+---
+
+
 ## Local Workflow
 
 > refer to the [github-workflow](./docs/standards/github-workflow.md) for how to interact with the GitHub CLI when asked to work on issues.

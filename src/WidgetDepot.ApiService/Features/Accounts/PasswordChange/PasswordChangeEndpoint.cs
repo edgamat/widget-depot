@@ -8,7 +8,7 @@ public static class PasswordChangeEndpoint
     {
         app.MapPut("/accounts/password", async (ChangePasswordRequest request, ClaimsPrincipal user, PasswordChangeHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!TryGetCustomerId(user, out var customerId))
+            if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
             var result = await handler.ChangeAsync(customerId, request, cancellationToken);
@@ -28,11 +28,5 @@ public static class PasswordChangeEndpoint
         .RequireAuthorization();
 
         return app;
-    }
-
-    private static bool TryGetCustomerId(ClaimsPrincipal user, out int customerId)
-    {
-        var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(claim, out customerId);
     }
 }
