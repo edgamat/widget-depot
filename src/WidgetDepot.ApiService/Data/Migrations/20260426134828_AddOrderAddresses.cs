@@ -13,85 +13,73 @@ namespace WidgetDepot.ApiService.Data.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "BillingCity",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "BillingRecipientName",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "BillingState",
                 table: "Orders",
-                type: "character varying(2)",
-                maxLength: 2,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "BillingStreetLine1",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "BillingStreetLine2",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "BillingZipCode",
                 table: "Orders",
-                type: "character varying(10)",
-                maxLength: 10,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "ShippingCity",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "ShippingRecipientName",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "ShippingState",
                 table: "Orders",
-                type: "character varying(2)",
-                maxLength: 2,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "ShippingStreetLine1",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "ShippingStreetLine2",
                 table: "Orders",
-                type: "character varying(100)",
-                maxLength: 100,
+                type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "ShippingZipCode",
                 table: "Orders",
-                type: "character varying(10)",
-                maxLength: 10,
+                type: "text",
                 nullable: true);
         }
 

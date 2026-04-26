@@ -157,37 +157,31 @@ namespace WidgetDepot.ApiService.Data.Migrations
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingCity");
 
                             b1.Property<string>("RecipientName")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingRecipientName");
 
                             b1.Property<string>("State")
                                 .IsRequired()
-                                .HasMaxLength(2)
-                                .HasColumnType("character varying(2)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingState");
 
                             b1.Property<string>("StreetLine1")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingStreetLine1");
 
                             b1.Property<string>("StreetLine2")
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingStreetLine2");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)")
+                                .HasColumnType("text")
                                 .HasColumnName("BillingZipCode");
 
                             b1.HasKey("OrderId");
@@ -205,37 +199,31 @@ namespace WidgetDepot.ApiService.Data.Migrations
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("ShippingCity");
 
                             b1.Property<string>("RecipientName")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("ShippingRecipientName");
 
                             b1.Property<string>("State")
                                 .IsRequired()
-                                .HasMaxLength(2)
-                                .HasColumnType("character varying(2)")
+                                .HasColumnType("text")
                                 .HasColumnName("ShippingState");
 
                             b1.Property<string>("StreetLine1")
                                 .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("ShippingStreetLine1");
 
                             b1.Property<string>("StreetLine2")
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("text")
                                 .HasColumnName("ShippingStreetLine2");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)")
+                                .HasColumnType("text")
                                 .HasColumnName("ShippingZipCode");
 
                             b1.HasKey("OrderId");
