@@ -35,6 +35,9 @@ Branch creation is a **precondition**, not a step. Before the first Edit or Writ
    - `git checkout -b <branch-name>`
 3. Only then proceed with edits.
 
+**IMPORTANT** When working on a GitHub issue, use `issue-<number>-short-description` as the branch name. When not working on a GitHub issue, create a meaningful branch name.
+
+
 **Never run Edit or Write tools while checked out on `main` or on a stale task branch.** If you notice mid-task that you are on the wrong branch, stop and switch before making further changes.
 
 ---

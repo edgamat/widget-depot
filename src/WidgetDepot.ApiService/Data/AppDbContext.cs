@@ -41,6 +41,28 @@ public class AppDbContext : DbContext
             entity.HasMany(o => o.Items)
                   .WithOne()
                   .HasForeignKey(oi => oi.OrderId);
+
+            entity.OwnsOne(o => o.ShippingAddress, a =>
+            {
+                a.Property(x => x.RecipientName).HasColumnName("ShippingRecipientName").HasMaxLength(100);
+                a.Property(x => x.StreetLine1).HasColumnName("ShippingStreetLine1").HasMaxLength(100);
+                a.Property(x => x.StreetLine2).HasColumnName("ShippingStreetLine2").HasMaxLength(100);
+                a.Property(x => x.City).HasColumnName("ShippingCity").HasMaxLength(100);
+                a.Property(x => x.State).HasColumnName("ShippingState").HasMaxLength(2);
+                a.Property(x => x.ZipCode).HasColumnName("ShippingZipCode").HasMaxLength(10);
+            });
+            entity.Navigation(o => o.ShippingAddress).IsRequired(false);
+
+            entity.OwnsOne(o => o.BillingAddress, a =>
+            {
+                a.Property(x => x.RecipientName).HasColumnName("BillingRecipientName").HasMaxLength(100);
+                a.Property(x => x.StreetLine1).HasColumnName("BillingStreetLine1").HasMaxLength(100);
+                a.Property(x => x.StreetLine2).HasColumnName("BillingStreetLine2").HasMaxLength(100);
+                a.Property(x => x.City).HasColumnName("BillingCity").HasMaxLength(100);
+                a.Property(x => x.State).HasColumnName("BillingState").HasMaxLength(2);
+                a.Property(x => x.ZipCode).HasColumnName("BillingZipCode").HasMaxLength(10);
+            });
+            entity.Navigation(o => o.BillingAddress).IsRequired(false);
         });
 
     }

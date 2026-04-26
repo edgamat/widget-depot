@@ -5,12 +5,12 @@
 - You create an issue in GitHub (via the web UI or `gh issue create`)
 - You tell Claude Code: "Let's work on issue #12"
 - Claude Code checks out the main branch and pulls down the latest commits.
-- Claude Code creates a branch named `issue-<number>-short-description` **before any Edit or Write tool call** (see [Before editing any file](#before-editing-any-file)).
+- Claude Code creates a branch named `issue-<number>-short-description` **before any Edit or Write tool call**.
 - Claude Code reads the issue with `gh issue view 12`, understands the task, and starts working
 - As work progresses, it (or you) can post progress updates as issue comments with `gh issue comment`
 - When done, Claude Code pushes the commits to the remote repo and then Claude Code opens a PR linked to the issue with `gh pr create`
 - You review, merge, and the issue closes automatically
-- Once the PR is merged, you say **"cleanup"** and Claude Code runs the [Post-merge cleanup](#post-merge-cleanup) sequence.
+- Once the PR is merged, you say **"run post merge cleanup"** and Claude Code runs the [Post-merge cleanup](#post-merge-cleanup) sequence.
 
 ---
 
@@ -41,7 +41,7 @@ git fetch --prune
 
 - Always use the GitHub CLI (`gh`) to interact with GitHub — never GitHub Actions
 - When starting work on an issue, run `gh issue view <number>` to read the full details before doing anything
-- Create a branch named `issue-<number>-short-description` **before any Edit or Write tool call** (see [Before editing any file](#before-editing-any-file))
+- Create a branch named `issue-<number>-short-description` **before any Edit or Write tool call**
 - Post a comment on the issue when starting work: "Starting work on this issue"
 - Post progress comments on the issue as significant steps are completed
 - Check off acceptance criteria checkboxes in the issue as each one is completed using `gh issue edit`
