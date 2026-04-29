@@ -1,0 +1,256 @@
+@page "/orders/{OrderId:int}/address"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Create
+@using WidgetDepot.Web.Features.Orders.Create.Step2
+@inject Step2Service Step2Service
+@inject NavigationManager NavigationManager
+@inject OrderWizardState WizardState
+
+<PageTitle>New Order - Addresses</PageTitle>
+
+<h1>New Order</h1>
+<p class="text-muted lead">Step 2 of 3: Shipping &amp; Billing Addresses</p>
+
+<EditForm Model="form" OnValidSubmit="HandleContinue">
+    <DataAnnotationsValidator />
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h2 class="h5">Shipping Address</h2>
+
+            <div class="mb-3">
+                <label class="form-label" for="shippingRecipientName">Recipient Name</label>
+                <InputText id="shippingRecipientName" class="form-control" @bind-Value="form.ShippingRecipientName" />
+                <ValidationMessage For="() => form.ShippingRecipientName" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="shippingStreetLine1">Street Line 1</label>
+                <InputText id="shippingStreetLine1" class="form-control" @bind-Value="form.ShippingStreetLine1" />
+                <ValidationMessage For="() => form.ShippingStreetLine1" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="shippingStreetLine2">Street Line 2 <span class="text-muted">(optional)</span></label>
+                <InputText id="shippingStreetLine2" class="form-control" @bind-Value="form.ShippingStreetLine2" />
+                <ValidationMessage For="() => form.ShippingStreetLine2" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="shippingCity">City</label>
+                <InputText id="shippingCity" class="form-control" @bind-Value="form.ShippingCity" />
+                <ValidationMessage For="() => form.ShippingCity" class="text-danger" />
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-7 mb-3">
+                    <label class="form-label" for="shippingState">State</label>
+                    <InputSelect id="shippingState" class="form-select" @bind-Value="form.ShippingState">
+                        <option value="">— Select state —</option>
+                        @foreach (var state in UsStates.All)
+                        {
+                            <option value="@state.Code">@state.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => form.ShippingState" class="text-danger" />
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label class="form-label" for="shippingZipCode">ZIP Code</label>
+                    <InputText id="shippingZipCode" class="form-control" @bind-Value="form.ShippingZipCode" />
+                    <ValidationMessage For="() => form.ShippingZipCode" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Billing Address</h2>
+                <div class="form-check mb-0">
+                    <input type="checkbox" class="form-check-input" id="sameAsShipping"
+                           @onchange="HandleSameAsShipping" />
+                    <label class="form-check-label" for="sameAsShipping">Same as shipping address</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="billingRecipientName">Recipient Name</label>
+                <InputText id="billingRecipientName" class="form-control" @bind-Value="form.BillingRecipientName" />
+                <ValidationMessage For="() => form.BillingRecipientName" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="billingStreetLine1">Street Line 1</label>
+                <InputText id="billingStreetLine1" class="form-control" @bind-Value="form.BillingStreetLine1" />
+                <ValidationMessage For="() => form.BillingStreetLine1" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="billingStreetLine2">Street Line 2 <span class="text-muted">(optional)</span></label>
+                <InputText id="billingStreetLine2" class="form-control" @bind-Value="form.BillingStreetLine2" />
+                <ValidationMessage For="() => form.BillingStreetLine2" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="billingCity">City</label>
+                <InputText id="billingCity" class="form-control" @bind-Value="form.BillingCity" />
+                <ValidationMessage For="() => form.BillingCity" class="text-danger" />
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-7 mb-3">
+                    <label class="form-label" for="billingState">State</label>
+                    <InputSelect id="billingState" class="form-select" @bind-Value="form.BillingState">
+                        <option value="">— Select state —</option>
+                        @foreach (var state in UsStates.All)
+                        {
+                            <option value="@state.Code">@state.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => form.BillingState" class="text-danger" />
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label class="form-label" for="billingZipCode">ZIP Code</label>
+                    <InputText id="billingZipCode" class="form-control" @bind-Value="form.BillingZipCode" />
+                    <ValidationMessage For="() => form.BillingZipCode" class="text-danger" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (errorMessage is not null)
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="button" class="btn btn-secondary" @onclick="HandleBack">Back</button>
+        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+            @(isSubmitting ? "Saving..." : "Continue")
+        </button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private readonly Step2FormModel form = new();
+    private GetDraftOrderResponse? order;
+    private string? errorMessage;
+    private bool isSubmitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OrderId <= 0)
+        {
+            NavigationManager.NavigateTo("/orders/new");
+            return;
+        }
+
+        var result = await Step2Service.GetDraftOrderAsync(OrderId);
+
+        if (result is GetDraftOrderResult.Success success)
+        {
+            order = success.Order;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/orders/new");
+            return;
+        }
+
+        if (WizardState.OrderId == OrderId)
+        {
+            CopyFromState();
+        }
+    }
+
+    private void CopyFromState()
+    {
+        var saved = WizardState.AddressData;
+        form.ShippingRecipientName = saved.ShippingRecipientName;
+        form.ShippingStreetLine1 = saved.ShippingStreetLine1;
+        form.ShippingStreetLine2 = saved.ShippingStreetLine2;
+        form.ShippingCity = saved.ShippingCity;
+        form.ShippingState = saved.ShippingState;
+        form.ShippingZipCode = saved.ShippingZipCode;
+        form.BillingRecipientName = saved.BillingRecipientName;
+        form.BillingStreetLine1 = saved.BillingStreetLine1;
+        form.BillingStreetLine2 = saved.BillingStreetLine2;
+        form.BillingCity = saved.BillingCity;
+        form.BillingState = saved.BillingState;
+        form.BillingZipCode = saved.BillingZipCode;
+    }
+
+    private void SaveToState()
+    {
+        WizardState.OrderId = OrderId;
+        var target = WizardState.AddressData;
+        target.ShippingRecipientName = form.ShippingRecipientName;
+        target.ShippingStreetLine1 = form.ShippingStreetLine1;
+        target.ShippingStreetLine2 = form.ShippingStreetLine2;
+        target.ShippingCity = form.ShippingCity;
+        target.ShippingState = form.ShippingState;
+        target.ShippingZipCode = form.ShippingZipCode;
+        target.BillingRecipientName = form.BillingRecipientName;
+        target.BillingStreetLine1 = form.BillingStreetLine1;
+        target.BillingStreetLine2 = form.BillingStreetLine2;
+        target.BillingCity = form.BillingCity;
+        target.BillingState = form.BillingState;
+        target.BillingZipCode = form.BillingZipCode;
+    }
+
+    private void HandleSameAsShipping(ChangeEventArgs e)
+    {
+        if (e.Value is true)
+        {
+            form.BillingRecipientName = form.ShippingRecipientName;
+            form.BillingStreetLine1 = form.ShippingStreetLine1;
+            form.BillingStreetLine2 = form.ShippingStreetLine2;
+            form.BillingCity = form.ShippingCity;
+            form.BillingState = form.ShippingState;
+            form.BillingZipCode = form.ShippingZipCode;
+        }
+    }
+
+    private void HandleBack()
+    {
+        SaveToState();
+        NavigationManager.NavigateTo("/orders/new");
+    }
+
+    private async Task HandleContinue()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await Step2Service.SaveAddressesAsync(OrderId, form);
+
+            switch (result)
+            {
+                case SaveAddressesResult.Success:
+                    NavigationManager.NavigateTo($"/orders/{OrderId}/shipping");
+                    break;
+                case SaveAddressesResult.NotFound:
+                case SaveAddressesResult.Forbidden:
+                    NavigationManager.NavigateTo("/orders/new");
+                    break;
+                default:
+                    errorMessage = "An unexpected error occurred. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

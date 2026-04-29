@@ -45,7 +45,12 @@ Branch creation is a **precondition**, not a step. Before the first Edit or Writ
 
 ## Local Workflow
 
-> refer to the [github-workflow](./docs/standards/github-workflow.md) for how to interact with the GitHub CLI when asked to work on issues.
+### When using the `gh` command line tool
+
+- When specifying `--repo`, always run `gh repo view --json nameWithOwner -q .nameWithOwner` as a separate command first to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
+
+
+When working on a GitHub issue, you MUST read and follow [github-workflow](./docs/standards/github-workflow.md) before starting.
 
 ---
 

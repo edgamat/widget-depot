@@ -6,6 +6,7 @@
 - You tell Claude Code: "Let's work on issue #12"
 - Claude Code checks out the main branch and pulls down the latest commits.
 - Claude Code creates a branch named `issue-<number>-short-description` **before any Edit or Write tool call**.
+- Claude code runs `gh repo view --json nameWithOwner -q .nameWithOwner` to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
 - Claude Code reads the issue with `gh issue view 12`, understands the task, and starts working
 - As work progresses, it (or you) can post progress updates as issue comments with `gh issue comment`
 - When done, Claude Code pushes the commits to the remote repo and then Claude Code opens a PR linked to the issue with `gh pr create`
@@ -40,6 +41,7 @@ git fetch --prune
 ## GitHub CLI Usage
 
 - Always use the GitHub CLI (`gh`) to interact with GitHub — never GitHub Actions
+- When specifying `--repo`, always run `gh repo view --json nameWithOwner -q .nameWithOwner` as a separate command first to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
 - When starting work on an issue, run `gh issue view <number>` to read the full details before doing anything
 - Create a branch named `issue-<number>-short-description` **before any Edit or Write tool call**
 - Post a comment on the issue when starting work: "Starting work on this issue"
@@ -47,7 +49,6 @@ git fetch --prune
 - Check off acceptance criteria checkboxes in the issue as each one is completed using `gh issue edit`
 - When work is complete, push the commits to the remote repo and open a PR using `gh pr create` with "Closes #<number>" in the body
 - Never commit directly to main, and never edit files while checked out on `main`
-- When specifying `--repo`, always run `gh repo view --json nameWithOwner -q .nameWithOwner` as a separate command first to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
 
 ---
 

@@ -2,9 +2,11 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Create
 @using WidgetDepot.Web.Features.Orders.Create.Step1
 @inject Step1Service Step1Service
 @inject NavigationManager NavigationManager
+@inject OrderWizardState WizardState
 
 <PageTitle>New Order</PageTitle>
 
@@ -131,6 +133,14 @@
     private string? errorMessage;
     private bool isSubmitting;
 
+    protected override void OnInitialized()
+    {
+        if (WizardState.SelectedItems.Count > 0)
+        {
+            selectedItems.AddRange(WizardState.SelectedItems);
+        }
+    }
+
     private async Task ExecuteSearch()
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
@@ -192,6 +202,8 @@
             switch (result)
             {
                 case CreateDraftResult.Success success:
+                    WizardState.OrderId = success.OrderId;
+                    WizardState.SelectedItems = new List<OrderItemModel>(selectedItems);
                     NavigationManager.NavigateTo($"/orders/{success.OrderId}/address");
                     break;
                 default:
