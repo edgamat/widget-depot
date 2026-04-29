@@ -137,12 +137,25 @@
     public int OrderId { get; set; }
 
     private readonly Step2FormModel form = new();
+    private GetDraftOrderResponse? order;
     private string? errorMessage;
     private bool isSubmitting;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (OrderId <= 0)
+        {
+            NavigationManager.NavigateTo("/orders/new");
+            return;
+        }
+
+        var result = await Step2Service.GetDraftOrderAsync(OrderId);
+
+        if (result is GetDraftOrderResult.Success success)
+        {
+            order = success.Order;
+        }
+        else
         {
             NavigationManager.NavigateTo("/orders/new");
             return;

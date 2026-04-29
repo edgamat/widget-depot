@@ -33,6 +33,52 @@ public class Step2ServiceTests
     };
 
     [Fact]
+    public async Task GetDraftOrderAsync_OkResponse_ReturnsSuccessWithOrder()
+    {
+        var json = """{"id":1,"status":"Draft","items":[],"shippingAddress":null,"billingAddress":null}""";
+        var handler = new FakeHttpMessageHandler(HttpStatusCode.OK, responseContent: json);
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://test") };
+        var service = new Step2Service(httpClient);
+
+        var result = await service.GetDraftOrderAsync(1, TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetDraftOrderResult.Success>();
+        success.Order.Id.ShouldBe(1);
+        success.Order.Status.ShouldBe("Draft");
+        success.Order.Items.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetDraftOrderAsync_NotFoundResponse_ReturnsNotFound()
+    {
+        var service = CreateService(HttpStatusCode.NotFound);
+
+        var result = await service.GetDraftOrderAsync(999, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftOrderResult.NotFound>();
+    }
+
+    [Fact]
+    public async Task GetDraftOrderAsync_ForbiddenResponse_ReturnsForbidden()
+    {
+        var service = CreateService(HttpStatusCode.Forbidden);
+
+        var result = await service.GetDraftOrderAsync(1, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftOrderResult.Forbidden>();
+    }
+
+    [Fact]
+    public async Task GetDraftOrderAsync_ServerErrorResponse_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.InternalServerError);
+
+        var result = await service.GetDraftOrderAsync(1, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftOrderResult.Failure>();
+    }
+
+    [Fact]
     public async Task SaveAddressesAsync_NoContentResponse_ReturnsSuccess()
     {
         var service = CreateService(HttpStatusCode.NoContent);
@@ -93,11 +139,13 @@ public class Step2ServiceTests
     {
         private readonly HttpStatusCode _statusCode;
         private readonly Action<string>? _bodyCapture;
+        private readonly string _responseContent;
 
-        public FakeHttpMessageHandler(HttpStatusCode statusCode, Action<string>? bodyCapture = null)
+        public FakeHttpMessageHandler(HttpStatusCode statusCode, Action<string>? bodyCapture = null, string? responseContent = null)
         {
             _statusCode = statusCode;
             _bodyCapture = bodyCapture;
+            _responseContent = responseContent ?? "{}";
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -110,7 +158,7 @@ public class Step2ServiceTests
 
             return new HttpResponseMessage(_statusCode)
             {
-                Content = new StringContent("{}", Encoding.UTF8, "application/json")
+                Content = new StringContent(_responseContent, Encoding.UTF8, "application/json")
             };
         }
     }

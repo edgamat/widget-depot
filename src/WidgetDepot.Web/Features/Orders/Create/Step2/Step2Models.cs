@@ -107,6 +107,23 @@ public static class UsStates
     ];
 }
 
+public record GetDraftOrderItemResponse(int WidgetId, int Quantity);
+
+public record GetDraftOrderAddressResponse(
+    string RecipientName,
+    string StreetLine1,
+    string? StreetLine2,
+    string City,
+    string State,
+    string ZipCode);
+
+public record GetDraftOrderResponse(
+    int Id,
+    string Status,
+    IReadOnlyList<GetDraftOrderItemResponse> Items,
+    GetDraftOrderAddressResponse? ShippingAddress,
+    GetDraftOrderAddressResponse? BillingAddress);
+
 public record AddressRequest(
     string RecipientName,
     string StreetLine1,

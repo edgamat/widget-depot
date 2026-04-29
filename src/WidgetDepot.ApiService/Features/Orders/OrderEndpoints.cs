@@ -6,4 +6,5 @@ public static class OrderEndpoints
 
     public const string CreateDraft = $"{Base}/draft";
     public const string SaveAddresses = $"{Base}/{{orderId}}/addresses";
+    public const string GetDraftOrder = $"{Base}/{{orderId}}/draft";
 }
