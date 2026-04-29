@@ -11,7 +11,7 @@
       "Bash(git branch:*)",
       "Bash(git checkout:*)",
       "Bash(git fetch:*)",
-      "Bash(git remote get-url:*",
+      "Bash(git remote get-url:*)",
       "Bash(find /home/matt/Source/widget-depot/:*)",
       "Bash(gh issue view:*)",
       "Bash(gh pr create:*)",
