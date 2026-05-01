@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WidgetDepot.ApiService\WidgetDepot.ApiService.csproj" />
+    <ProjectReference Include="..\WidgetDepot.FakeShippingApi\WidgetDepot.FakeShippingApi.csproj" />
     <ProjectReference Include="..\WidgetDepot.Web\WidgetDepot.Web.csproj" />
   </ItemGroup>
 

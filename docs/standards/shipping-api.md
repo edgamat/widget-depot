@@ -33,7 +33,7 @@
     "country": "string"
   },
   "package": {
-    "weightKg": 0.0
+    "weightLbs": 0.0
   }
 }
 ```

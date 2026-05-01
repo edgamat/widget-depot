@@ -4,10 +4,15 @@ var postgres = builder.AddPostgres("postgres")
     .WithDataVolume()
     .AddDatabase("widgetdepot");
 
+var fakeShippingApi = builder.AddProject<Projects.WidgetDepot_FakeShippingApi>("fakeshippingapi")
+    .WithHttpHealthCheck("/health");
+
 var apiService = builder.AddProject<Projects.WidgetDepot_ApiService>("apiservice")
     .WithHttpHealthCheck("/health")
     .WithReference(postgres)
-    .WaitFor(postgres);
+    .WaitFor(postgres)
+    .WithReference(fakeShippingApi)
+    .WaitFor(fakeShippingApi);
 
 builder.AddProject<Projects.WidgetDepot_Web>("webfrontend")
     .WithExternalHttpEndpoints()
