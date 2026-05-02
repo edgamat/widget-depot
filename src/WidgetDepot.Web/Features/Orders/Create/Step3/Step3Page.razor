@@ -35,11 +35,11 @@ else
 {
     <div class="mb-4">
         <h2 class="h5">Order Items</h2>
-        <table class="table table-bordered">
+        <table class="table table-hover table-sm">
             <thead>
-                <tr>
+                <tr class="table-primary">
                     <th>Widget</th>
-                    <th class="text-end">Qty</th>
+                    <th class="text-end">Quantity</th>
                     <th class="text-end">Weight (lbs)</th>
                     <th class="text-end">Subtotal (lbs)</th>
                 </tr>
@@ -58,9 +58,9 @@ else
             @if (totalWeight.HasValue)
             {
                 <tfoot>
-                    <tr class="table-secondary fw-bold">
-                        <td colspan="3" class="text-end">Total weight</td>
-                        <td class="text-end">@totalWeight.Value.ToString("0.###") lbs</td>
+                    <tr class="fw-bold">
+                        <td colspan="3" class="text-end">Total weight (lbs)</td>
+                        <td class="text-end">@totalWeight.Value.ToString("0.###")</td>
                     </tr>
                 </tfoot>
             }
