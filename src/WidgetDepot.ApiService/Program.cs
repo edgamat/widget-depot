@@ -7,6 +7,7 @@ using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
+using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
@@ -41,6 +42,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
+
+builder.Services.AddHttpClient<AcmeShippingApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https+http://shippingapi/");
+    var apiKey = builder.Configuration["SHIPPING_API_KEY"] ?? "dev-api-key";
+    client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
+});
+builder.Services.AddScoped<IShippingApiClient, AcmeShippingApiClient>();
 builder.Services.AddScoped<CreateDraftOrderHandler>();
 builder.Services.AddScoped<GetDraftOrderHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();

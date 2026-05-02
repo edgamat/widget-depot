@@ -4,7 +4,7 @@ var postgres = builder.AddPostgres("postgres")
     .WithDataVolume()
     .AddDatabase("widgetdepot");
 
-var fakeShippingApi = builder.AddProject<Projects.WidgetDepot_FakeShippingApi>("fakeshippingapi")
+var fakeShippingApi = builder.AddProject<Projects.WidgetDepot_FakeShippingApi>("shippingapi")
     .WithHttpHealthCheck("/health");
 
 var apiService = builder.AddProject<Projects.WidgetDepot_ApiService>("apiservice")

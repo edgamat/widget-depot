@@ -20,6 +20,7 @@ stored on the order.
 **In scope:**
 - Step 3 of the wizard: display of the calculated shipping estimate
 - Calling the third-party shipping API on every arrival at step 3 to obtain a fresh estimate (including when resuming a draft that already has a stored estimate), overwriting any previously stored value
+- List all the widgets added to the order, their quantities and weights, a sub-total weight for each widget, and total weight.
 - Storing the estimated shipping cost (`ShippingEstimate`, decimal) on the `Order` entity
 - EF Core migration for the new column if not already present
 - A "Back" button that returns to step 2
