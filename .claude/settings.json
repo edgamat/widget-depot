@@ -17,7 +17,8 @@
       "Bash(gh pr create:*)",
       "Bash(gh repo view:*)",
       "Bash(gh issue comment:*)",
-      "Bash(gh issue edit:*)"  
+      "Bash(gh issue edit:*)",
+      "Bash(gh pr *)"
     ]
   },
   "hooks": {
