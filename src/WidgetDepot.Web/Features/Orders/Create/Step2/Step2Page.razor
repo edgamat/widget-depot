@@ -233,6 +233,7 @@
             switch (result)
             {
                 case SaveAddressesResult.Success:
+                    SaveToState();
                     NavigationManager.NavigateTo($"/orders/{OrderId}/shipping");
                     break;
                 case SaveAddressesResult.NotFound:
