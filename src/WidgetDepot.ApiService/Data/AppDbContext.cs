@@ -63,6 +63,8 @@ public class AppDbContext : DbContext
                 a.Property(x => x.ZipCode).HasColumnName("BillingZipCode").HasColumnType("text");
             });
             entity.Navigation(o => o.BillingAddress).IsRequired(false);
+
+            entity.Property(o => o.ShippingEstimate).HasPrecision(10, 2);
         });
 
     }

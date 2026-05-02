@@ -53,6 +53,7 @@ builder.Services.AddScoped<IShippingApiClient, AcmeShippingApiClient>();
 builder.Services.AddScoped<CreateDraftOrderHandler>();
 builder.Services.AddScoped<GetDraftOrderHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();
+builder.Services.AddScoped<CalculateShippingHandler>();
 builder.Services.AddScoped<SearchWidgetsHandler>();
 builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();

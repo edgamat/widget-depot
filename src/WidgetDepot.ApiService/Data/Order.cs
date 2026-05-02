@@ -16,4 +16,5 @@ public class Order
     public ICollection<OrderItem> Items { get; set; } = [];
     public Address? ShippingAddress { get; set; }
     public Address? BillingAddress { get; set; }
+    public decimal? ShippingEstimate { get; set; }
 }
