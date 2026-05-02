@@ -30,7 +30,7 @@ public class AcmeShippingApiClient : IShippingApiClient
 
             return new ShippingEstimateResult.Failure($"Received HTTP {(int)response.StatusCode}");
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex)
         {
             return new ShippingEstimateResult.Failure(ex.Message);
         }
