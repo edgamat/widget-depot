@@ -43,13 +43,12 @@ builder.Services.AddAuthorization();
 
 builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
 
-builder.Services.AddHttpClient<AcmeShippingApiClient>(client =>
+builder.Services.AddHttpClient<IShippingApiClient, AcmeShippingApiClient>(client =>
 {
     client.BaseAddress = new Uri("https+http://shippingapi/");
     var apiKey = builder.Configuration["SHIPPING_API_KEY"] ?? "dev-api-key";
     client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
 });
-builder.Services.AddScoped<IShippingApiClient, AcmeShippingApiClient>();
 builder.Services.AddScoped<CreateDraftOrderHandler>();
 builder.Services.AddScoped<GetDraftOrderHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();

@@ -1,0 +1,226 @@
+@page "/orders/{OrderId:int}/shipping"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Create
+@using WidgetDepot.Web.Features.Orders.Create.Step1
+@using WidgetDepot.Web.Features.Orders.Create.Step3
+@inject Step3Service Step3Service
+@inject NavigationManager NavigationManager
+@inject OrderWizardState WizardState
+
+<PageTitle>New Order - Shipping Estimate</PageTitle>
+
+<h1>New Order</h1>
+<p class="text-muted lead">Step 3 of 3: Shipping Estimate</p>
+
+@if (isLoading)
+{
+    <p>Calculating shipping estimate&hellip;</p>
+}
+else if (loadError is not null)
+{
+    <div class="alert alert-danger">
+        <p class="mb-2">@loadError</p>
+        <button type="button" class="btn btn-warning btn-sm" @onclick="RetryAsync" disabled="@isRetrying">
+            @(isRetrying ? "Retrying..." : "Retry")
+        </button>
+    </div>
+
+    <div class="mt-3">
+        <button type="button" class="btn btn-secondary" @onclick="HandleBack">Back</button>
+    </div>
+}
+else
+{
+    <div class="mb-4">
+        <h2 class="h5">Order Items</h2>
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr class="table-primary">
+                    <th>Widget</th>
+                    <th class="text-end">Quantity</th>
+                    <th class="text-end">Weight (lbs)</th>
+                    <th class="text-end">Subtotal (lbs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in displayItems)
+                {
+                    <tr>
+                        <td>@(item.Name ?? $"Widget #{item.WidgetId}")</td>
+                        <td class="text-end">@item.Quantity</td>
+                        <td class="text-end">@(item.WeightPerUnit.HasValue ? item.WeightPerUnit.Value.ToString("0.###") : "—")</td>
+                        <td class="text-end">@(item.SubtotalWeight.HasValue ? item.SubtotalWeight.Value.ToString("0.###") : "—")</td>
+                    </tr>
+                }
+            </tbody>
+            @if (totalWeight.HasValue)
+            {
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="3" class="text-end">Total weight (lbs)</td>
+                        <td class="text-end">@totalWeight.Value.ToString("0.###")</td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+
+    <div class="mb-4">
+        <h2 class="h5">Shipping Estimate</h2>
+        @if (estimatedCost.HasValue)
+        {
+            <p class="fs-4">@estimatedCost.Value.ToString("C") <span class="text-muted fs-6">(@currency)</span></p>
+        }
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-secondary" @onclick="HandleBack">Back</button>
+        <button type="button" class="btn btn-outline-secondary" @onclick="HandleSaveForLater">Save for later</button>
+        <button type="button" class="btn btn-primary" @onclick="HandleSubmitOrder">Submit order</button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private bool isLoading = true;
+    private bool isRetrying;
+    private string? loadError;
+    private decimal? estimatedCost;
+    private string? currency;
+    private decimal? totalWeight;
+    private List<ItemDisplayModel> displayItems = [];
+
+    private record ItemDisplayModel(
+        int WidgetId,
+        string? Name,
+        int Quantity,
+        decimal? WeightPerUnit,
+        decimal? SubtotalWeight);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OrderId <= 0)
+        {
+            NavigationManager.NavigateTo("/orders/new");
+            return;
+        }
+
+        await LoadPageAsync();
+    }
+
+    private async Task LoadPageAsync()
+    {
+        isLoading = true;
+        loadError = null;
+
+        var draftResult = await Step3Service.GetDraftOrderAsync(OrderId);
+
+        switch (draftResult)
+        {
+            case GetDraftOrderResult.NotFound:
+            case GetDraftOrderResult.Forbidden:
+                NavigationManager.NavigateTo("/orders/new");
+                return;
+            case GetDraftOrderResult.Failure:
+                loadError = "Unable to load order. Please try again.";
+                isLoading = false;
+                return;
+        }
+
+        var order = ((GetDraftOrderResult.Success)draftResult).Order;
+
+        if (order.ShippingAddress is null)
+        {
+            NavigationManager.NavigateTo($"/orders/{OrderId}/address");
+            return;
+        }
+
+        BuildDisplayItems(order);
+
+        await CalculateShippingAsync();
+    }
+
+    private async Task RetryAsync()
+    {
+        isRetrying = true;
+        loadError = null;
+        await CalculateShippingAsync();
+        isRetrying = false;
+    }
+
+    private async Task CalculateShippingAsync()
+    {
+        isLoading = true;
+
+        var result = await Step3Service.CalculateShippingAsync(OrderId);
+
+        switch (result)
+        {
+            case CalculateShippingResult.Success success:
+                estimatedCost = success.EstimatedCost;
+                currency = success.Currency;
+                loadError = null;
+                break;
+            case CalculateShippingResult.NotFound:
+            case CalculateShippingResult.Forbidden:
+                NavigationManager.NavigateTo("/orders/new");
+                return;
+            case CalculateShippingResult.NoShippingAddress:
+                NavigationManager.NavigateTo($"/orders/{OrderId}/address");
+                return;
+            case CalculateShippingResult.ApiFailure:
+                loadError = "The shipping carrier is temporarily unavailable. Please retry or try again later.";
+                break;
+            default:
+                loadError = "An unexpected error occurred calculating shipping. Please try again.";
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private void BuildDisplayItems(GetDraftOrderResponse order)
+    {
+        var wizardItems = WizardState.OrderId == OrderId
+            ? WizardState.SelectedItems.ToDictionary(i => i.WidgetId)
+            : null;
+
+        displayItems = order.Items.Select(item =>
+        {
+            if (wizardItems is not null && wizardItems.TryGetValue(item.WidgetId, out var wi))
+            {
+                return new ItemDisplayModel(
+                    item.WidgetId,
+                    wi.Name,
+                    item.Quantity,
+                    wi.Weight,
+                    item.Quantity * wi.Weight);
+            }
+
+            return new ItemDisplayModel(item.WidgetId, null, item.Quantity, null, null);
+        }).ToList();
+
+        totalWeight = displayItems.All(i => i.SubtotalWeight.HasValue)
+            ? displayItems.Sum(i => i.SubtotalWeight!.Value)
+            : null;
+    }
+
+    private void HandleBack()
+    {
+        NavigationManager.NavigateTo($"/orders/{OrderId}/address");
+    }
+
+    private void HandleSaveForLater()
+    {
+        NavigationManager.NavigateTo("/orders");
+    }
+
+    private void HandleSubmitOrder()
+    {
+        NavigationManager.NavigateTo($"/orders/{OrderId}/submit");
+    }
+}
