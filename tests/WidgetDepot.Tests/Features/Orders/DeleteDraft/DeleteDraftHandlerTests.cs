@@ -36,7 +36,7 @@ public class DeleteDraftHandlerTests
         using var db = CreateDb();
         var handler = new DeleteDraftHandler(db);
 
-        var result = await handler.HandleAsync(999, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(999, customerId: 1, TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<DeleteDraftError.OrderNotFound>();
     }
