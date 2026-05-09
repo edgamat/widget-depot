@@ -8,4 +8,5 @@ public static class OrderEndpoints
     public const string SaveAddresses = $"{Base}/{{orderId}}/addresses";
     public const string GetDraftOrder = $"{Base}/{{orderId}}/draft";
     public const string CalculateShipping = $"{Base}/{{orderId}}/shipping-estimate";
+    public const string GetDrafts = $"{Base}/drafts";
 }
