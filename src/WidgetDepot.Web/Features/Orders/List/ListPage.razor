@@ -1,0 +1,159 @@
+@page "/orders"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.List
+@inject ListService ListService
+@inject NavigationManager NavigationManager
+
+<PageTitle>My Draft Orders</PageTitle>
+
+<h1>My Draft Orders</h1>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (loadFailed)
+{
+    <div class="alert alert-danger">Unable to load your draft orders. Please try again later.</div>
+}
+else if (drafts.Count == 0)
+{
+    <p class="text-muted">You have no draft orders. <a href="/orders/new">Start a new order</a>.</p>
+}
+else
+{
+    @if (errorMessage is not null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <table class="table table-sm table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Order ID</th>
+                <th>Widgets</th>
+                <th>Created</th>
+                <th>Expires</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var draft in drafts)
+            {
+                <tr>
+                    <td>@draft.Id</td>
+                    <td>@draft.WidgetCount</td>
+                    <td>@draft.CreatedAt.ToString("d")</td>
+                    <td>@draft.ExpiryDate.ToString("d")</td>
+                    <td>
+                        @if (pendingDeleteId == draft.Id)
+                        {
+                            <span class="me-2">Delete this order?</span>
+                            <button class="btn btn-sm btn-danger me-1"
+                                    @onclick="() => ConfirmDeleteAsync(draft.Id)"
+                                    disabled="@isDeleting">
+                                @(isDeleting ? "Deleting..." : "Yes, Delete")
+                            </button>
+                            <button class="btn btn-sm btn-secondary"
+                                    @onclick="CancelDelete"
+                                    disabled="@isDeleting">
+                                Cancel
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-primary me-1" @onclick="() => Resume(draft.Id)">
+                                Resume
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => RequestDelete(draft.Id)">
+                                Delete
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<DraftOrderListItem> drafts = [];
+    private bool isLoading = true;
+    private bool loadFailed;
+    private int? pendingDeleteId;
+    private bool isDeleting;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ListService.GetDraftsAsync();
+
+        switch (result)
+        {
+            case GetDraftsResult.Success success:
+                drafts = success.Drafts;
+                break;
+            default:
+                loadFailed = true;
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private void Resume(int orderId)
+    {
+        NavigationManager.NavigateTo($"/orders/{orderId}/step1");
+    }
+
+    private void RequestDelete(int orderId)
+    {
+        pendingDeleteId = orderId;
+        errorMessage = null;
+    }
+
+    private void CancelDelete()
+    {
+        pendingDeleteId = null;
+    }
+
+    private async Task ConfirmDeleteAsync(int orderId)
+    {
+        isDeleting = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await ListService.DeleteDraftAsync(orderId);
+
+            switch (result)
+            {
+                case DeleteDraftResult.Success:
+                    drafts = drafts.Where(d => d.Id != orderId).ToList();
+                    pendingDeleteId = null;
+                    break;
+                case DeleteDraftResult.NotFound:
+                    errorMessage = "The order could not be found.";
+                    pendingDeleteId = null;
+                    break;
+                case DeleteDraftResult.Forbidden:
+                    errorMessage = "You do not have permission to delete this order.";
+                    pendingDeleteId = null;
+                    break;
+                default:
+                    errorMessage = "An unexpected error occurred. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+}
