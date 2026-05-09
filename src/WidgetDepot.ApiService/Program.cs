@@ -11,6 +11,7 @@ using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
+using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
@@ -53,6 +54,7 @@ builder.Services.AddHttpClient<IShippingApiClient, AcmeShippingApiClient>(client
 builder.Services.AddScoped<CreateDraftOrderHandler>();
 builder.Services.AddScoped<DeleteDraftHandler>();
 builder.Services.AddScoped<GetDraftOrderHandler>();
+builder.Services.AddScoped<GetDraftsHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();
 builder.Services.AddScoped<CalculateShippingHandler>();
 builder.Services.AddScoped<SearchWidgetsHandler>();
