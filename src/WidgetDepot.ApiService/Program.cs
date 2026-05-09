@@ -9,6 +9,7 @@ using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
 using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
+using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 using WidgetDepot.ApiService.Features.Widgets.Import;
@@ -50,6 +51,7 @@ builder.Services.AddHttpClient<IShippingApiClient, AcmeShippingApiClient>(client
     client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
 });
 builder.Services.AddScoped<CreateDraftOrderHandler>();
+builder.Services.AddScoped<DeleteDraftHandler>();
 builder.Services.AddScoped<GetDraftOrderHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();
 builder.Services.AddScoped<CalculateShippingHandler>();
