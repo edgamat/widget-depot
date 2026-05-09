@@ -80,6 +80,50 @@ public class Step1ServiceTests
         result.ShouldBeOfType<CreateDraftResult.Failure>();
     }
 
+    [Fact]
+    public async Task GetDraftOrderAsync_SuccessResponse_ReturnsSuccessWithItems()
+    {
+        var body = """{"id":5,"status":"Draft","items":[{"widgetId":1,"sku":"SPR-001","name":"Sprocket","weight":1.5,"quantity":2}]}""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.GetDraftOrderAsync(5, TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetDraftStep1Result.Success>();
+        success.Order.Items.Count.ShouldBe(1);
+        success.Order.Items[0].Sku.ShouldBe("SPR-001");
+        success.Order.Items[0].Quantity.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task GetDraftOrderAsync_NotFound_ReturnsNotFound()
+    {
+        var service = CreateService(HttpStatusCode.NotFound, "{}");
+
+        var result = await service.GetDraftOrderAsync(5, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftStep1Result.NotFound>();
+    }
+
+    [Fact]
+    public async Task GetDraftOrderAsync_Forbidden_ReturnsForbidden()
+    {
+        var service = CreateService(HttpStatusCode.Forbidden, "{}");
+
+        var result = await service.GetDraftOrderAsync(5, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftStep1Result.Forbidden>();
+    }
+
+    [Fact]
+    public async Task GetDraftOrderAsync_ServerError_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.InternalServerError, "{}");
+
+        var result = await service.GetDraftOrderAsync(5, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftStep1Result.Failure>();
+    }
+
     private class FakeHttpMessageHandler(HttpStatusCode statusCode, string body) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

@@ -36,6 +36,13 @@ public class AppDbContext : DbContext
             entity.HasIndex(c => c.Email).IsUnique();
         });
 
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.HasOne(oi => oi.Widget)
+                  .WithMany()
+                  .HasForeignKey(oi => oi.WidgetId);
+        });
+
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasMany(o => o.Items)
