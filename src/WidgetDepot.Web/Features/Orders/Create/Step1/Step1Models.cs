@@ -30,3 +30,15 @@ public abstract record CreateDraftResult
     public record Success(int OrderId) : CreateDraftResult;
     public record Failure : CreateDraftResult;
 }
+
+public record GetDraftStep1ItemResponse(int WidgetId, string Sku, string Name, decimal Weight, int Quantity);
+
+public record GetDraftStep1Response(int Id, string Status, IReadOnlyList<GetDraftStep1ItemResponse> Items);
+
+public abstract record GetDraftStep1Result
+{
+    public record Success(GetDraftStep1Response Order) : GetDraftStep1Result;
+    public record NotFound : GetDraftStep1Result;
+    public record Forbidden : GetDraftStep1Result;
+    public record Failure : GetDraftStep1Result;
+}

@@ -1,4 +1,5 @@
 @page "/orders/new"
+@page "/orders/{OrderId:int}/step1"
 @rendermode InteractiveServer
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
@@ -126,6 +127,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public int OrderId { get; set; }
+
     private string? searchTerm;
     private IReadOnlyList<WidgetSearchResult> searchResults = [];
     private bool hasSearched;
@@ -133,8 +137,31 @@
     private string? errorMessage;
     private bool isSubmitting;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        if (OrderId > 0)
+        {
+            var result = await Step1Service.GetDraftOrderAsync(OrderId);
+
+            if (result is GetDraftStep1Result.Success success)
+            {
+                selectedItems.AddRange(success.Order.Items.Select(i => new OrderItemModel
+                {
+                    WidgetId = i.WidgetId,
+                    Sku = i.Sku,
+                    Name = i.Name,
+                    Weight = i.Weight,
+                    Quantity = i.Quantity
+                }));
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/orders/new");
+            }
+
+            return;
+        }
+
         if (WizardState.SelectedItems.Count > 0)
         {
             selectedItems.AddRange(WizardState.SelectedItems);
