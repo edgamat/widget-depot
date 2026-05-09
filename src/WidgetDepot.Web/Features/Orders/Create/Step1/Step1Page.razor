@@ -143,21 +143,20 @@
         {
             var result = await Step1Service.GetDraftOrderAsync(OrderId);
 
-            if (result is GetDraftStep1Result.Success success)
+            if (result is not GetDraftStep1Result.Success success)
             {
-                selectedItems.AddRange(success.Order.Items.Select(i => new OrderItemModel
-                {
-                    WidgetId = i.WidgetId,
-                    Sku = i.Sku,
-                    Name = i.Name,
-                    Weight = i.Weight,
-                    Quantity = i.Quantity
-                }));
+                errorMessage = "The order could not be found or you do not have permission to view it.";
+                return;
             }
-            else
+
+            selectedItems.AddRange(success.Order.Items.Select(i => new OrderItemModel
             {
-                NavigationManager.NavigateTo("/orders/new");
-            }
+                WidgetId = i.WidgetId,
+                Sku = i.Sku,
+                Name = i.Name,
+                Weight = i.Weight,
+                Quantity = i.Quantity
+            }));
 
             return;
         }
