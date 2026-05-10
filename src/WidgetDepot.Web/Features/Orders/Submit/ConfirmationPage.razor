@@ -1,0 +1,23 @@
+@page "/orders/{OrderId:int}/confirmation"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>Order Submitted</PageTitle>
+
+<h1>Order Submitted</h1>
+
+<div class="alert alert-success mt-3">
+    <p class="mb-1">Your order has been successfully submitted.</p>
+    <p class="mb-0 fw-bold">Order ID: @OrderId</p>
+</div>
+
+<div class="mt-4">
+    <a href="/orders" class="btn btn-outline-secondary me-2">View Draft Orders</a>
+    <a href="/" class="btn btn-primary">Return to Home</a>
+</div>
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+}

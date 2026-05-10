@@ -16,6 +16,7 @@ using WidgetDepot.Web.Features.Orders.Create.Step1;
 using WidgetDepot.Web.Features.Orders.Create.Step2;
 using WidgetDepot.Web.Features.Orders.Create.Step3;
 using WidgetDepot.Web.Features.Orders.List;
+using WidgetDepot.Web.Features.Orders.Submit;
 using WidgetDepot.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +74,10 @@ builder.Services.AddHttpClient<Step3Service>(client =>
     .AddHttpMessageHandler<CookieForwardingHandler>();
 
 builder.Services.AddHttpClient<ListService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
+
+builder.Services.AddHttpClient<Step4Service>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"))
     .AddHttpMessageHandler<CookieForwardingHandler>();
 

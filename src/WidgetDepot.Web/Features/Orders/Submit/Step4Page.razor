@@ -1,0 +1,208 @@
+@page "/orders/{OrderId:int}/submit"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Submit
+@inject Step4Service Step4Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>New Order - Review &amp; Submit</PageTitle>
+
+<h1>New Order</h1>
+<p class="text-muted lead">Step 4 of 4: Review &amp; Submit</p>
+
+@if (isLoading)
+{
+    <p>Loading order details&hellip;</p>
+}
+else if (loadError is not null)
+{
+    <div class="alert alert-danger">@loadError</div>
+    <div class="mt-3">
+        <button type="button" class="btn btn-secondary" @onclick="HandleBack">Back</button>
+    </div>
+}
+else if (order is not null)
+{
+    <div class="mb-4">
+        <h2 class="h5">Order Items</h2>
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr class="table-primary">
+                    <th>Widget</th>
+                    <th>SKU</th>
+                    <th class="text-end">Quantity</th>
+                    <th class="text-end">Weight (lbs)</th>
+                    <th class="text-end">Subtotal (lbs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in order.Items)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Sku</td>
+                        <td class="text-end">@item.Quantity</td>
+                        <td class="text-end">@item.Weight.ToString("0.###")</td>
+                        <td class="text-end">@((item.Quantity * item.Weight).ToString("0.###"))</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="4" class="text-end">Total weight (lbs)</td>
+                    <td class="text-end">@order.Items.Sum(i => i.Quantity * i.Weight).ToString("0.###")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 class="h5">Shipping Address</h2>
+            @if (order.ShippingAddress is not null)
+            {
+                <address>
+                    @order.ShippingAddress.RecipientName<br />
+                    @order.ShippingAddress.StreetLine1<br />
+                    @if (!string.IsNullOrEmpty(order.ShippingAddress.StreetLine2))
+                    {
+                        @order.ShippingAddress.StreetLine2<br />
+                    }
+                    @order.ShippingAddress.City, @order.ShippingAddress.State @order.ShippingAddress.ZipCode
+                </address>
+            }
+        </div>
+        <div class="col-md-6">
+            <h2 class="h5">Billing Address</h2>
+            @if (order.BillingAddress is not null)
+            {
+                <address>
+                    @order.BillingAddress.RecipientName<br />
+                    @order.BillingAddress.StreetLine1<br />
+                    @if (!string.IsNullOrEmpty(order.BillingAddress.StreetLine2))
+                    {
+                        @order.BillingAddress.StreetLine2<br />
+                    }
+                    @order.BillingAddress.City, @order.BillingAddress.State @order.BillingAddress.ZipCode
+                </address>
+            }
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <h2 class="h5">Shipping Estimate</h2>
+        @if (order.ShippingEstimate.HasValue)
+        {
+            <p class="fs-4">@order.ShippingEstimate.Value.ToString("C")</p>
+        }
+        else
+        {
+            <p class="text-muted">Not calculated</p>
+        }
+    </div>
+
+    @if (submitError is not null)
+    {
+        <div class="alert alert-danger">@submitError</div>
+    }
+
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-secondary" @onclick="HandleBack" disabled="@isSubmitting">Back</button>
+        <button type="button" class="btn btn-primary" @onclick="HandleSubmitAsync" disabled="@isSubmitting">
+            @(isSubmitting ? "Submitting…" : "Submit Order")
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private bool isLoading = true;
+    private bool isSubmitting;
+    private string? loadError;
+    private string? submitError;
+    private GetDraftOrderResponse? order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OrderId <= 0)
+        {
+            NavigationManager.NavigateTo("/orders/new");
+            return;
+        }
+
+        await LoadPageAsync();
+    }
+
+    private async Task LoadPageAsync()
+    {
+        isLoading = true;
+        loadError = null;
+
+        var result = await Step4Service.GetDraftOrderAsync(OrderId);
+
+        switch (result)
+        {
+            case GetDraftOrderResult.NotFound:
+            case GetDraftOrderResult.Forbidden:
+                NavigationManager.NavigateTo("/orders/new");
+                return;
+            case GetDraftOrderResult.Failure:
+                loadError = "Unable to load order details. Please try again.";
+                isLoading = false;
+                return;
+            case GetDraftOrderResult.Success success:
+                order = success.Order;
+                if (order.ShippingAddress is null)
+                {
+                    NavigationManager.NavigateTo($"/orders/{OrderId}/address");
+                    return;
+                }
+                if (!order.ShippingEstimate.HasValue)
+                {
+                    NavigationManager.NavigateTo($"/orders/{OrderId}/shipping");
+                    return;
+                }
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private void HandleBack()
+    {
+        NavigationManager.NavigateTo($"/orders/{OrderId}/shipping");
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        isSubmitting = true;
+        submitError = null;
+
+        var result = await Step4Service.SubmitOrderAsync(OrderId);
+
+        switch (result)
+        {
+            case SubmitOrderResult.Success success:
+                NavigationManager.NavigateTo($"/orders/{success.OrderId}/confirmation");
+                return;
+            case SubmitOrderResult.NotFound:
+            case SubmitOrderResult.Forbidden:
+                NavigationManager.NavigateTo("/orders/new");
+                return;
+            case SubmitOrderResult.InvalidState:
+                submitError = "This order has already been submitted.";
+                break;
+            case SubmitOrderResult.IncompleteOrder incomplete:
+                submitError = incomplete.Reason;
+                break;
+            default:
+                submitError = "An unexpected error occurred. Please try again.";
+                break;
+        }
+
+        isSubmitting = false;
+    }
+}
