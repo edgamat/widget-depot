@@ -35,6 +35,16 @@ public record GetDraftStep1ItemResponse(int WidgetId, string Sku, string Name, d
 
 public record GetDraftStep1Response(int Id, string Status, IReadOnlyList<GetDraftStep1ItemResponse> Items);
 
+public record UpdateDraftRequest(IReadOnlyList<UpdateDraftItemRequest> Items);
+
+public record UpdateDraftItemRequest(int WidgetId, int Quantity);
+
+public abstract record UpdateDraftResult
+{
+    public record Success : UpdateDraftResult;
+    public record Failure : UpdateDraftResult;
+}
+
 public abstract record GetDraftStep1Result
 {
     public record Success(GetDraftStep1Response Order) : GetDraftStep1Result;
