@@ -13,6 +13,7 @@ using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
+using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
 
@@ -57,6 +58,8 @@ builder.Services.AddScoped<GetDraftOrderHandler>();
 builder.Services.AddScoped<GetDraftsHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();
 builder.Services.AddScoped<CalculateShippingHandler>();
+builder.Services.AddScoped<SubmitOrderHandler>();
+builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
 builder.Services.AddScoped<SearchWidgetsHandler>();
 builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();

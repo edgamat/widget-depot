@@ -10,4 +10,5 @@ public static class OrderEndpoints
     public const string CalculateShipping = $"{Base}/{{orderId}}/shipping-estimate";
     public const string GetDrafts = $"{Base}/drafts";
     public const string DeleteDraft = $"{Base}/{{orderId}}/draft";
+    public const string SubmitOrder = $"{Base}/{{orderId}}/submit";
 }
