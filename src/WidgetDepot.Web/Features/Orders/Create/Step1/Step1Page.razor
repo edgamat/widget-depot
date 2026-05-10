@@ -161,10 +161,9 @@
             return;
         }
 
-        if (WizardState.SelectedItems.Count > 0)
-        {
-            selectedItems.AddRange(WizardState.SelectedItems);
-        }
+        WizardState.OrderId = 0;
+        WizardState.SelectedItems = [];
+        WizardState.AddressData = new();
     }
 
     private async Task ExecuteSearch()
