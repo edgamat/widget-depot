@@ -19,7 +19,8 @@ public record GetDraftOrderResponse(
     string Status,
     IReadOnlyList<GetDraftOrderItemResponse> Items,
     GetDraftOrderAddressResponse? ShippingAddress,
-    GetDraftOrderAddressResponse? BillingAddress);
+    GetDraftOrderAddressResponse? BillingAddress,
+    decimal? ShippingEstimate);
 
 public abstract record GetDraftOrderError
 {
@@ -47,7 +48,8 @@ public class GetDraftOrderHandler(AppDbContext db)
             order.Status.ToString(),
             [.. order.Items.Select(i => new GetDraftOrderItemResponse(i.WidgetId, i.Widget.Sku, i.Widget.Name, i.Widget.Weight, i.Quantity))],
             MapAddress(order.ShippingAddress),
-            MapAddress(order.BillingAddress));
+            MapAddress(order.BillingAddress),
+            order.ShippingEstimate);
     }
 
     private static GetDraftOrderAddressResponse? MapAddress(Address? address) =>
