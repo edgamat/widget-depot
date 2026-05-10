@@ -58,14 +58,14 @@ builder.Services.AddScoped<GetDraftOrderHandler>();
 builder.Services.AddScoped<GetDraftsHandler>();
 builder.Services.AddScoped<SaveAddressesHandler>();
 builder.Services.AddScoped<CalculateShippingHandler>();
-builder.Services.AddScoped<SubmitOrderHandler>();
-builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
 builder.Services.AddScoped<SearchWidgetsHandler>();
 builder.Services.AddScoped<ImportWidgetsCsvHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<ProfileHandler>();
 builder.Services.AddScoped<PasswordChangeHandler>();
+builder.Services.AddScoped<SubmitOrderHandler>();
+builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

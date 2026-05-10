@@ -58,7 +58,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var header = GetLine(file.Content, 0);
+        var header = GetLine(file.GetContent(), 0);
         header[..10].ShouldBe("0000000042");
     }
 
@@ -69,7 +69,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var header = GetLine(file.Content, 0);
+        var header = GetLine(file.GetContent(), 0);
         header.Substring(10, 100).TrimEnd().ShouldBe("alice@example.com");
     }
 
@@ -80,7 +80,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var header = GetLine(file.Content, 0);
+        var header = GetLine(file.GetContent(), 0);
         header.Substring(110, 10).TrimEnd().ShouldBe("2026/05/10");
     }
 
@@ -92,7 +92,7 @@ public class OrderFileTests
         var file = new OrderFile(order, "alice@example.com");
 
         // 3 items × 2.5 weight = 7.5 total
-        var header = GetLine(file.Content, 0);
+        var header = GetLine(file.GetContent(), 0);
         header.Substring(120, 10).ShouldBe("0000007.50");
     }
 
@@ -103,7 +103,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var line = GetLine(file.Content, 1);
+        var line = GetLine(file.GetContent(), 1);
         line.Substring(10, 10).TrimEnd().ShouldBe("S");
     }
 
@@ -114,7 +114,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var line = GetLine(file.Content, 2);
+        var line = GetLine(file.GetContent(), 2);
         line.Substring(10, 10).TrimEnd().ShouldBe("B");
     }
 
@@ -125,7 +125,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var line = GetLine(file.Content, 3);
+        var line = GetLine(file.GetContent(), 3);
         line.Substring(10, 10).ShouldBe("0000000007");
     }
 
@@ -136,7 +136,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var line = GetLine(file.Content, 3);
+        var line = GetLine(file.GetContent(), 3);
         line.Substring(20, 10).ShouldBe("0000000003");
     }
 
@@ -149,7 +149,7 @@ public class OrderFileTests
 
         var file = new OrderFile(order, "alice@example.com");
 
-        var lines = file.Content.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+        var lines = file.GetContent().Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
         lines.Length.ShouldBe(5); // header + shipping + billing + 2 items
     }
 

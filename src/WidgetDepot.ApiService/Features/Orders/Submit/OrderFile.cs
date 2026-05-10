@@ -6,14 +6,19 @@ namespace WidgetDepot.ApiService.Features.Orders.Submit;
 
 public class OrderFile
 {
+    private readonly Order _order;
+    private readonly string _customerEmail;
+
     public string FileName { get; }
-    public string Content { get; }
 
     public OrderFile(Order order, string customerEmail)
     {
         FileName = $"EXT-{order.Id.ToString().PadLeft(10, '0')}.TXT";
-        Content = BuildContent(order, customerEmail);
+        _order = order;
+        _customerEmail = customerEmail;
     }
+
+    public string GetContent() => BuildContent(_order, _customerEmail);
 
     private static string BuildContent(Order order, string customerEmail)
     {
