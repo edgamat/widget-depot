@@ -4,6 +4,7 @@ using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
+using WidgetDepot.ApiService.Features.Orders.Submit;
 
 namespace WidgetDepot.ApiService.Features.Orders;
 
@@ -17,6 +18,7 @@ public static class OrderEndpointExtensions
         app.MapSaveAddresses();
         app.MapCalculateShipping();
         app.MapDeleteDraft();
+        app.MapSubmitOrder();
 
         return app;
     }

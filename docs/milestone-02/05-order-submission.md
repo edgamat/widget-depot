@@ -13,9 +13,9 @@ can submit the order. Submission changes the order status to `Submitted` and cau
 to write an order file to a designated pickup directory. A separate scheduled job (story in
 Milestone 3) transmits those files to the ERP system via FTP.
 
-**Dependency:** The ERP order file format is TBD — it must match the format used by the
-existing website. This story cannot be fully implemented until the format spec is confirmed.
-The story should be implementation-ready in all other respects.
+**Dependency:** The ERP order file format is described here:
+
+[ERP File Format](../standards/erp-order-format.md)
 
 ## Scope
 
@@ -35,9 +35,11 @@ The story should be implementation-ready in all other respects.
 
 - New feature slice: `WidgetDepot.Web/Features/Orders/Submit/`
 - New API endpoint: `WidgetDepot.ApiService/Features/Orders/Submit/`
+- Create an order file class (OrderFile) that uses the order, the addresses, and line items
+  and creates the contents of the file as a string. 
 - The order file writer should be implemented behind an interface (e.g., `IOrderFileWriter`) so it can be tested without touching the filesystem
 - The pickup directory path should be read from configuration (e.g., `Orders:PickupDirectory`)
-- Order file format must replicate the existing ERP format exactly (spec TBD — treat as a required input before implementation)
+- Order file format must replicate the existing ERP format exactly
 - Only orders with `Draft` status and all required fields populated (widgets, both addresses, shipping estimate) may be submitted; return a typed error otherwise
 - `SubmittedAt` timestamp should be added to the `Order` entity (nullable; set when status transitions to `Submitted`) — add an EF Core migration
 - Patterns to follow: Vertical Slice Architecture; EF Core for data access; Bootstrap 5.3 for layout; no MediatR

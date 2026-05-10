@@ -13,6 +13,7 @@ using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
+using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
 
@@ -63,6 +64,8 @@ builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<ProfileHandler>();
 builder.Services.AddScoped<PasswordChangeHandler>();
+builder.Services.AddScoped<SubmitOrderHandler>();
+builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

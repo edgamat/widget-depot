@@ -17,4 +17,5 @@ public class Order
     public Address? ShippingAddress { get; set; }
     public Address? BillingAddress { get; set; }
     public decimal? ShippingEstimate { get; set; }
+    public DateTime? SubmittedAt { get; set; }
 }
