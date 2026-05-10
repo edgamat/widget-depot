@@ -4,7 +4,7 @@ using WidgetDepot.ApiService.Data;
 
 namespace WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 
-public record GetDraftOrderItemResponse(int WidgetId, string Sku, string Name, decimal Weight, int Quantity);
+public record GetDraftOrderItemResponse(int WidgetId, string Sku, string Name, decimal Weight, decimal UnitCost, int Quantity);
 
 public record GetDraftOrderAddressResponse(
     string RecipientName,
@@ -46,7 +46,7 @@ public class GetDraftOrderHandler(AppDbContext db)
         return new GetDraftOrderResponse(
             order.Id,
             order.Status.ToString(),
-            [.. order.Items.Select(i => new GetDraftOrderItemResponse(i.WidgetId, i.Widget.Sku, i.Widget.Name, i.Widget.Weight, i.Quantity))],
+            [.. order.Items.Select(i => new GetDraftOrderItemResponse(i.WidgetId, i.Widget.Sku, i.Widget.Name, i.Widget.Weight, i.Widget.Price, i.Quantity))],
             MapAddress(order.ShippingAddress),
             MapAddress(order.BillingAddress),
             order.ShippingEstimate);

@@ -18,7 +18,7 @@ public abstract record SubmitOrderResult
     public record Failure : SubmitOrderResult;
 }
 
-public record GetDraftOrderItemResponse(int WidgetId, string Sku, string Name, decimal Weight, int Quantity);
+public record GetDraftOrderItemResponse(int WidgetId, string Sku, string Name, decimal UnitCost, int Quantity);
 
 public record GetDraftOrderAddressResponse(
     string RecipientName,

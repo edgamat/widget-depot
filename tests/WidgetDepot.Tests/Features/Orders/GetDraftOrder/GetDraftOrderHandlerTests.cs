@@ -104,6 +104,7 @@ public class GetDraftOrderHandlerTests
         response.Items[0].Sku.ShouldBe("SPR-001");
         response.Items[0].Name.ShouldBe("Sprocket");
         response.Items[0].Weight.ShouldBe(1.5m);
+        response.Items[0].UnitCost.ShouldBe(9.99m);
         response.Items[0].Quantity.ShouldBe(3);
     }
 }
