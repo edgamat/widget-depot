@@ -223,18 +223,36 @@
 
         try
         {
-            var result = await Step1Service.CreateDraftAsync(selectedItems);
-
-            switch (result)
+            if (OrderId > 0)
             {
-                case CreateDraftResult.Success success:
-                    WizardState.OrderId = success.OrderId;
+                var result = await Step1Service.UpdateDraftAsync(OrderId, selectedItems);
+
+                if (result is UpdateDraftResult.Success)
+                {
+                    WizardState.OrderId = OrderId;
                     WizardState.SelectedItems = new List<OrderItemModel>(selectedItems);
-                    NavigationManager.NavigateTo($"/orders/{success.OrderId}/address");
-                    break;
-                default:
+                    NavigationManager.NavigateTo($"/orders/{OrderId}/address");
+                }
+                else
+                {
                     errorMessage = "An unexpected error occurred. Please try again.";
-                    break;
+                }
+            }
+            else
+            {
+                var result = await Step1Service.CreateDraftAsync(selectedItems);
+
+                switch (result)
+                {
+                    case CreateDraftResult.Success success:
+                        WizardState.OrderId = success.OrderId;
+                        WizardState.SelectedItems = new List<OrderItemModel>(selectedItems);
+                        NavigationManager.NavigateTo($"/orders/{success.OrderId}/address");
+                        break;
+                    default:
+                        errorMessage = "An unexpected error occurred. Please try again.";
+                        break;
+                }
             }
         }
         catch (Exception)

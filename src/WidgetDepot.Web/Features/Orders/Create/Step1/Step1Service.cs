@@ -48,4 +48,16 @@ public class Step1Service(HttpClient httpClient)
 
         return new CreateDraftResult.Failure();
     }
+
+    public async Task<UpdateDraftResult> UpdateDraftAsync(int orderId, IReadOnlyList<OrderItemModel> items, CancellationToken cancellationToken = default)
+    {
+        var request = new UpdateDraftRequest(
+            items.Select(i => new UpdateDraftItemRequest(i.WidgetId, i.Quantity)).ToList());
+
+        var response = await httpClient.PutAsJsonAsync($"/orders/{orderId}/items", request, cancellationToken);
+
+        return response.StatusCode == System.Net.HttpStatusCode.NoContent
+            ? new UpdateDraftResult.Success()
+            : new UpdateDraftResult.Failure();
+    }
 }

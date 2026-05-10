@@ -218,7 +218,7 @@
     private void HandleBack()
     {
         SaveToState();
-        NavigationManager.NavigateTo("/orders/new");
+        NavigationManager.NavigateTo($"/orders/{OrderId}/step1");
     }
 
     private async Task HandleContinue()
