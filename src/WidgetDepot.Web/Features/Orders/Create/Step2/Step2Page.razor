@@ -161,27 +161,35 @@
             return;
         }
 
-        if (WizardState.OrderId == OrderId)
+        if (WizardState.OrderId == OrderId && order is not null)
         {
-            CopyFromState();
+            CopyFromOrder(order);
         }
     }
 
-    private void CopyFromState()
+    private void CopyFromOrder(GetDraftOrderResponse order)
     {
-        var saved = WizardState.AddressData;
-        form.ShippingRecipientName = saved.ShippingRecipientName;
-        form.ShippingStreetLine1 = saved.ShippingStreetLine1;
-        form.ShippingStreetLine2 = saved.ShippingStreetLine2;
-        form.ShippingCity = saved.ShippingCity;
-        form.ShippingState = saved.ShippingState;
-        form.ShippingZipCode = saved.ShippingZipCode;
-        form.BillingRecipientName = saved.BillingRecipientName;
-        form.BillingStreetLine1 = saved.BillingStreetLine1;
-        form.BillingStreetLine2 = saved.BillingStreetLine2;
-        form.BillingCity = saved.BillingCity;
-        form.BillingState = saved.BillingState;
-        form.BillingZipCode = saved.BillingZipCode;
+        var shippingAddress = order.ShippingAddress;
+        if (shippingAddress is not null)
+        {
+            form.ShippingRecipientName = shippingAddress.RecipientName;
+            form.ShippingStreetLine1 = shippingAddress.StreetLine1;
+            form.ShippingStreetLine2 = shippingAddress.StreetLine2;
+            form.ShippingCity = shippingAddress.City;
+            form.ShippingState = shippingAddress.State;
+            form.ShippingZipCode = shippingAddress.ZipCode;
+        }
+
+        var billingAddress = order.BillingAddress;
+        if (billingAddress is not null)
+        {
+            form.BillingRecipientName = billingAddress.RecipientName;
+            form.BillingStreetLine1 = billingAddress.StreetLine1;
+            form.BillingStreetLine2 = billingAddress.StreetLine2;
+            form.BillingCity = billingAddress.City;
+            form.BillingState = billingAddress.State;
+            form.BillingZipCode = billingAddress.ZipCode;
+        }
     }
 
     private void SaveToState()
