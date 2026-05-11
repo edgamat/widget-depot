@@ -1,7 +1,18 @@
+using System.Net.Sockets;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithContainerName("postgres")
     .WithDataVolume()
+    .WithEndpoint(
+        name: "postgres",
+        port: 5432,
+        targetPort: 5432,
+        protocol: ProtocolType.Tcp,
+        isProxied: false
+    )
     .AddDatabase("widgetdepot");
 
 var fakeShippingApi = builder.AddProject<Projects.WidgetDepot_FakeShippingApi>("shippingapi")
