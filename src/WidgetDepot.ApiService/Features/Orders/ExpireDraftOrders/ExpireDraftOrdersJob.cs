@@ -5,6 +5,7 @@ public class ExpireDraftOrdersJob : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<ExpireDraftOrdersJob> _logger;
     private readonly int _scheduleHourUtc;
+    private bool _first = true;
 
     public ExpireDraftOrdersJob(
         IServiceScopeFactory scopeFactory,
@@ -24,6 +25,7 @@ public class ExpireDraftOrdersJob : BackgroundService
 
             try
             {
+                _logger.LogInformation("ExpireDraftOrdersJob: Delaying for {Delay}", delay);
                 await Task.Delay(delay, stoppingToken);
             }
             catch (OperationCanceledException)
@@ -46,6 +48,13 @@ public class ExpireDraftOrdersJob : BackgroundService
 
     private TimeSpan TimeUntilNextScheduledRun()
     {
+        if (_first)
+        {
+            // Run the job on startup
+            _first = false;
+            return TimeSpan.Zero;            
+        }
+
         var now = DateTime.UtcNow;
         var nextRun = now.Date.AddHours(_scheduleHourUtc);
 
