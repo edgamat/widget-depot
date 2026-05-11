@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
-
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
@@ -10,6 +9,7 @@ using WidgetDepot.ApiService.Features.Accounts.Register;
 using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
+using WidgetDepot.ApiService.Features.Orders.ExpireDraftOrders;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
@@ -68,6 +68,8 @@ builder.Services.AddScoped<PasswordChangeHandler>();
 builder.Services.AddScoped<SubmitOrderHandler>();
 builder.Services.AddScoped<UpdateDraftItemsHandler>();
 builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
+builder.Services.AddScoped<ExpireDraftOrdersHandler>();
+builder.Services.AddHostedService<ExpireDraftOrdersJob>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
