@@ -1,0 +1,78 @@
+@page "/orders/history"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.History
+@inject HistoryService HistoryService
+
+<PageTitle>My Recent Orders</PageTitle>
+
+<h1>My Recent Orders</h1>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (loadFailed)
+{
+    <div class="alert alert-danger">Unable to load your recent orders. Please try again later.</div>
+}
+else if (orders.Count == 0)
+{
+    <p class="text-muted">You have no submitted orders yet.</p>
+}
+else
+{
+    <table class="table table-sm table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Order ID</th>
+                <th>Submitted</th>
+                <th>Widgets</th>
+                <th>Est. Shipping</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr style="cursor:pointer" @onclick="() => NavigateToDetail(order.Id)">
+                    <td>@order.Id</td>
+                    <td>@order.SubmittedAt.ToString("d")</td>
+                    <td>@order.WidgetCount</td>
+                    <td>@(order.ShippingEstimate.HasValue ? order.ShippingEstimate.Value.ToString("C") : "—")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private IReadOnlyList<RecentOrderListItem> orders = [];
+    private bool isLoading = true;
+    private bool loadFailed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await HistoryService.GetRecentOrdersAsync();
+
+        switch (result)
+        {
+            case GetRecentOrdersResult.Success success:
+                orders = success.Orders;
+                break;
+            default:
+                loadFailed = true;
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private void NavigateToDetail(int orderId)
+    {
+        NavigationManager.NavigateTo($"/orders/{orderId}");
+    }
+}

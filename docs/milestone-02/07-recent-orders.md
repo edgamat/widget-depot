@@ -34,6 +34,7 @@ the draft orders list (story 04).
 - New API endpoint: `WidgetDepot.ApiService/Features/Orders/GetRecentSubmitted/`
 - Query: submitted orders for the authenticated customer, ordered by `SubmittedAt` descending, limited to 10 rows
 - `SubmittedAt` timestamp should be added to the `Order` entity (nullable; set when status transitions to `Submitted`) — add an EF Core migration if story 05 has not already added this column
+- Add a navigation link to access the new page (My Recent Orders).
 - Patterns to follow: Vertical Slice Architecture; EF Core for data access; Bootstrap 5.3 for layout; no MediatR
 
 ## Acceptance Criteria

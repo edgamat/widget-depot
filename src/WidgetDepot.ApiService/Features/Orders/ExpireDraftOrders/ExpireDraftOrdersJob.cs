@@ -52,7 +52,7 @@ public class ExpireDraftOrdersJob : BackgroundService
         {
             // Run the job on startup
             _first = false;
-            return TimeSpan.Zero;            
+            return TimeSpan.Zero;
         }
 
         var now = DateTime.UtcNow;

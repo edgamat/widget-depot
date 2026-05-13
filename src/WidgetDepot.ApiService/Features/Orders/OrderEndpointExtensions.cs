@@ -3,6 +3,7 @@ using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
+using WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.UpdateDraftItems;
@@ -21,6 +22,7 @@ public static class OrderEndpointExtensions
         app.MapDeleteDraft();
         app.MapSubmitOrder();
         app.MapUpdateDraftItems();
+        app.MapGetRecentSubmitted();
 
         return app;
     }
