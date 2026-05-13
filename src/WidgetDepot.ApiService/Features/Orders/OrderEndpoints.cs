@@ -13,4 +13,5 @@ public static class OrderEndpoints
     public const string SubmitOrder = $"{Base}/{{orderId}}/submit";
     public const string UpdateDraftItems = $"{Base}/{{orderId}}/items";
     public const string GetRecentSubmitted = $"{Base}/recent";
+    public const string GetByOrderNumber = $"{Base}/{{orderNumber}}";
 }

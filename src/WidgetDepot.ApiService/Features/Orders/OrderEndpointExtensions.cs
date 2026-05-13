@@ -1,6 +1,7 @@
 using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
+using WidgetDepot.ApiService.Features.Orders.GetByOrderNumber;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
@@ -23,6 +24,7 @@ public static class OrderEndpointExtensions
         app.MapSubmitOrder();
         app.MapUpdateDraftItems();
         app.MapGetRecentSubmitted();
+        app.MapGetByOrderNumber();
 
         return app;
     }
