@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WidgetDepot.Web.Features.Orders.Detail;
 
 public record OrderDetailItem(int WidgetId, string Sku, string Name, decimal Weight, decimal UnitCost, int Quantity);
@@ -25,6 +27,12 @@ public abstract record GetOrderDetailResult
     public record Success(OrderDetail Order) : GetOrderDetailResult;
     public record NotFound : GetOrderDetailResult;
     public record Failure : GetOrderDetailResult;
+}
+
+public class LookupFormModel
+{
+    [Required(ErrorMessage = "Order number is required.")]
+    public string? OrderNumber { get; set; }
 }
 
 internal record GetByOrderNumberItemResponse(int WidgetId, string Sku, string Name, decimal Weight, decimal UnitCost, int Quantity);

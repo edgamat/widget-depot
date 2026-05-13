@@ -1,0 +1,35 @@
+@page "/orders/lookup"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Detail
+@inject NavigationManager NavigationManager
+
+<PageTitle>Order Lookup</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1>Order Lookup</h1>
+
+        <EditForm Model="form" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label" for="orderNumber">Order Number</label>
+                <InputText id="orderNumber" class="form-control" @bind-Value="form.OrderNumber" />
+                <ValidationMessage For="() => form.OrderNumber" class="text-danger" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Look Up</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private readonly LookupFormModel form = new();
+
+    private void HandleSubmit()
+    {
+        NavigationManager.NavigateTo($"/orders/{form.OrderNumber}");
+    }
+}
