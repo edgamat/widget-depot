@@ -1,0 +1,139 @@
+@page "/orders/{orderNumber:int}"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.Orders.Detail
+@inject DetailService DetailService
+
+<PageTitle>Order #@OrderNumber</PageTitle>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (notFound)
+{
+    <div class="alert alert-warning">Order not found.</div>
+}
+else if (loadFailed)
+{
+    <div class="alert alert-danger">Unable to load order details. Please try again later.</div>
+}
+else if (order is not null)
+{
+    <h1>Order #@order.Id</h1>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@order.Status</dd>
+        <dt class="col-sm-3">Created</dt>
+        <dd class="col-sm-9">@order.CreatedAt.ToString("d")</dd>
+        @if (order.SubmittedAt.HasValue)
+        {
+            <dt class="col-sm-3">Submitted</dt>
+            <dd class="col-sm-9">@order.SubmittedAt.Value.ToString("d")</dd>
+        }
+        @if (order.ShippingEstimate.HasValue)
+        {
+            <dt class="col-sm-3">Est. Shipping</dt>
+            <dd class="col-sm-9">@order.ShippingEstimate.Value.ToString("C")</dd>
+        }
+    </dl>
+
+    <h2>Items</h2>
+    @if (order.Items.Count == 0)
+    {
+        <p class="text-muted">No items on this order.</p>
+    }
+    else
+    {
+        <table class="table table-sm table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Weight</th>
+                    <th>Unit Cost</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in order.Items)
+                {
+                    <tr>
+                        <td>@item.Sku</td>
+                        <td>@item.Name</td>
+                        <td>@item.Weight.ToString("F2")</td>
+                        <td>@item.UnitCost.ToString("C")</td>
+                        <td>@item.Quantity</td>
+                        <td>@((item.UnitCost * item.Quantity).ToString("C"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <div class="row mt-4">
+        @if (order.ShippingAddress is not null)
+        {
+            <div class="col-md-6">
+                <h2>Shipping Address</h2>
+                <address>
+                    @order.ShippingAddress.RecipientName<br />
+                    @order.ShippingAddress.StreetLine1<br />
+                    @if (!string.IsNullOrEmpty(order.ShippingAddress.StreetLine2))
+                    {
+                        @order.ShippingAddress.StreetLine2<br />
+                    }
+                    @order.ShippingAddress.City, @order.ShippingAddress.State @order.ShippingAddress.ZipCode
+                </address>
+            </div>
+        }
+        @if (order.BillingAddress is not null)
+        {
+            <div class="col-md-6">
+                <h2>Billing Address</h2>
+                <address>
+                    @order.BillingAddress.RecipientName<br />
+                    @order.BillingAddress.StreetLine1<br />
+                    @if (!string.IsNullOrEmpty(order.BillingAddress.StreetLine2))
+                    {
+                        @order.BillingAddress.StreetLine2<br />
+                    }
+                    @order.BillingAddress.City, @order.BillingAddress.State @order.BillingAddress.ZipCode
+                </address>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int OrderNumber { get; set; }
+
+    private OrderDetail? order;
+    private bool isLoading = true;
+    private bool notFound;
+    private bool loadFailed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await DetailService.GetOrderDetailAsync(OrderNumber);
+
+        switch (result)
+        {
+            case GetOrderDetailResult.Success success:
+                order = success.Order;
+                break;
+            case GetOrderDetailResult.NotFound:
+                notFound = true;
+                break;
+            default:
+                loadFailed = true;
+                break;
+        }
+
+        isLoading = false;
+    }
+}

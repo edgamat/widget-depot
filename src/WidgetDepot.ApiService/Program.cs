@@ -10,6 +10,7 @@ using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
 using WidgetDepot.ApiService.Features.Orders.DeleteDraft;
 using WidgetDepot.ApiService.Features.Orders.ExpireDraftOrders;
+using WidgetDepot.ApiService.Features.Orders.GetByOrderNumber;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
@@ -71,6 +72,7 @@ builder.Services.AddScoped<UpdateDraftItemsHandler>();
 builder.Services.AddScoped<GetRecentSubmittedHandler>();
 builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
 builder.Services.AddScoped<ExpireDraftOrdersHandler>();
+builder.Services.AddScoped<GetByOrderNumberHandler>();
 builder.Services.AddHostedService<ExpireDraftOrdersJob>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
