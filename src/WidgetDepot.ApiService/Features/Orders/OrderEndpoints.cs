@@ -12,4 +12,5 @@ public static class OrderEndpoints
     public const string DeleteDraft = $"{Base}/{{orderId}}/draft";
     public const string SubmitOrder = $"{Base}/{{orderId}}/submit";
     public const string UpdateDraftItems = $"{Base}/{{orderId}}/items";
+    public const string GetRecentSubmitted = $"{Base}/recent";
 }
