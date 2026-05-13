@@ -30,16 +30,22 @@ else
                 <th>Submitted</th>
                 <th>Widgets</th>
                 <th>Est. Shipping</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var order in orders)
             {
-                <tr style="cursor:pointer" @onclick="() => NavigateToDetail(order.Id)">
+                <tr>
                     <td>@order.Id</td>
                     <td>@order.SubmittedAt.ToString("d")</td>
                     <td>@order.WidgetCount</td>
                     <td>@(order.ShippingEstimate.HasValue ? order.ShippingEstimate.Value.ToString("C") : "—")</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @onclick="() => NavigateToDetail(order.Id)">
+                            View
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
