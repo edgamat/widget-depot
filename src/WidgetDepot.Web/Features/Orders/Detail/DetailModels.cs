@@ -32,7 +32,8 @@ public abstract record GetOrderDetailResult
 public class LookupFormModel
 {
     [Required(ErrorMessage = "Order number is required.")]
-    public string? OrderNumber { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = "Order number must be a positive number.")]
+    public int? OrderNumber { get; set; }
 }
 
 internal record GetByOrderNumberItemResponse(int WidgetId, string Sku, string Name, decimal Weight, decimal UnitCost, int Quantity);
