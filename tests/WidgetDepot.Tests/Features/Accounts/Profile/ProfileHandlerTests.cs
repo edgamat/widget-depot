@@ -51,6 +51,43 @@ public class ProfileHandlerTests
     }
 
     [Fact]
+    public async Task GetAsync_CustomerWithNoAddresses_ReturnsNullAddresses()
+    {
+        using var db = CreateDb();
+        SeedCustomer(db);
+        var handler = new ProfileHandler(db);
+
+        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<GetProfileResponse>();
+        response.ShippingAddress.ShouldBeNull();
+        response.BillingAddress.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetAsync_CustomerWithAddresses_ReturnsAddresses()
+    {
+        using var db = CreateDb();
+        var customer = SeedCustomer(db);
+        customer.ShippingAddress = new Address { RecipientName = "Jane Doe", StreetLine1 = "123 Main St", City = "Springfield", State = "IL", ZipCode = "62701" };
+        customer.BillingAddress = new Address { RecipientName = "Jane Doe", StreetLine1 = "456 Oak Ave", City = "Shelbyville", State = "IL", ZipCode = "62565" };
+        db.SaveChanges();
+        var handler = new ProfileHandler(db);
+
+        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<GetProfileResponse>();
+        response.ShippingAddress.ShouldNotBeNull();
+        response.ShippingAddress.RecipientName.ShouldBe("Jane Doe");
+        response.ShippingAddress.StreetLine1.ShouldBe("123 Main St");
+        response.ShippingAddress.City.ShouldBe("Springfield");
+        response.ShippingAddress.State.ShouldBe("IL");
+        response.ShippingAddress.ZipCode.ShouldBe("62701");
+        response.BillingAddress.ShouldNotBeNull();
+        response.BillingAddress.StreetLine1.ShouldBe("456 Oak Ave");
+    }
+
+    [Fact]
     public async Task GetAsync_UnknownCustomer_ReturnsNotFound()
     {
         using var db = CreateDb();
@@ -69,7 +106,7 @@ public class ProfileHandlerTests
         using var db = CreateDb();
         SeedCustomer(db);
         var handler = new ProfileHandler(db);
-        var request = new UpdateProfileRequest("Janet", "Smith", "janet@example.com");
+        var request = new UpdateProfileRequest("Janet", "Smith", "janet@example.com", null, null);
 
         var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
 
@@ -85,12 +122,59 @@ public class ProfileHandlerTests
     }
 
     [Fact]
+    public async Task UpdateAsync_WithAddresses_PersistsAddresses()
+    {
+        using var db = CreateDb();
+        SeedCustomer(db);
+        var handler = new ProfileHandler(db);
+        var shippingAddress = new AddressDto("Jane Doe", "123 Main St", null, "Springfield", "IL", "62701");
+        var billingAddress = new AddressDto("Jane Doe", "456 Oak Ave", "Apt 2", "Shelbyville", "IL", "62565");
+        var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", shippingAddress, billingAddress);
+
+        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<UpdateProfileResponse>();
+        response.ShippingAddress.ShouldNotBeNull();
+        response.ShippingAddress.RecipientName.ShouldBe("Jane Doe");
+        response.ShippingAddress.StreetLine1.ShouldBe("123 Main St");
+        response.ShippingAddress.City.ShouldBe("Springfield");
+        response.BillingAddress.ShouldNotBeNull();
+        response.BillingAddress.StreetLine1.ShouldBe("456 Oak Ave");
+        response.BillingAddress.StreetLine2.ShouldBe("Apt 2");
+
+        var customer = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
+        customer.ShippingAddress.ShouldNotBeNull();
+        customer.ShippingAddress.StreetLine1.ShouldBe("123 Main St");
+        customer.BillingAddress.ShouldNotBeNull();
+        customer.BillingAddress.StreetLine1.ShouldBe("456 Oak Ave");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WithNullAddresses_ClearsAddresses()
+    {
+        using var db = CreateDb();
+        var customer = SeedCustomer(db);
+        customer.ShippingAddress = new Address { RecipientName = "Jane Doe", StreetLine1 = "123 Main St", City = "Springfield", State = "IL", ZipCode = "62701" };
+        db.SaveChanges();
+        var handler = new ProfileHandler(db);
+        var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", null, null);
+
+        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<UpdateProfileResponse>();
+        response.ShippingAddress.ShouldBeNull();
+
+        var saved = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
+        saved.ShippingAddress.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task UpdateAsync_SameEmail_Succeeds()
     {
         using var db = CreateDb();
         SeedCustomer(db);
         var handler = new ProfileHandler(db);
-        var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com");
+        var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", null, null);
 
         var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
 
@@ -104,7 +188,7 @@ public class ProfileHandlerTests
         SeedCustomer(db, id: 1, email: "jane@example.com");
         SeedCustomer(db, id: 2, email: "other@example.com");
         var handler = new ProfileHandler(db);
-        var request = new UpdateProfileRequest("Jane", "Doe", "other@example.com");
+        var request = new UpdateProfileRequest("Jane", "Doe", "other@example.com", null, null);
 
         var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
 
@@ -116,7 +200,7 @@ public class ProfileHandlerTests
     {
         using var db = CreateDb();
         var handler = new ProfileHandler(db);
-        var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com");
+        var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", null, null);
 
         var result = await handler.UpdateAsync(99, request, TestContext.Current.CancellationToken);
 

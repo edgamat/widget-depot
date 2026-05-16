@@ -4,6 +4,7 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using WidgetDepot.Web.Features.Orders.Create.Step2
 @inject ProfileService ProfileService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -11,7 +12,7 @@
 <PageTitle>My Profile</PageTitle>
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-10">
         <h1>My Profile</h1>
 
         @if (showSaveConfirmation)
@@ -39,22 +40,117 @@
             <EditForm Model="form" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
 
-                <div class="mb-3">
-                    <label class="form-label" for="firstName">First Name</label>
-                    <InputText id="firstName" class="form-control" @bind-Value="form.FirstName" />
-                    <ValidationMessage For="() => form.FirstName" class="text-danger" />
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="firstName">First Name</label>
+                            <InputText id="firstName" class="form-control" @bind-Value="form.FirstName" />
+                            <ValidationMessage For="() => form.FirstName" class="text-danger" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="lastName">Last Name</label>
+                            <InputText id="lastName" class="form-control" @bind-Value="form.LastName" />
+                            <ValidationMessage For="() => form.LastName" class="text-danger" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="email">Email Address</label>
+                            <InputText id="email" type="email" class="form-control" @bind-Value="form.Email" />
+                            <ValidationMessage For="() => form.Email" class="text-danger" />
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label" for="lastName">Last Name</label>
-                    <InputText id="lastName" class="form-control" @bind-Value="form.LastName" />
-                    <ValidationMessage For="() => form.LastName" class="text-danger" />
-                </div>
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <h2 class="h5">Shipping Address</h2>
 
-                <div class="mb-3">
-                    <label class="form-label" for="email">Email Address</label>
-                    <InputText id="email" type="email" class="form-control" @bind-Value="form.Email" />
-                    <ValidationMessage For="() => form.Email" class="text-danger" />
+                        <div class="mb-3">
+                            <label class="form-label" for="shippingRecipientName">Recipient Name</label>
+                            <InputText id="shippingRecipientName" class="form-control" @bind-Value="form.ShippingAddress.RecipientName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="shippingStreetLine1">Street Line 1</label>
+                            <InputText id="shippingStreetLine1" class="form-control" @bind-Value="form.ShippingAddress.StreetLine1" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="shippingStreetLine2">Street Line 2 <span class="text-muted">(optional)</span></label>
+                            <InputText id="shippingStreetLine2" class="form-control" @bind-Value="form.ShippingAddress.StreetLine2" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="shippingCity">City</label>
+                            <InputText id="shippingCity" class="form-control" @bind-Value="form.ShippingAddress.City" />
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-7 mb-3">
+                                <label class="form-label" for="shippingState">State</label>
+                                <InputSelect id="shippingState" class="form-select" @bind-Value="form.ShippingAddress.State">
+                                    <option value="">— Select state —</option>
+                                    @foreach (var state in UsStates.All)
+                                    {
+                                        <option value="@state.Code">@state.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label" for="shippingZipCode">ZIP Code</label>
+                                <InputText id="shippingZipCode" class="form-control" @bind-Value="form.ShippingAddress.ZipCode" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 mb-0">Billing Address</h2>
+                            <div class="form-check mb-0">
+                                <input type="checkbox" class="form-check-input" id="sameAsShipping"
+                                       @onchange="HandleSameAsShipping" />
+                                <label class="form-check-label" for="sameAsShipping">Same as shipping address</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="billingRecipientName">Recipient Name</label>
+                            <InputText id="billingRecipientName" class="form-control" @bind-Value="form.BillingAddress.RecipientName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="billingStreetLine1">Street Line 1</label>
+                            <InputText id="billingStreetLine1" class="form-control" @bind-Value="form.BillingAddress.StreetLine1" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="billingStreetLine2">Street Line 2 <span class="text-muted">(optional)</span></label>
+                            <InputText id="billingStreetLine2" class="form-control" @bind-Value="form.BillingAddress.StreetLine2" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="billingCity">City</label>
+                            <InputText id="billingCity" class="form-control" @bind-Value="form.BillingAddress.City" />
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-7 mb-3">
+                                <label class="form-label" for="billingState">State</label>
+                                <InputSelect id="billingState" class="form-select" @bind-Value="form.BillingAddress.State">
+                                    <option value="">— Select state —</option>
+                                    @foreach (var state in UsStates.All)
+                                    {
+                                        <option value="@state.Code">@state.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label" for="billingZipCode">ZIP Code</label>
+                                <InputText id="billingZipCode" class="form-control" @bind-Value="form.BillingAddress.ZipCode" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
@@ -96,6 +192,26 @@
                 form.FirstName = success.Profile.FirstName;
                 form.LastName = success.Profile.LastName;
                 form.Email = success.Profile.Email;
+
+                if (success.Profile.ShippingAddress is not null)
+                {
+                    form.ShippingAddress.RecipientName = success.Profile.ShippingAddress.RecipientName;
+                    form.ShippingAddress.StreetLine1 = success.Profile.ShippingAddress.StreetLine1;
+                    form.ShippingAddress.StreetLine2 = success.Profile.ShippingAddress.StreetLine2;
+                    form.ShippingAddress.City = success.Profile.ShippingAddress.City;
+                    form.ShippingAddress.State = success.Profile.ShippingAddress.State;
+                    form.ShippingAddress.ZipCode = success.Profile.ShippingAddress.ZipCode;
+                }
+
+                if (success.Profile.BillingAddress is not null)
+                {
+                    form.BillingAddress.RecipientName = success.Profile.BillingAddress.RecipientName;
+                    form.BillingAddress.StreetLine1 = success.Profile.BillingAddress.StreetLine1;
+                    form.BillingAddress.StreetLine2 = success.Profile.BillingAddress.StreetLine2;
+                    form.BillingAddress.City = success.Profile.BillingAddress.City;
+                    form.BillingAddress.State = success.Profile.BillingAddress.State;
+                    form.BillingAddress.ZipCode = success.Profile.BillingAddress.ZipCode;
+                }
                 break;
             default:
                 loadFailed = true;
@@ -103,6 +219,19 @@
         }
 
         isLoading = false;
+    }
+
+    private void HandleSameAsShipping(ChangeEventArgs e)
+    {
+        if (e.Value is true)
+        {
+            form.BillingAddress.RecipientName = form.ShippingAddress.RecipientName;
+            form.BillingAddress.StreetLine1 = form.ShippingAddress.StreetLine1;
+            form.BillingAddress.StreetLine2 = form.ShippingAddress.StreetLine2;
+            form.BillingAddress.City = form.ShippingAddress.City;
+            form.BillingAddress.State = form.ShippingAddress.State;
+            form.BillingAddress.ZipCode = form.ShippingAddress.ZipCode;
+        }
     }
 
     private async Task HandleSubmit()

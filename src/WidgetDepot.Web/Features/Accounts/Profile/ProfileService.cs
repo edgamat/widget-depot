@@ -24,7 +24,29 @@ public class ProfileService(HttpClient httpClient)
         {
             form.FirstName,
             form.LastName,
-            form.Email
+            form.Email,
+            ShippingAddress = form.ShippingAddress.HasAnyValue()
+                ? new
+                {
+                    form.ShippingAddress.RecipientName,
+                    form.ShippingAddress.StreetLine1,
+                    form.ShippingAddress.StreetLine2,
+                    form.ShippingAddress.City,
+                    form.ShippingAddress.State,
+                    form.ShippingAddress.ZipCode
+                }
+                : (object?)null,
+            BillingAddress = form.BillingAddress.HasAnyValue()
+                ? new
+                {
+                    form.BillingAddress.RecipientName,
+                    form.BillingAddress.StreetLine1,
+                    form.BillingAddress.StreetLine2,
+                    form.BillingAddress.City,
+                    form.BillingAddress.State,
+                    form.BillingAddress.ZipCode
+                }
+                : (object?)null
         };
 
         var response = await httpClient.PutAsJsonAsync("/accounts/profile", request, cancellationToken);
