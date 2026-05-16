@@ -18,7 +18,7 @@ public class ProfileServiceTests
     [Fact]
     public async Task LoadAsync_SuccessResponse_ReturnsSuccessWithProfile()
     {
-        var service = CreateService(HttpStatusCode.OK, """{"firstName": "Jane", "lastName": "Doe", "email": "jane@example.com"}""");
+        var service = CreateService(HttpStatusCode.OK, """{"firstName": "Jane", "lastName": "Doe", "email": "jane@example.com", "shippingAddress": null, "billingAddress": null}""");
 
         var result = await service.LoadAsync(TestContext.Current.CancellationToken);
 
@@ -26,6 +26,32 @@ public class ProfileServiceTests
         success.Profile.FirstName.ShouldBe("Jane");
         success.Profile.LastName.ShouldBe("Doe");
         success.Profile.Email.ShouldBe("jane@example.com");
+    }
+
+    [Fact]
+    public async Task LoadAsync_SuccessResponseWithAddresses_ReturnsAddresses()
+    {
+        var body = """
+            {
+                "firstName": "Jane",
+                "lastName": "Doe",
+                "email": "jane@example.com",
+                "shippingAddress": {"recipientName": "Jane Doe", "streetLine1": "123 Main St", "streetLine2": null, "city": "Springfield", "state": "IL", "zipCode": "62701"},
+                "billingAddress": {"recipientName": "Jane Doe", "streetLine1": "456 Oak Ave", "streetLine2": "Apt 2", "city": "Shelbyville", "state": "IL", "zipCode": "62565"}
+            }
+            """;
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.LoadAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<LoadProfileResult.Success>();
+        success.Profile.ShippingAddress.ShouldNotBeNull();
+        success.Profile.ShippingAddress.RecipientName.ShouldBe("Jane Doe");
+        success.Profile.ShippingAddress.StreetLine1.ShouldBe("123 Main St");
+        success.Profile.ShippingAddress.City.ShouldBe("Springfield");
+        success.Profile.BillingAddress.ShouldNotBeNull();
+        success.Profile.BillingAddress.StreetLine1.ShouldBe("456 Oak Ave");
+        success.Profile.BillingAddress.StreetLine2.ShouldBe("Apt 2");
     }
 
     [Fact]
@@ -51,7 +77,7 @@ public class ProfileServiceTests
     [Fact]
     public async Task UpdateAsync_SuccessResponse_ReturnsSuccessWithProfile()
     {
-        var service = CreateService(HttpStatusCode.OK, """{"firstName": "Jane", "lastName": "Smith", "email": "jane.smith@example.com"}""");
+        var service = CreateService(HttpStatusCode.OK, """{"firstName": "Jane", "lastName": "Smith", "email": "jane.smith@example.com", "shippingAddress": null, "billingAddress": null}""");
         var form = new ProfileFormModel { FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com" };
 
         var result = await service.UpdateAsync(form, TestContext.Current.CancellationToken);
@@ -60,6 +86,22 @@ public class ProfileServiceTests
         success.Profile.FirstName.ShouldBe("Jane");
         success.Profile.LastName.ShouldBe("Smith");
         success.Profile.Email.ShouldBe("jane.smith@example.com");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WithAddresses_SendsAddressDataInRequest()
+    {
+        var service = CreateService(HttpStatusCode.OK, """{"firstName": "Jane", "lastName": "Doe", "email": "jane@example.com", "shippingAddress": null, "billingAddress": null}""");
+        var form = new ProfileFormModel { FirstName = "Jane", LastName = "Doe", Email = "jane@example.com" };
+        form.ShippingAddress.RecipientName = "Jane Doe";
+        form.ShippingAddress.StreetLine1 = "123 Main St";
+        form.ShippingAddress.City = "Springfield";
+        form.ShippingAddress.State = "IL";
+        form.ShippingAddress.ZipCode = "62701";
+
+        var result = await service.UpdateAsync(form, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<UpdateProfileResult.Success>();
     }
 
     [Fact]
