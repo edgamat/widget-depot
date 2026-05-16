@@ -4,11 +4,21 @@ namespace WidgetDepot.Web.Features.Accounts.Profile;
 
 public class AddressFormModel
 {
+    [MaxLength(100, ErrorMessage = "Recipient name must not exceed 100 characters.")]
     public string RecipientName { get; set; } = string.Empty;
+
+    [MaxLength(100, ErrorMessage = "Street line 1 must not exceed 100 characters.")]
     public string StreetLine1 { get; set; } = string.Empty;
+
+    [MaxLength(100, ErrorMessage = "Street line 2 must not exceed 100 characters.")]
     public string? StreetLine2 { get; set; }
+
+    [MaxLength(100, ErrorMessage = "City must not exceed 100 characters.")]
     public string City { get; set; } = string.Empty;
+
     public string State { get; set; } = string.Empty;
+
+    [RegularExpression(@"^\d{5}(-\d{4})?$", ErrorMessage = "ZIP code must be in 5-digit (12345) or ZIP+4 (12345-6789) format.")]
     public string ZipCode { get; set; } = string.Empty;
 
     public bool HasAnyValue() =>
