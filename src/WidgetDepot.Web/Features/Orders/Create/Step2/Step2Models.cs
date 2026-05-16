@@ -134,6 +134,18 @@ public record AddressRequest(
 
 public record SaveAddressesRequest(AddressRequest ShippingAddress, AddressRequest BillingAddress);
 
+public record ProfileAddressData(
+    string RecipientName,
+    string StreetLine1,
+    string? StreetLine2,
+    string City,
+    string State,
+    string ZipCode);
+
+public record ProfileAddressesResponse(
+    ProfileAddressData? ShippingAddress,
+    ProfileAddressData? BillingAddress);
+
 public abstract record SaveAddressesResult
 {
     public record Success : SaveAddressesResult;

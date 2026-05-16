@@ -11,6 +11,12 @@ public abstract record GetDraftOrderResult
     public record Failure : GetDraftOrderResult;
 }
 
+public abstract record GetProfileAddressesResult
+{
+    public record Success(ProfileAddressesResponse Profile) : GetProfileAddressesResult;
+    public record Failure : GetProfileAddressesResult;
+}
+
 public class Step2Service
 {
     private readonly HttpClient _httpClient;
@@ -67,6 +73,21 @@ public class Step2Service
             HttpStatusCode.Forbidden => new SaveAddressesResult.Forbidden(),
             _ => new SaveAddressesResult.Failure()
         };
+    }
+
+    public async Task<GetProfileAddressesResult> GetProfileAddressesAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.GetAsync("/accounts/profile", cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var profile = await response.Content.ReadFromJsonAsync<ProfileAddressesResponse>(cancellationToken);
+            return profile is null
+                ? new GetProfileAddressesResult.Failure()
+                : new GetProfileAddressesResult.Success(profile);
+        }
+
+        return new GetProfileAddressesResult.Failure();
     }
 
     private static string? NullIfEmpty(string? value) =>

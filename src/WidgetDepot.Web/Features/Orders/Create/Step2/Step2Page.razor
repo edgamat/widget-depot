@@ -166,6 +166,45 @@
         {
             CopyFromOrder(order);
         }
+
+        await PrefillFromProfileAsync();
+    }
+
+    private async Task PrefillFromProfileAsync()
+    {
+        var shippingEmpty = string.IsNullOrEmpty(form.ShippingStreetLine1);
+        var billingEmpty = string.IsNullOrEmpty(form.BillingStreetLine1);
+
+        if (!shippingEmpty && !billingEmpty)
+        {
+            return;
+        }
+
+        var profileResult = await Step2Service.GetProfileAddressesAsync();
+        if (profileResult is not GetProfileAddressesResult.Success profileSuccess)
+        {
+            return;
+        }
+
+        if (shippingEmpty && profileSuccess.Profile.ShippingAddress is { } shipping)
+        {
+            form.ShippingRecipientName = shipping.RecipientName;
+            form.ShippingStreetLine1 = shipping.StreetLine1;
+            form.ShippingStreetLine2 = shipping.StreetLine2;
+            form.ShippingCity = shipping.City;
+            form.ShippingState = shipping.State;
+            form.ShippingZipCode = shipping.ZipCode;
+        }
+
+        if (billingEmpty && profileSuccess.Profile.BillingAddress is { } billing)
+        {
+            form.BillingRecipientName = billing.RecipientName;
+            form.BillingStreetLine1 = billing.StreetLine1;
+            form.BillingStreetLine2 = billing.StreetLine2;
+            form.BillingCity = billing.City;
+            form.BillingState = billing.State;
+            form.BillingZipCode = billing.ZipCode;
+        }
     }
 
     private void CopyFromOrder(GetDraftOrderResponse order)
