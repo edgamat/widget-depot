@@ -1,3 +1,10 @@
+---
+status: shared
+milestone: 2
+github_issue: 109
+task_issues: []
+---
+
 # Order wizard: pre-fill addresses from profile
 
 ## User Story

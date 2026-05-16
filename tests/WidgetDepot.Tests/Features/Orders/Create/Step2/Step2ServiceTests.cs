@@ -135,6 +135,48 @@ public class Step2ServiceTests
         capturedBody.ShouldContain("\"streetLine2\":null");
     }
 
+    [Fact]
+    public async Task GetProfileAddressesAsync_OkResponseWithShippingAddress_ReturnsSuccessWithShippingAddress()
+    {
+        var json = """{"shippingAddress":{"recipientName":"Alice Smith","streetLine1":"123 Main St","streetLine2":null,"city":"Springfield","state":"IL","zipCode":"62701"},"billingAddress":null}""";
+        var handler = new FakeHttpMessageHandler(HttpStatusCode.OK, responseContent: json);
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://test") };
+        var service = new Step2Service(httpClient);
+
+        var result = await service.GetProfileAddressesAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetProfileAddressesResult.Success>();
+        success.Profile.ShippingAddress.ShouldNotBeNull();
+        success.Profile.ShippingAddress.RecipientName.ShouldBe("Alice Smith");
+        success.Profile.ShippingAddress.StreetLine1.ShouldBe("123 Main St");
+        success.Profile.BillingAddress.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetProfileAddressesAsync_OkResponseWithNoAddresses_ReturnsSuccessWithNullAddresses()
+    {
+        var json = """{"shippingAddress":null,"billingAddress":null}""";
+        var handler = new FakeHttpMessageHandler(HttpStatusCode.OK, responseContent: json);
+        var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://test") };
+        var service = new Step2Service(httpClient);
+
+        var result = await service.GetProfileAddressesAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetProfileAddressesResult.Success>();
+        success.Profile.ShippingAddress.ShouldBeNull();
+        success.Profile.BillingAddress.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetProfileAddressesAsync_NonSuccessResponse_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.InternalServerError);
+
+        var result = await service.GetProfileAddressesAsync(TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetProfileAddressesResult.Failure>();
+    }
+
     private class FakeHttpMessageHandler : HttpMessageHandler
     {
         private readonly HttpStatusCode _statusCode;
