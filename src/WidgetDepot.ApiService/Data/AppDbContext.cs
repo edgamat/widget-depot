@@ -34,6 +34,28 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Customer>(entity =>
         {
             entity.HasIndex(c => c.Email).IsUnique();
+
+            entity.OwnsOne(c => c.ShippingAddress, a =>
+            {
+                a.Property(x => x.RecipientName).HasColumnName("ShippingRecipientName").HasColumnType("text");
+                a.Property(x => x.StreetLine1).HasColumnName("ShippingStreetLine1").HasColumnType("text");
+                a.Property(x => x.StreetLine2).HasColumnName("ShippingStreetLine2").HasColumnType("text");
+                a.Property(x => x.City).HasColumnName("ShippingCity").HasColumnType("text");
+                a.Property(x => x.State).HasColumnName("ShippingState").HasColumnType("text");
+                a.Property(x => x.ZipCode).HasColumnName("ShippingZipCode").HasColumnType("text");
+            });
+            entity.Navigation(c => c.ShippingAddress).IsRequired(false);
+
+            entity.OwnsOne(c => c.BillingAddress, a =>
+            {
+                a.Property(x => x.RecipientName).HasColumnName("BillingRecipientName").HasColumnType("text");
+                a.Property(x => x.StreetLine1).HasColumnName("BillingStreetLine1").HasColumnType("text");
+                a.Property(x => x.StreetLine2).HasColumnName("BillingStreetLine2").HasColumnType("text");
+                a.Property(x => x.City).HasColumnName("BillingCity").HasColumnType("text");
+                a.Property(x => x.State).HasColumnName("BillingState").HasColumnType("text");
+                a.Property(x => x.ZipCode).HasColumnName("BillingZipCode").HasColumnType("text");
+            });
+            entity.Navigation(c => c.BillingAddress).IsRequired(false);
         });
 
         modelBuilder.Entity<OrderItem>(entity =>

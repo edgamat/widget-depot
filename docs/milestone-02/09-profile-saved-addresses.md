@@ -1,3 +1,10 @@
+---
+status: split
+milestone: 2
+github_issue: 104
+task_issues: [105, 106]
+---
+
 # Profile: saved shipping and billing addresses
 
 ## User Story
