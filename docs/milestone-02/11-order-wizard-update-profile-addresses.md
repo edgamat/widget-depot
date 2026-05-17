@@ -1,7 +1,7 @@
 ---
 status: ready
 milestone: 2
-github_issue:
+github_issue: 111
 task_issues: []
 ---
 
@@ -15,8 +15,7 @@ task_issues: []
 
 ## Background
 
-This story is the complement to story 10 (pre-fill addresses from profile). Story 10 explicitly
-scoped out saving wizard address edits back to the profile; this story adds that capability.
+This story is the complement to story 10 (pre-fill addresses from profile). 
 
 When a customer reaches step 2 of the order wizard, two "Save to profile" checkboxes appear —
 one for shipping, one for billing. Both are pre-checked by default. If the customer clicks

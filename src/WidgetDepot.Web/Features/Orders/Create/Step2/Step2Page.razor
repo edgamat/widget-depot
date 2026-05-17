@@ -63,6 +63,11 @@
                     <ValidationMessage For="() => form.ShippingZipCode" class="text-danger" />
                 </div>
             </div>
+
+            <div class="form-check mb-3">
+                <InputCheckbox id="saveShippingToProfile" class="form-check-input" @bind-Value="form.SaveShippingToProfile" />
+                <label class="form-check-label" for="saveShippingToProfile">Save to profile</label>
+            </div>
         </div>
 
         <div class="col-md-6">
@@ -116,6 +121,11 @@
                     <InputText id="billingZipCode" class="form-control" @bind-Value="form.BillingZipCode" />
                     <ValidationMessage For="() => form.BillingZipCode" class="text-danger" />
                 </div>
+            </div>
+
+            <div class="form-check mb-3">
+                <InputCheckbox id="saveBillingToProfile" class="form-check-input" @bind-Value="form.SaveBillingToProfile" />
+                <label class="form-check-label" for="saveBillingToProfile">Save to profile</label>
             </div>
         </div>
     </div>
@@ -269,6 +279,14 @@
         NavigationManager.NavigateTo($"/orders/{OrderId}/step1");
     }
 
+    private async Task SaveProfileAddressesIfNeededAsync()
+    {
+        if (!form.SaveShippingToProfile && !form.SaveBillingToProfile)
+            return;
+
+        await Step2Service.SaveProfileAddressesAsync(form, form.SaveShippingToProfile, form.SaveBillingToProfile);
+    }
+
     private async Task HandleContinue()
     {
         isSubmitting = true;
@@ -282,6 +300,7 @@
             {
                 case SaveAddressesResult.Success:
                     SaveToState();
+                    await SaveProfileAddressesIfNeededAsync();
                     NavigationManager.NavigateTo($"/orders/{OrderId}/shipping");
                     break;
                 case SaveAddressesResult.NotFound:
