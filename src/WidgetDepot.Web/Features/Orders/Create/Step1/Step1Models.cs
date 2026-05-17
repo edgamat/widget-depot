@@ -50,5 +50,6 @@ public abstract record GetDraftStep1Result
     public record Success(GetDraftStep1Response Order) : GetDraftStep1Result;
     public record NotFound : GetDraftStep1Result;
     public record Forbidden : GetDraftStep1Result;
+    public record NotDraft : GetDraftStep1Result;
     public record Failure : GetDraftStep1Result;
 }

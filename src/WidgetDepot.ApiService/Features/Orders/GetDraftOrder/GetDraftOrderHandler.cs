@@ -26,6 +26,7 @@ public abstract record GetDraftOrderError
 {
     public record OrderNotFound : GetDraftOrderError;
     public record Forbidden : GetDraftOrderError;
+    public record NotDraft : GetDraftOrderError;
 }
 
 public class GetDraftOrderHandler(AppDbContext db)
@@ -42,6 +43,9 @@ public class GetDraftOrderHandler(AppDbContext db)
 
         if (order.CustomerId != customerId)
             return new GetDraftOrderError.Forbidden();
+
+        if (order.Status != OrderStatus.Draft)
+            return new GetDraftOrderError.NotDraft();
 
         return new GetDraftOrderResponse(
             order.Id,

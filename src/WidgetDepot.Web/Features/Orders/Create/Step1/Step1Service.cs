@@ -20,6 +20,7 @@ public class Step1Service(HttpClient httpClient)
         {
             HttpStatusCode.NotFound => new GetDraftStep1Result.NotFound(),
             HttpStatusCode.Forbidden => new GetDraftStep1Result.Forbidden(),
+            HttpStatusCode.Conflict => new GetDraftStep1Result.NotDraft(),
             _ => new GetDraftStep1Result.Failure()
         };
     }

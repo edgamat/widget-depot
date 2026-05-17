@@ -143,6 +143,12 @@
         {
             var result = await Step1Service.GetDraftOrderAsync(OrderId);
 
+            if (result is GetDraftStep1Result.NotDraft)
+            {
+                errorMessage = "This order is no longer a draft and cannot be edited.";
+                return;
+            }
+
             if (result is not GetDraftStep1Result.Success success)
             {
                 errorMessage = "The order could not be found or you do not have permission to view it.";

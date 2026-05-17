@@ -41,7 +41,7 @@ orders list with "Resume" action), and the step 2 page from story 02 to accept a
 
 ## Acceptance Criteria
 
-- [ ] Step 1 (edit mode) is only reachable for orders in `Draft` status belonging to the authenticated customer; any other attempt returns an appropriate error
+- [x] Step 1 (edit mode) is only reachable for orders in `Draft` status belonging to the authenticated customer; any other attempt returns an appropriate error
 - [ ] Previously selected widgets and quantities are pre-populated when the customer arrives at step 1 via "Resume"
 - [ ] The customer can add a widget with a quantity, adjust quantity, and remove a widget from the order
 - [ ] A summary of selected widgets and their quantities is visible at all times during this step
