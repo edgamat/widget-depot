@@ -47,10 +47,14 @@ Branch creation is a **precondition**, not a step. Before the first Edit or Writ
 
 ### When using the `gh` command line tool
 
-- When specifying `--repo`, always run `gh repo view --json nameWithOwner -q .nameWithOwner` as a separate command first to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
+- When specifying `--repo`, always use the literal value 'edgamat/widget-depot' — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
 
 
 When working on a GitHub issue, you MUST read and follow [github-workflow](./docs/standards/github-workflow.md) before starting.
+
+## Source Layout
+
+All project source lives under `src/`. The main web app is `src/WidgetDepot.Web/`. See [architecture](./docs/standards/architecture.md) for the full folder structure.
 
 ---
 
