@@ -108,16 +108,30 @@
             </table>
         }
 
+        @if (draftSavedMessage is not null)
+        {
+            <div class="alert alert-success alert-dismissible mt-2" role="alert">
+                @draftSavedMessage
+                <button type="button" class="btn-close" @onclick="() => draftSavedMessage = null" aria-label="Close"></button>
+            </div>
+        }
+
         @if (errorMessage is not null)
         {
             <div class="alert alert-danger mt-2">@errorMessage</div>
         }
 
         <div class="mt-3">
-            <button class="btn btn-primary" @onclick="HandleContinue"
-                    disabled="@(selectedItems.Count == 0 || isSubmitting)">
-                @(isSubmitting ? "Saving..." : "Continue")
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary" @onclick="HandleSaveDraft"
+                        disabled="@(selectedItems.Count == 0 || isSubmitting || isSavingDraft)">
+                    @(isSavingDraft ? "Saving..." : "Save Draft")
+                </button>
+                <button class="btn btn-primary" @onclick="HandleContinue"
+                        disabled="@(selectedItems.Count == 0 || isSubmitting || isSavingDraft)">
+                    @(isSubmitting ? "Saving..." : "Continue")
+                </button>
+            </div>
             @if (selectedItems.Count == 0)
             {
                 <p class="text-muted small mt-1">Add at least one widget to continue.</p>
@@ -130,12 +144,18 @@
     [Parameter]
     public int OrderId { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "saved")]
+    public bool Saved { get; set; }
+
     private string? searchTerm;
     private IReadOnlyList<WidgetSearchResult> searchResults = [];
     private bool hasSearched;
     private readonly List<OrderItemModel> selectedItems = [];
     private string? errorMessage;
+    private string? draftSavedMessage;
     private bool isSubmitting;
+    private bool isSavingDraft;
 
     protected override async Task OnInitializedAsync()
     {
@@ -163,6 +183,11 @@
                 Weight = i.Weight,
                 Quantity = i.Quantity
             }));
+
+            if (Saved)
+            {
+                draftSavedMessage = "Draft saved.";
+            }
 
             return;
         }
@@ -219,6 +244,52 @@
     {
         if (int.TryParse(e.Value?.ToString(), out var qty) && qty >= 1)
             item.Quantity = qty;
+    }
+
+    private async Task HandleSaveDraft()
+    {
+        isSavingDraft = true;
+        errorMessage = null;
+        draftSavedMessage = null;
+
+        try
+        {
+            if (OrderId > 0)
+            {
+                var result = await Step1Service.UpdateDraftAsync(OrderId, selectedItems);
+
+                if (result is UpdateDraftResult.Success)
+                {
+                    draftSavedMessage = "Draft saved.";
+                }
+                else
+                {
+                    errorMessage = "An unexpected error occurred. Please try again.";
+                }
+            }
+            else
+            {
+                var result = await Step1Service.CreateDraftAsync(selectedItems);
+
+                switch (result)
+                {
+                    case CreateDraftResult.Success success:
+                        NavigationManager.NavigateTo($"/orders/{success.OrderId}/step1?saved=true");
+                        break;
+                    default:
+                        errorMessage = "An unexpected error occurred. Please try again.";
+                        break;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isSavingDraft = false;
+        }
     }
 
     private async Task HandleContinue()

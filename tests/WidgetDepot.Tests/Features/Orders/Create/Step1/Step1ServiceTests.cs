@@ -124,6 +124,48 @@ public class Step1ServiceTests
         result.ShouldBeOfType<GetDraftStep1Result.Failure>();
     }
 
+    [Fact]
+    public async Task UpdateDraftAsync_NoContentResponse_ReturnsSuccess()
+    {
+        var service = CreateService(HttpStatusCode.NoContent, "");
+        var items = new List<OrderItemModel>
+        {
+            new() { WidgetId = 1, Sku = "SPR-001", Name = "Sprocket", Weight = 1.5m, Quantity = 3 }
+        };
+
+        var result = await service.UpdateDraftAsync(5, items, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<UpdateDraftResult.Success>();
+    }
+
+    [Fact]
+    public async Task UpdateDraftAsync_ServerError_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.InternalServerError, "{}");
+        var items = new List<OrderItemModel>
+        {
+            new() { WidgetId = 1, Sku = "SPR-001", Name = "Sprocket", Weight = 1.5m, Quantity = 1 }
+        };
+
+        var result = await service.UpdateDraftAsync(5, items, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<UpdateDraftResult.Failure>();
+    }
+
+    [Fact]
+    public async Task UpdateDraftAsync_NotFound_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.NotFound, "{}");
+        var items = new List<OrderItemModel>
+        {
+            new() { WidgetId = 1, Sku = "SPR-001", Name = "Sprocket", Weight = 1.5m, Quantity = 1 }
+        };
+
+        var result = await service.UpdateDraftAsync(5, items, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<UpdateDraftResult.Failure>();
+    }
+
     private class FakeHttpMessageHandler(HttpStatusCode statusCode, string body) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
