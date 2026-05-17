@@ -47,6 +47,9 @@ public class Step2FormModel
     [Required(ErrorMessage = "ZIP code is required.")]
     [RegularExpression(@"^\d{5}(-\d{4})?$", ErrorMessage = "ZIP code must be in 5-digit (12345) or ZIP+4 (12345-6789) format.")]
     public string BillingZipCode { get; set; } = string.Empty;
+
+    public bool SaveShippingToProfile { get; set; } = true;
+    public bool SaveBillingToProfile { get; set; } = true;
 }
 
 public static class UsStates
@@ -152,4 +155,17 @@ public abstract record SaveAddressesResult
     public record NotFound : SaveAddressesResult;
     public record Forbidden : SaveAddressesResult;
     public record Failure : SaveAddressesResult;
+}
+
+public record FullProfileData(
+    string FirstName,
+    string LastName,
+    string Email,
+    ProfileAddressData? ShippingAddress,
+    ProfileAddressData? BillingAddress);
+
+public abstract record SaveProfileAddressesResult
+{
+    public record Success : SaveProfileAddressesResult;
+    public record Failure : SaveProfileAddressesResult;
 }
