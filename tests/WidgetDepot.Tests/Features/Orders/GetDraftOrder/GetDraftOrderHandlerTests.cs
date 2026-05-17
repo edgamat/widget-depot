@@ -71,6 +71,20 @@ public class GetDraftOrderHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_OrderIsNotInDraftStatus_ReturnsNotDraft()
+    {
+        using var db = CreateDb();
+        var order = await SeedOrderAsync(db, customerId: 1);
+        order.Status = OrderStatus.Submitted;
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var handler = new GetDraftOrderHandler(db);
+
+        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<GetDraftOrderError.NotDraft>();
+    }
+
+    [Fact]
     public async Task HandleAsync_OrderExistsAndBelongsToCustomer_ReturnsResponse()
     {
         using var db = CreateDb();

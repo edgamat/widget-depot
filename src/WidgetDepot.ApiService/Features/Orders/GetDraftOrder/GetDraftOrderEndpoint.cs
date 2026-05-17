@@ -21,6 +21,7 @@ public static class GetDraftOrderEndpoint
             {
                 GetDraftOrderError.OrderNotFound => Results.NotFound(),
                 GetDraftOrderError.Forbidden => Results.Forbid(),
+                GetDraftOrderError.NotDraft => Results.Conflict(),
                 GetDraftOrderResponse response => Results.Ok(response),
                 _ => Results.Problem(statusCode: 500)
             };
