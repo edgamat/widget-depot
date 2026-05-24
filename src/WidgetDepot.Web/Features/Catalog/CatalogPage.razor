@@ -8,11 +8,11 @@
 
 <div class="row g-3 mb-4">
     <div class="col-auto">
-        <input type="text" class="form-control" placeholder="Search widgets..."
+        <input id="search-input" type="text" class="form-control" placeholder="Search widgets..."
                @bind="searchTerm" @bind:event="oninput" @onkeydown="HandleKeyDown" />
     </div>
     <div class="col-auto">
-        <button class="btn btn-primary" @onclick="ExecuteSearch">Search</button>
+        <button id="search-button" class="btn btn-primary" role="button" @onclick="ExecuteSearch">Search</button>
     </div>
 </div>
 
