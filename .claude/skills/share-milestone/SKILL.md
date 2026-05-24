@@ -61,78 +61,29 @@ body uses the Review Checklist format from `/docs/standards/user-stories.md`.
    ```
    Save this as `PARENT_NODE_ID`.
 
-## Step 2 - Create each story issue (one at a time)
+## Step 2 - Run share-stories.sh
 
-For each story file, in filename order:
+Run the helper script to process all story files:
 
-### 2a. Extract title and body
-
-- Drop the YAML frontmatter (everything from the first `---` line through the
-  matching closing `---` line, plus the blank line that follows).
-- The next `# H1 line` is the issue **title**. Drop that line from the body.
-- The remainder is the issue **body**, byte-for-byte. Do not reformat,
-  paraphrase, summarize, or "improve" anything.
-- Normalize line endings to `\n` (LF). Save the body to a temp file for the
-  next step. This is the canonical body that will be compared against
-  GitHub's response.
-
-### 2b. Create the issue
-
-```
-gh issue create \
-  --title "{title from H1}" \
-  --body-file <tempfile> \
-  --label story
+```bash
+bash .claude/skills/share-milestone/share-stories.sh \
+  docs/milestone-NN \
+  "$PARENT_NODE_ID"
 ```
 
-Capture the new issue's number from the output.
+Replace `milestone-NN` with the zero-padded milestone directory (e.g. `milestone-03`).
 
-### 2c. Fetch back and verify (drift check)
+The script handles each story file in filename order:
+- Extracts the H1 title and body (strips frontmatter)
+- Creates the GitHub issue with `--label story`
+- Drift-checks the returned body byte-for-byte against the source (trailing
+  newline normalized to absorb GitHub's API artifact)
+- Links the issue as a native sub-issue via the GraphQL `addSubIssue` mutation
+- Flips the story file's frontmatter to `status: shared` with `github_issue: N`
 
-```
-gh issue view {number} --json body --jq .body
-```
-
-Normalize line endings on the response to `\n`, then compare to the canonical
-body byte-for-byte.
-
-- **Mismatch:** stop the entire skill. Print a unified diff between the
-  source body and the returned body. Do **not** continue with subsequent
-  stories. Do **not** edit the GitHub issue to "fix" the difference. Do
-  **not** edit the source markdown. Tell the user the issue number that
-  failed verification and stop.
-- **Match:** continue.
-
-### 2d. Link as a sub-issue of the milestone parent
-
-Fetch the new issue's GraphQL node ID:
-
-```
-gh issue view {number} --json id --jq .id
-```
-
-Save as `CHILD_NODE_ID`. Then run the sub-issue mutation:
-
-```
-gh api graphql \
-  -f query='mutation($issueId: ID!, $subIssueId: ID!) { addSubIssue(input: {issueId: $issueId, subIssueId: $subIssueId}) { issue { number } subIssue { number } } }' \
-  -f issueId="$PARENT_NODE_ID" \
-  -f subIssueId="$CHILD_NODE_ID"
-```
-
-This is the **only** supported way to create native sub-issues in `gh`
-2.92.x - there is no first-class flag. Do not improvise an alternative.
-
-### 2e. Write the issue number back to the story file
-
-Update the story's frontmatter:
-
-- `status: shared`
-- `github_issue: {number}`
-
-Leave `task_issues: []` alone - that's `/refine-story`'s job.
-
-Edit the file in place. Preserve the rest of the document exactly.
+If the script exits non-zero, it will have reported which issues were created
+before the failure and which story files remain at `status: ready`. Do not
+continue — relay the script's output to the user.
 
 ## Step 3 - Summary
 
