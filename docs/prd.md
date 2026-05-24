@@ -72,6 +72,8 @@ Delivery of the new website will be structured as iterative milestones so that w
 - Generated files are written to a designated pickup directory.
 - A scheduled task runs **once per day** and transmits all pending files to the ERP system via FTP.
 - The file format and FTP configuration must remain identical to the existing system (see Constraint 7.1).
+- On the 'My Recent Orders' page, customers can see the status of their order file transmittal (Pending, Transmitted, Failed)
+- Customers can request a file be retransmitted (if transmittal is in a Failed state)
 
 ### 5.5 Problem Reporting
 
@@ -128,6 +130,8 @@ Milestones are ordered to deliver usable functionality as early as possible. Eac
 **Delivers:** Submitted orders flow to the ERP system automatically.
 
 - Scheduled daily FTP task to transmit order files from the pickup directory to the ERP system.
+- Update to "My Recent Orders" to show if file has been transmitted (and when).
+- Means to re-transmit file to FTP site on demand for any submitted order.
 - Order file format validated against ERP expectations.
 
 ### Milestone 4 - Admin Tools
