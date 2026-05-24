@@ -1,7 +1,7 @@
 ---
-status: ready
+status: shared
 milestone: 3
-github_issue:
+github_issue: 118
 task_issues: []
 ---
 
