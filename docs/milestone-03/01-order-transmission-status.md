@@ -1,5 +1,5 @@
 ---
-status: draft
+status: ready
 milestone: 3
 github_issue:
 task_issues: []
