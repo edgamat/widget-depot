@@ -2,6 +2,7 @@ import { test, expect, Page, Locator } from '@playwright/test';
 
 const SEARCH_INPUT = '#search-input';
 const SEARCH_BUTTON = '#search-button';
+const SEARCH_RESULTS = '#search-results';
 
 // Blazor InteractiveServer renders the page via SSR first, then connects a
 // SignalR circuit before @onclick / @bind handlers become active. Clicking
@@ -11,6 +12,7 @@ async function waitForBlazorReady(page: Page): Promise<void> {
     () => !!(window as any).Blazor?._internal?.navigationManager,
     { timeout: 30_000 }
   );
+  await page.waitForLoadState('networkidle');
 }
 
 // Blazor's @bind:event="oninput" pushes the value to the server over SignalR
@@ -55,7 +57,10 @@ test.describe('Catalog page', () => {
     await waitForBlazorReady(page);
     await typeSearch(page.locator(SEARCH_INPUT), 'flux');
     await page.locator(SEARCH_BUTTON).click();
-    await expect(page.locator('table tbody tr').first()).toBeVisible();
+
+    const searchResults = page.locator(SEARCH_RESULTS);
+    const firstRow = searchResults.locator('tbody tr').first();
+    await expect(firstRow).toBeVisible();
   });
 
   // AC #5: Each result displays SKU, Name, Description, Manufacturer, Weight, Price, Date Available
@@ -65,13 +70,15 @@ test.describe('Catalog page', () => {
     await typeSearch(page.locator(SEARCH_INPUT), 'Flux Capacitor');
     await page.locator(SEARCH_BUTTON).click();
 
-    const firstRow = page.locator('table tbody tr').first();
+    const searchResults = page.locator(SEARCH_RESULTS);
+    const firstRow = searchResults.locator('tbody tr').first();
     await expect(firstRow).toBeVisible();
+    
     await expect(firstRow.getByText('WGT-001')).toBeVisible();
     await expect(firstRow.getByText('Flux Capacitor')).toBeVisible();
     await expect(firstRow.getByText('Enables time travel when 1.21 gigawatts applied')).toBeVisible();
     await expect(firstRow.getByText('Outatime Industries')).toBeVisible();
-    await expect(firstRow.getByText('1.21')).toBeVisible();
+    await expect(firstRow.getByText('1.210')).toBeVisible();
     await expect(firstRow.getByText(/9,999\.99/)).toBeVisible();
     await expect(firstRow.getByText('2025-10-26')).toBeVisible();
   });
