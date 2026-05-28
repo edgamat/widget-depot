@@ -7,6 +7,14 @@ public enum OrderStatus
     Cancelled = 2
 }
 
+public enum TransmissionStatus
+{
+    Pending = 0,
+    Transmitted = 1,
+    Failed = 2,
+    Missing = 3
+}
+
 public class Order
 {
     public int Id { get; set; }
@@ -18,4 +26,6 @@ public class Order
     public Address? BillingAddress { get; set; }
     public decimal? ShippingEstimate { get; set; }
     public DateTime? SubmittedAt { get; set; }
+    public TransmissionStatus? TransmissionStatus { get; set; }
+    public DateTime? TransmissionStatusChangedAt { get; set; }
 }

@@ -30,6 +30,7 @@ else
                 <th>Submitted</th>
                 <th>Widgets</th>
                 <th>Est. Shipping</th>
+                <th>Transmission</th>
                 <th></th>
             </tr>
         </thead>
@@ -41,6 +42,13 @@ else
                     <td>@order.SubmittedAt.ToString("d")</td>
                     <td>@order.WidgetCount</td>
                     <td>@(order.ShippingEstimate.HasValue ? order.ShippingEstimate.Value.ToString("C") : "—")</td>
+                    <td>
+                        <span>@order.TransmissionStatus</span>
+                        @if (order.TransmissionStatus != TransmissionStatus.Pending && order.TransmissionStatusChangedAt.HasValue)
+                        {
+                            <span class="text-muted ms-1">@order.TransmissionStatusChangedAt.Value.ToString("g")</span>
+                        }
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-primary" @onclick="() => NavigateToDetail(order.Id)">
                             View

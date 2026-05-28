@@ -23,7 +23,13 @@ public class HistoryService
                 return new GetRecentOrdersResult.Failure();
 
             var items = orders
-                .Select(o => new RecentOrderListItem(o.Id, o.SubmittedAt, o.WidgetCount, o.ShippingEstimate))
+                .Select(o => new RecentOrderListItem(
+                    o.Id,
+                    o.SubmittedAt,
+                    o.WidgetCount,
+                    o.ShippingEstimate,
+                    o.TransmissionStatus,
+                    o.TransmissionStatusChangedAt))
                 .ToList();
 
             return new GetRecentOrdersResult.Success(items);

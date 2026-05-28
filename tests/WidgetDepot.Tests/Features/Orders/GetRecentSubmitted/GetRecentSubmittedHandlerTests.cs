@@ -17,14 +17,22 @@ public class GetRecentSubmittedHandlerTests
         return new AppDbContext(options);
     }
 
-    private static async Task<Order> SeedOrderAsync(AppDbContext db, int customerId, OrderStatus status, DateTime? submittedAt = null)
+    private static async Task<Order> SeedOrderAsync(
+        AppDbContext db,
+        int customerId,
+        OrderStatus status,
+        DateTime? submittedAt = null,
+        TransmissionStatus? transmissionStatus = null,
+        DateTime? transmissionStatusChangedAt = null)
     {
         var order = new Order
         {
             CustomerId = customerId,
             Status = status,
             CreatedAt = DateTime.UtcNow,
-            SubmittedAt = submittedAt
+            SubmittedAt = submittedAt,
+            TransmissionStatus = transmissionStatus,
+            TransmissionStatusChangedAt = transmissionStatusChangedAt
         };
         db.Orders.Add(order);
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -130,5 +138,60 @@ public class GetRecentSubmittedHandlerTests
         var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
 
         result[0].ShippingEstimate.ShouldBe(19.99m);
+    }
+
+    [Fact]
+    public async Task HandleAsync_PendingTransmission_ReturnsPendingStatus()
+    {
+        using var db = CreateDb();
+        await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Pending);
+        var handler = new GetRecentSubmittedHandler(db);
+
+        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+
+        result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Pending);
+        result[0].TransmissionStatusChangedAt.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task HandleAsync_TransmittedOrder_ReturnsStatusAndTimestamp()
+    {
+        using var db = CreateDb();
+        var changedAt = new DateTime(2026, 5, 15, 10, 0, 0, DateTimeKind.Utc);
+        await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Transmitted, changedAt);
+        var handler = new GetRecentSubmittedHandler(db);
+
+        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+
+        result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
+        result[0].TransmissionStatusChangedAt.ShouldBe(changedAt);
+    }
+
+    [Fact]
+    public async Task HandleAsync_FailedTransmission_ReturnsStatusAndTimestamp()
+    {
+        using var db = CreateDb();
+        var changedAt = new DateTime(2026, 5, 15, 10, 0, 0, DateTimeKind.Utc);
+        await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Failed, changedAt);
+        var handler = new GetRecentSubmittedHandler(db);
+
+        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+
+        result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
+        result[0].TransmissionStatusChangedAt.ShouldBe(changedAt);
+    }
+
+    [Fact]
+    public async Task HandleAsync_MissingTransmission_ReturnsStatusAndTimestamp()
+    {
+        using var db = CreateDb();
+        var changedAt = new DateTime(2026, 5, 15, 10, 0, 0, DateTimeKind.Utc);
+        await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Missing, changedAt);
+        var handler = new GetRecentSubmittedHandler(db);
+
+        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+
+        result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Missing);
+        result[0].TransmissionStatusChangedAt.ShouldBe(changedAt);
     }
 }

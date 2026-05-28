@@ -59,6 +59,7 @@ public class SubmitOrderHandler
 
         order.Status = OrderStatus.Submitted;
         order.SubmittedAt = DateTime.UtcNow;
+        order.TransmissionStatus = TransmissionStatus.Pending;
 
         var orderFile = new OrderFile(order, customer.Email);
         await _orderFileWriter.WriteAsync(orderFile, cancellationToken);
