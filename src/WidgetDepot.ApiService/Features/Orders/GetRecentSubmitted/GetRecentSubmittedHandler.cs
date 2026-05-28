@@ -4,7 +4,13 @@ using WidgetDepot.ApiService.Data;
 
 namespace WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
 
-public record GetRecentSubmittedOrderResponse(int Id, DateTime SubmittedAt, int WidgetCount, decimal? ShippingEstimate);
+public record GetRecentSubmittedOrderResponse(
+    int Id,
+    DateTime SubmittedAt,
+    int WidgetCount,
+    decimal? ShippingEstimate,
+    TransmissionStatus TransmissionStatus,
+    DateTime? TransmissionStatusChangedAt);
 
 public class GetRecentSubmittedHandler(AppDbContext db)
 {
@@ -18,7 +24,9 @@ public class GetRecentSubmittedHandler(AppDbContext db)
                 o.Id,
                 o.SubmittedAt ?? DateTime.MinValue,
                 o.Items.Sum(i => i.Quantity),
-                o.ShippingEstimate))
+                o.ShippingEstimate,
+                o.TransmissionStatus ?? Data.TransmissionStatus.Pending,
+                o.TransmissionStatusChangedAt))
             .ToListAsync(cancellationToken);
     }
 }

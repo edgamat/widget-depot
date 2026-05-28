@@ -18,7 +18,7 @@ public class HistoryServiceTests
     [Fact]
     public async Task GetRecentOrdersAsync_SuccessResponse_ReturnsOrders()
     {
-        var body = """[{"id":1,"submittedAt":"2026-05-01T00:00:00","widgetCount":3,"shippingEstimate":12.50}]""";
+        var body = """[{"id":1,"submittedAt":"2026-05-01T00:00:00","widgetCount":3,"shippingEstimate":12.50,"transmissionStatus":0,"transmissionStatusChangedAt":null}]""";
         var service = CreateService(HttpStatusCode.OK, body);
 
         var result = await service.GetRecentOrdersAsync(TestContext.Current.CancellationToken);
@@ -28,6 +28,56 @@ public class HistoryServiceTests
         success.Orders[0].Id.ShouldBe(1);
         success.Orders[0].WidgetCount.ShouldBe(3);
         success.Orders[0].ShippingEstimate.ShouldBe(12.50m);
+    }
+
+    [Fact]
+    public async Task GetRecentOrdersAsync_PendingTransmission_ReturnsPendingStatus()
+    {
+        var body = """[{"id":1,"submittedAt":"2026-05-01T00:00:00","widgetCount":1,"shippingEstimate":null,"transmissionStatus":0,"transmissionStatusChangedAt":null}]""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.GetRecentOrdersAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetRecentOrdersResult.Success>();
+        success.Orders[0].TransmissionStatus.ShouldBe(TransmissionStatus.Pending);
+        success.Orders[0].TransmissionStatusChangedAt.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetRecentOrdersAsync_TransmittedOrder_ReturnsStatusAndTimestamp()
+    {
+        var body = """[{"id":1,"submittedAt":"2026-05-01T00:00:00","widgetCount":1,"shippingEstimate":null,"transmissionStatus":1,"transmissionStatusChangedAt":"2026-05-02T08:30:00"}]""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.GetRecentOrdersAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetRecentOrdersResult.Success>();
+        success.Orders[0].TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
+        success.Orders[0].TransmissionStatusChangedAt.ShouldBe(new DateTime(2026, 5, 2, 8, 30, 0));
+    }
+
+    [Fact]
+    public async Task GetRecentOrdersAsync_FailedOrder_ReturnsFailedStatus()
+    {
+        var body = """[{"id":1,"submittedAt":"2026-05-01T00:00:00","widgetCount":1,"shippingEstimate":null,"transmissionStatus":2,"transmissionStatusChangedAt":"2026-05-02T08:30:00"}]""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.GetRecentOrdersAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetRecentOrdersResult.Success>();
+        success.Orders[0].TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
+    }
+
+    [Fact]
+    public async Task GetRecentOrdersAsync_MissingOrder_ReturnsMissingStatus()
+    {
+        var body = """[{"id":1,"submittedAt":"2026-05-01T00:00:00","widgetCount":1,"shippingEstimate":null,"transmissionStatus":3,"transmissionStatusChangedAt":"2026-05-02T08:30:00"}]""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.GetRecentOrdersAsync(TestContext.Current.CancellationToken);
+
+        var success = result.ShouldBeOfType<GetRecentOrdersResult.Success>();
+        success.Orders[0].TransmissionStatus.ShouldBe(TransmissionStatus.Missing);
     }
 
     [Fact]

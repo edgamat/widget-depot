@@ -254,6 +254,32 @@ public class SubmitOrderHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_ValidOrder_SetsTransmissionStatusToPending()
+    {
+        using var db = CreateDb();
+        var (order, _) = await SeedFullOrderAsync(db);
+        var handler = CreateHandler(db);
+
+        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+
+        var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
+        saved.TransmissionStatus.ShouldBe(TransmissionStatus.Pending);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ValidOrder_DoesNotSetTransmissionStatusChangedAt()
+    {
+        using var db = CreateDb();
+        var (order, _) = await SeedFullOrderAsync(db);
+        var handler = CreateHandler(db);
+
+        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+
+        var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
+        saved.TransmissionStatusChangedAt.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task HandleAsync_ValidOrder_CallsOrderFileWriter()
     {
         using var db = CreateDb();

@@ -1,6 +1,20 @@
 namespace WidgetDepot.Web.Features.Orders.History;
 
-public record RecentOrderListItem(int Id, DateTime SubmittedAt, int WidgetCount, decimal? ShippingEstimate);
+public enum TransmissionStatus
+{
+    Pending = 0,
+    Transmitted = 1,
+    Failed = 2,
+    Missing = 3
+}
+
+public record RecentOrderListItem(
+    int Id,
+    DateTime SubmittedAt,
+    int WidgetCount,
+    decimal? ShippingEstimate,
+    TransmissionStatus TransmissionStatus,
+    DateTime? TransmissionStatusChangedAt);
 
 public abstract record GetRecentOrdersResult
 {
@@ -8,4 +22,10 @@ public abstract record GetRecentOrdersResult
     public record Failure : GetRecentOrdersResult;
 }
 
-internal record GetRecentSubmittedResponse(int Id, DateTime SubmittedAt, int WidgetCount, decimal? ShippingEstimate);
+internal record GetRecentSubmittedResponse(
+    int Id,
+    DateTime SubmittedAt,
+    int WidgetCount,
+    decimal? ShippingEstimate,
+    TransmissionStatus TransmissionStatus,
+    DateTime? TransmissionStatusChangedAt);
