@@ -29,3 +29,13 @@ internal record GetRecentSubmittedResponse(
     decimal? ShippingEstimate,
     TransmissionStatus TransmissionStatus,
     DateTime? TransmissionStatusChangedAt);
+
+internal record RetransmitOrderApiResponse(TransmissionStatus NewStatus, DateTime StatusChangedAt);
+
+public abstract record RetransmitResult
+{
+    public record Transmitted : RetransmitResult;
+    public record Missing : RetransmitResult;
+    public record Failed : RetransmitResult;
+    public record Failure : RetransmitResult;
+}

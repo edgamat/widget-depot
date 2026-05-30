@@ -40,6 +40,10 @@ Branch creation is a **precondition**, not a step. Before the first Edit or Writ
 
 **Never run Edit or Write tools while checked out on `main` or on a stale task branch.** If you notice mid-task that you are on the wrong branch, stop and switch before making further changes.
 
+**Never add a 'Co-authored-by' footer in commit messages**. Instead use the following:
+
+AI-Assisted-By: <Model Name>
+
 ---
 
 

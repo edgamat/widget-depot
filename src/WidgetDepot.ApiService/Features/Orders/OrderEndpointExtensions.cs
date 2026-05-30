@@ -5,6 +5,7 @@ using WidgetDepot.ApiService.Features.Orders.GetByOrderNumber;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
+using WidgetDepot.ApiService.Features.Orders.RetransmitOrder;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.UpdateDraftItems;
@@ -25,6 +26,7 @@ public static class OrderEndpointExtensions
         app.MapUpdateDraftItems();
         app.MapGetRecentSubmitted();
         app.MapGetByOrderNumber();
+        app.MapRetransmitOrder();
 
         return app;
     }

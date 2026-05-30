@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.Orders.Submit;
 
 namespace WidgetDepot.ApiService.Features.Orders.TransmitOrders;
 
@@ -34,7 +35,7 @@ public class TransmitOrdersHandler
 
         foreach (var order in orders)
         {
-            var fileName = $"EXT-{order.Id.ToString().PadLeft(10, '0')}.TXT";
+            var fileName = OrderFile.GetFileName(order.Id);
             var localFilePath = Path.Combine(_pickupDirectory, fileName);
 
             if (!File.Exists(localFilePath))

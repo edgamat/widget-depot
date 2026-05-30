@@ -12,6 +12,28 @@ public class HistoryService
         _httpClient = httpClient;
     }
 
+    public async Task<RetransmitResult> RetransmitOrderAsync(int orderId, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsync($"/orders/{orderId}/retransmit", null, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var result = await response.Content.ReadFromJsonAsync<RetransmitOrderApiResponse>(cancellationToken);
+            if (result is null)
+                return new RetransmitResult.Failure();
+
+            return result.NewStatus switch
+            {
+                TransmissionStatus.Transmitted => new RetransmitResult.Transmitted(),
+                TransmissionStatus.Missing => new RetransmitResult.Missing(),
+                TransmissionStatus.Failed => new RetransmitResult.Failed(),
+                _ => new RetransmitResult.Failure()
+            };
+        }
+
+        return new RetransmitResult.Failure();
+    }
+
     public async Task<GetRecentOrdersResult> GetRecentOrdersAsync(CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.GetAsync("/orders/recent", cancellationToken);
