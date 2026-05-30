@@ -15,4 +15,5 @@ public static class OrderEndpoints
     public const string GetRecentSubmitted = $"{Base}/recent";
     public const string GetByOrderNumber = $"{Base}/{{orderNumber}}";
     public const string RetransmitOrder = $"{Base}/{{orderId}}/retransmit";
+    public const string RecreateOrder = $"{Base}/{{orderId}}/recreate";
 }

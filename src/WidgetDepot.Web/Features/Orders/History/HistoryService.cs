@@ -34,6 +34,27 @@ public class HistoryService
         return new RetransmitResult.Failure();
     }
 
+    public async Task<RecreateResult> RecreateOrderAsync(int orderId, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsync($"/orders/{orderId}/recreate", null, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var result = await response.Content.ReadFromJsonAsync<RecreateOrderApiResponse>(cancellationToken);
+            if (result is null)
+                return new RecreateResult.Failure();
+
+            return result.NewStatus switch
+            {
+                TransmissionStatus.Transmitted => new RecreateResult.Transmitted(),
+                TransmissionStatus.Failed => new RecreateResult.Failed(result.ErrorMessage ?? "FTP transmission failed."),
+                _ => new RecreateResult.Failure()
+            };
+        }
+
+        return new RecreateResult.Failure();
+    }
+
     public async Task<GetRecentOrdersResult> GetRecentOrdersAsync(CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.GetAsync("/orders/recent", cancellationToken);

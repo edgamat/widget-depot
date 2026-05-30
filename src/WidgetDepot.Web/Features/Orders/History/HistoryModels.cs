@@ -39,3 +39,12 @@ public abstract record RetransmitResult
     public record Failed : RetransmitResult;
     public record Failure : RetransmitResult;
 }
+
+internal record RecreateOrderApiResponse(TransmissionStatus NewStatus, DateTime StatusChangedAt, string? ErrorMessage = null);
+
+public abstract record RecreateResult
+{
+    public record Transmitted : RecreateResult;
+    public record Failed(string ErrorMessage) : RecreateResult;
+    public record Failure : RecreateResult;
+}
