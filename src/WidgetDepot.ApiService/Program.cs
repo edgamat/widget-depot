@@ -14,6 +14,7 @@ using WidgetDepot.ApiService.Features.Orders.GetByOrderNumber;
 using WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
+using WidgetDepot.ApiService.Features.Orders.RecreateOrder;
 using WidgetDepot.ApiService.Features.Orders.RetransmitOrder;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 using WidgetDepot.ApiService.Features.Orders.Submit;
@@ -78,6 +79,7 @@ builder.Services.AddScoped<GetByOrderNumberHandler>();
 builder.Services.AddScoped<IOrderTransmitter, FtpOrderTransmitter>();
 builder.Services.AddScoped<TransmitOrdersHandler>();
 builder.Services.AddScoped<RetransmitOrderHandler>();
+builder.Services.AddScoped<RecreateOrderHandler>();
 builder.Services.AddHostedService<ExpireDraftOrdersJob>();
 builder.Services.AddHostedService<TransmitOrdersJob>();
 

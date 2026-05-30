@@ -123,6 +123,49 @@ public class HistoryServiceTests
         success.Orders[0].ShippingEstimate.ShouldBeNull();
     }
 
+    [Fact]
+    public async Task RecreateOrderAsync_SuccessTransmitted_ReturnsTransmitted()
+    {
+        var body = """{"newStatus":1,"statusChangedAt":"2026-05-30T10:00:00","errorMessage":null}""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.RecreateOrderAsync(1, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<RecreateResult.Transmitted>();
+    }
+
+    [Fact]
+    public async Task RecreateOrderAsync_SuccessWithFailedStatus_ReturnsFailedWithErrorMessage()
+    {
+        var body = """{"newStatus":2,"statusChangedAt":"2026-05-30T10:00:00","errorMessage":"FTP transmission failed."}""";
+        var service = CreateService(HttpStatusCode.OK, body);
+
+        var result = await service.RecreateOrderAsync(1, TestContext.Current.CancellationToken);
+
+        var failed = result.ShouldBeOfType<RecreateResult.Failed>();
+        failed.ErrorMessage.ShouldBe("FTP transmission failed.");
+    }
+
+    [Fact]
+    public async Task RecreateOrderAsync_ServerError_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.InternalServerError, "{}");
+
+        var result = await service.RecreateOrderAsync(1, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<RecreateResult.Failure>();
+    }
+
+    [Fact]
+    public async Task RecreateOrderAsync_Conflict_ReturnsFailure()
+    {
+        var service = CreateService(HttpStatusCode.Conflict, "{}");
+
+        var result = await service.RecreateOrderAsync(1, TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<RecreateResult.Failure>();
+    }
+
     private class FakeHttpMessageHandler(HttpStatusCode statusCode, string body) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

@@ -76,6 +76,21 @@ else
                                 </button>
                             }
                         }
+                        @if (order.TransmissionStatus == TransmissionStatus.Missing)
+                        {
+                            @if (confirmingRecreateOrderId == order.Id)
+                            {
+                                <span class="ms-2 me-1">Re-create and retransmit this order?</span>
+                                <button class="btn btn-sm btn-warning me-1" @onclick="() => ConfirmRecreateAsync(order.Id)">Yes</button>
+                                <button class="btn btn-sm btn-secondary" @onclick="CancelRecreate">No</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-warning ms-1" @onclick="() => RequestRecreate(order.Id)">
+                                    Re-create
+                                </button>
+                            }
+                        }
                     </td>
                 </tr>
             }
@@ -92,6 +107,7 @@ else
     private bool loadFailed;
 
     private int? confirmingOrderId;
+    private int? confirmingRecreateOrderId;
     private string? retransmitMessage;
     private string retransmitMessageClass = "alert-success";
 
@@ -128,6 +144,17 @@ else
         confirmingOrderId = null;
     }
 
+    private void RequestRecreate(int orderId)
+    {
+        confirmingRecreateOrderId = orderId;
+        retransmitMessage = null;
+    }
+
+    private void CancelRecreate()
+    {
+        confirmingRecreateOrderId = null;
+    }
+
     private void DismissRetransmitMessage()
     {
         retransmitMessage = null;
@@ -154,6 +181,31 @@ else
             case RetransmitResult.Failed:
                 retransmitMessageClass = "alert-danger";
                 retransmitMessage = "Retransmission failed. Please try again later.";
+                await RefreshOrdersAsync();
+                break;
+            default:
+                retransmitMessageClass = "alert-danger";
+                retransmitMessage = "An error occurred. Please try again later.";
+                break;
+        }
+    }
+
+    private async Task ConfirmRecreateAsync(int orderId)
+    {
+        confirmingRecreateOrderId = null;
+
+        var result = await HistoryService.RecreateOrderAsync(orderId);
+
+        switch (result)
+        {
+            case RecreateResult.Transmitted:
+                retransmitMessageClass = "alert-success";
+                retransmitMessage = "Order file successfully re-created and transmitted.";
+                await RefreshOrdersAsync();
+                break;
+            case RecreateResult.Failed failed:
+                retransmitMessageClass = "alert-danger";
+                retransmitMessage = $"Re-creation failed: {failed.ErrorMessage}";
                 await RefreshOrdersAsync();
                 break;
             default:
