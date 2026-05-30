@@ -42,13 +42,17 @@ git fetch --prune
 
 - Always use the GitHub CLI (`gh`) to interact with GitHub — never GitHub Actions
 - When specifying `--repo`, always run `gh repo view --json nameWithOwner -q .nameWithOwner` as a separate command first to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
+- When starting work on an issue, post a comment on the issue when starting work: "Starting work on this issue"
 - When starting work on an issue, run `gh issue view <number>` to read the full details before doing anything
 - Create a branch named `issue-<number>-short-description` **before any Edit or Write tool call**
-- Post a comment on the issue when starting work: "Starting work on this issue"
 - Post progress comments on the issue as significant steps are completed
 - Check off acceptance criteria checkboxes in the issue as each one is completed using `gh issue edit`
 - When work is complete, push the commits to the remote repo and open a PR using `gh pr create` with "Closes #<number>" in the body
 - Never commit directly to main, and never edit files while checked out on `main`
+- Never combine `git commit` with other commands. Always run `git commit` as a separate command.
+- Never add a 'Co-authored-by' footer in commit messages. Instead use the following:
+
+AI-Assisted-By: <Model Name>
 
 ---
 

@@ -16,6 +16,7 @@ using WidgetDepot.ApiService.Features.Orders.GetDrafts;
 using WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
 using WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 using WidgetDepot.ApiService.Features.Orders.Submit;
+using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
 using WidgetDepot.ApiService.Features.Orders.UpdateDraftItems;
 using WidgetDepot.ApiService.Features.Widgets.Import;
 using WidgetDepot.ApiService.Features.Widgets.Search;
@@ -73,7 +74,10 @@ builder.Services.AddScoped<GetRecentSubmittedHandler>();
 builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
 builder.Services.AddScoped<ExpireDraftOrdersHandler>();
 builder.Services.AddScoped<GetByOrderNumberHandler>();
+builder.Services.AddScoped<IOrderTransmitter, FtpOrderTransmitter>();
+builder.Services.AddScoped<TransmitOrdersHandler>();
 builder.Services.AddHostedService<ExpireDraftOrdersJob>();
+builder.Services.AddHostedService<TransmitOrdersJob>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
