@@ -11,6 +11,8 @@ public static class FtpContainerExtensions
 
         var ftp = builder
             .AddContainer("fake-ftp", "delfer/alpine-ftp-server")
+            .WithLifetime(ContainerLifetime.Persistent)
+            .WithContainerName("fake-ftp")
             .WithEnvironment("USERS", "devftp|devftp|/home/devftp")
             .WithEnvironment("ADDRESS", "127.0.0.1")
             .WithEnvironment("MIN_PORT", passivePortStart.ToString())
