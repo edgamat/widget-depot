@@ -11,9 +11,12 @@ public class OrderFile
 
     public string FileName { get; }
 
+    public static string GetFileName(int orderId) =>
+        $"EXT-{orderId.ToString().PadLeft(10, '0')}.TXT";
+
     public OrderFile(Order order, string customerEmail)
     {
-        FileName = $"EXT-{order.Id.ToString().PadLeft(10, '0')}.TXT";
+        FileName = GetFileName(order.Id);
         _order = order;
         _customerEmail = customerEmail;
     }
