@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Orders.Submit;
@@ -20,12 +21,12 @@ public class RetransmitOrderHandler
     public RetransmitOrderHandler(
         AppDbContext db,
         IOrderTransmitter transmitter,
-        IConfiguration configuration,
+        IOptions<OrdersOptions> options,
         ILogger<RetransmitOrderHandler> logger)
     {
         _db = db;
         _transmitter = transmitter;
-        _pickupDirectory = configuration["Orders:PickupDirectory"] ?? "/tmp/orders";
+        _pickupDirectory = options.Value.PickupDirectory;
         _logger = logger;
     }
 

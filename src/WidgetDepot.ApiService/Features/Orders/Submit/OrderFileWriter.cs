@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace WidgetDepot.ApiService.Features.Orders.Submit;
 
@@ -6,9 +6,9 @@ public class OrderFileWriter : IOrderFileWriter
 {
     private readonly string _pickupDirectory;
 
-    public OrderFileWriter(IConfiguration configuration)
+    public OrderFileWriter(IOptions<OrdersOptions> options)
     {
-        _pickupDirectory = configuration["Orders:PickupDirectory"] ?? "";
+        _pickupDirectory = options.Value.PickupDirectory;
     }
 
     public async Task WriteAsync(OrderFile orderFile, CancellationToken cancellationToken)

@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Moq;
 
 using Shouldly;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.Orders;
 using WidgetDepot.ApiService.Features.Orders.RetransmitOrder;
 using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
 
@@ -41,14 +42,9 @@ public class RetransmitOrderHandlerTests : IDisposable
         string? pickupDirectory = null)
     {
         var mockTransmitter = transmitter ?? new Mock<IOrderTransmitter>().Object;
-        var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Orders:PickupDirectory"] = pickupDirectory ?? _tempDir
-            })
-            .Build();
+        var options = Options.Create(new OrdersOptions { PickupDirectory = pickupDirectory ?? _tempDir });
         var logger = new Mock<ILogger<RetransmitOrderHandler>>().Object;
-        return new RetransmitOrderHandler(db, mockTransmitter, config, logger);
+        return new RetransmitOrderHandler(db, mockTransmitter, options, logger);
     }
 
     private static async Task<Order> SeedOrderAsync(AppDbContext db, int customerId, TransmissionStatus? transmissionStatus)
