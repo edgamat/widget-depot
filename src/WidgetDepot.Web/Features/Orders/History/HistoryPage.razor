@@ -9,6 +9,14 @@
 
 <h1>My Recent Orders</h1>
 
+@if (retransmitMessage is not null)
+{
+    <div class="alert @retransmitMessageClass alert-dismissible" role="alert">
+        @retransmitMessage
+        <button type="button" class="btn-close" @onclick="DismissRetransmitMessage" aria-label="Close"></button>
+    </div>
+}
+
 @if (isLoading)
 {
     <p>Loading...</p>
@@ -53,6 +61,21 @@ else
                         <button class="btn btn-sm btn-primary" @onclick="() => NavigateToDetail(order.Id)">
                             View
                         </button>
+                        @if (order.TransmissionStatus == TransmissionStatus.Failed)
+                        {
+                            @if (confirmingOrderId == order.Id)
+                            {
+                                <span class="ms-2 me-1">Retransmit this order?</span>
+                                <button class="btn btn-sm btn-warning me-1" @onclick="() => ConfirmRetransmitAsync(order.Id)">Yes</button>
+                                <button class="btn btn-sm btn-secondary" @onclick="CancelRetransmit">No</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-warning ms-1" @onclick="() => RequestRetransmit(order.Id)">
+                                    Retransmit
+                                </button>
+                            }
+                        }
                     </td>
                 </tr>
             }
@@ -67,6 +90,10 @@ else
     private IReadOnlyList<RecentOrderListItem> orders = [];
     private bool isLoading = true;
     private bool loadFailed;
+
+    private int? confirmingOrderId;
+    private string? retransmitMessage;
+    private string retransmitMessageClass = "alert-success";
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,5 +115,58 @@ else
     private void NavigateToDetail(int orderId)
     {
         NavigationManager.NavigateTo($"/orders/{orderId}");
+    }
+
+    private void RequestRetransmit(int orderId)
+    {
+        confirmingOrderId = orderId;
+        retransmitMessage = null;
+    }
+
+    private void CancelRetransmit()
+    {
+        confirmingOrderId = null;
+    }
+
+    private void DismissRetransmitMessage()
+    {
+        retransmitMessage = null;
+    }
+
+    private async Task ConfirmRetransmitAsync(int orderId)
+    {
+        confirmingOrderId = null;
+
+        var result = await HistoryService.RetransmitOrderAsync(orderId);
+
+        switch (result)
+        {
+            case RetransmitResult.Transmitted:
+                retransmitMessageClass = "alert-success";
+                retransmitMessage = "Order file successfully transmitted.";
+                await RefreshOrdersAsync();
+                break;
+            case RetransmitResult.Missing:
+                retransmitMessageClass = "alert-warning";
+                retransmitMessage = "Order file was not found. The order status has been updated to Missing and will be retried in the next daily batch.";
+                await RefreshOrdersAsync();
+                break;
+            case RetransmitResult.Failed:
+                retransmitMessageClass = "alert-danger";
+                retransmitMessage = "Retransmission failed. Please try again later.";
+                await RefreshOrdersAsync();
+                break;
+            default:
+                retransmitMessageClass = "alert-danger";
+                retransmitMessage = "An error occurred. Please try again later.";
+                break;
+        }
+    }
+
+    private async Task RefreshOrdersAsync()
+    {
+        var result = await HistoryService.GetRecentOrdersAsync();
+        if (result is GetRecentOrdersResult.Success success)
+            orders = success.Orders;
     }
 }
