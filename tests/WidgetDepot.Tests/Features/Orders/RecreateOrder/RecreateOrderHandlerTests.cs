@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Moq;
 
 using Shouldly;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.Orders;
 using WidgetDepot.ApiService.Features.Orders.RecreateOrder;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
@@ -30,11 +31,9 @@ public class RecreateOrderHandlerTests
     {
         var mockWriter = writer ?? new Mock<IOrderFileWriter>().Object;
         var mockTransmitter = transmitter ?? new Mock<IOrderTransmitter>().Object;
-        var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["Orders:PickupDirectory"] = "/tmp/orders" })
-            .Build();
+        var options = Options.Create(new OrdersOptions { PickupDirectory = "/tmp/orders" });
         var logger = new Mock<ILogger<RecreateOrderHandler>>().Object;
-        return new RecreateOrderHandler(db, mockWriter, mockTransmitter, config, logger);
+        return new RecreateOrderHandler(db, mockWriter, mockTransmitter, options, logger);
     }
 
     private static async Task<(Order order, Customer customer)> SeedMissingOrderAsync(AppDbContext db, int customerId = 1)

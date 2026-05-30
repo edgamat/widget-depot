@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Orders.Submit;
@@ -22,13 +23,13 @@ public class RecreateOrderHandler
         AppDbContext db,
         IOrderFileWriter orderFileWriter,
         IOrderTransmitter transmitter,
-        IConfiguration configuration,
+        IOptions<OrdersOptions> options,
         ILogger<RecreateOrderHandler> logger)
     {
         _db = db;
         _orderFileWriter = orderFileWriter;
         _transmitter = transmitter;
-        _pickupDirectory = configuration["Orders:PickupDirectory"] ?? "/tmp/orders";
+        _pickupDirectory = options.Value.PickupDirectory;
         _logger = logger;
     }
 
