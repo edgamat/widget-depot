@@ -237,4 +237,5 @@ Default behavior:
 2. If `X` involves a page without a page object, create the page object first, then the fixture registration, then the test.
 3. If `X` is an authenticated flow, use the existing auth fixture rather than logging in inside the test.
 4. Show the user the new/modified files: the page object, the fixture update (if any), and the spec.
-5. Run `npm test --prefix tests/WidgetDepot.E2E` and report the results to the user.
+5. Run `cd tests/WidgetDepot.E2E && npx playwright test --list` to verify the TypeScript parses without errors.
+6. Run `npm test --prefix tests/WidgetDepot.E2E` and report the results to the user.

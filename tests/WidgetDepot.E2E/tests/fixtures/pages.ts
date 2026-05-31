@@ -4,12 +4,14 @@ import { CatalogPage } from '../pages/CatalogPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
+import { NavBarComponent } from '../pages/components/NavBarComponent';
 
 export type PageFixtures = {
   catalogImportPage: CatalogImportPage;
   catalogPage: CatalogPage;
   homePage: HomePage;
   loginPage: LoginPage;
+  navBar: NavBarComponent;
   registerPage: RegisterPage;
 };
 
@@ -25,6 +27,9 @@ export const pagesTest = base.extend<PageFixtures>({
   },
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
+  },
+  navBar: async ({ page }, use) => {
+    await use(new NavBarComponent(page));
   },
   registerPage: async ({ page }, use) => {
     await use(new RegisterPage(page));

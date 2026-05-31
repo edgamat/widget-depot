@@ -19,7 +19,8 @@
       "Bash(gh issue comment:*)",
       "Bash(gh issue edit:*)",
       "Bash(gh pr *)",
-      "Bash(npm test *)"
+      "Bash(npm test *)",
+      "Bash(npx playwright *)"
     ]
   },
   "hooks": {
