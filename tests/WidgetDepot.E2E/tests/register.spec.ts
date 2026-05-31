@@ -1,6 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Customer self-registration', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   // AC #1: Visitor can navigate to /accounts/register without being redirected to login
   test('unauthenticated visitor can access registration page without redirect', async ({ registerPage }) => {
     await registerPage.goto();
