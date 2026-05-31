@@ -53,4 +53,4 @@ Azure Entra authentication is wired for production but bypassed locally. This st
 - [ ] A logged-in customer can log out; they are redirected to `/` and can no longer access authenticated routes
 - [ ] The login form validates that email and password fields are not empty before submitting
 - [ ] Unit tests cover: successful login, invalid password, unknown email, and empty field validation
-- [ ] Customer's email address is dsplayed in page header after then have signed in.
+- [ ] Customer's email address is displayed in page header after then have signed in.
