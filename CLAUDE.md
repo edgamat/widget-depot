@@ -7,8 +7,9 @@ This is a public-facing widget ordering application using ASP.NET Blazor 10.0 an
 ## Key Commands
 
 - `dotnet build` for building the application
-- `dotnet test` for running the test suite
+- `dotnet test` for running the unit test suite
 - `aspire run` for running the application
+- `npm test --prefix tests/WidgetDepot.E2E` for running E2E tests
 
 ---
 

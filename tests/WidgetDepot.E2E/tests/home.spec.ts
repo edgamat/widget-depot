@@ -1,27 +1,23 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Home page', () => {
-  test('loads successfully', async ({ page }) => {
-    const response = await page.goto('/');
+  test('loads successfully', async ({ homePage }) => {
+    const response = await homePage.goto();
     expect(response?.status()).toBeLessThan(400);
   });
 
-  test('has expected title', async ({ page }) => {
-    await page.goto('/');
-    // Default Blazor template title — adjust to match your app
-    await expect(page).toHaveTitle(/Home/);
+  test('has expected title', async ({ homePage }) => {
+    await homePage.goto();
+    await expect(homePage.page).toHaveTitle(/Home/);
   });
 
-  test('renders the welcome heading', async ({ page }) => {
-    await page.goto('/');
-    // Default Blazor template heading — adjust to match your app
-    const heading = page.getByRole('heading', { level: 1 });
-    await expect(heading).toBeVisible();
+  test('renders the welcome heading', async ({ homePage }) => {
+    await homePage.goto();
+    await expect(homePage.heading).toBeVisible();
   });
 
-  test('navigation menu is present', async ({ page }) => {
-    await page.goto('/');
-    // Blazor templates use a <nav> element with a "Home" link
-    await expect(page.getByRole('link', { name: 'Home' })).toBeVisible();
+  test('navigation menu is present', async ({ homePage }) => {
+    await homePage.goto();
+    await expect(homePage.homeNavLink).toBeVisible();
   });
 });
