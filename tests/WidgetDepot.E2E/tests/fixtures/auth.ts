@@ -11,7 +11,10 @@ export const authTest = base.extend<{}, { workerStorageState: string }>({
 
     if (!fs.existsSync(fileName)) {
       fs.mkdirSync(STORAGE_STATE_DIR, { recursive: true });
-      const context = await browser.newContext();
+      const context = await browser.newContext({
+        baseURL: 'https://localhost:7092',
+        ignoreHTTPSErrors: true,
+      });
       const page = await context.newPage();
       const loginPage = new LoginPage(page);
       await loginPage.goto();

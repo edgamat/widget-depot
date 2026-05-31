@@ -1,6 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Catalog page', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   // AC #1: Unauthenticated visitor can navigate to catalog without redirect
   test('unauthenticated visitor can access catalog without being redirected to login', async ({ catalogPage }) => {
     await catalogPage.goto();
