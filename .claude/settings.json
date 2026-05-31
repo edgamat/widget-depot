@@ -18,7 +18,8 @@
       "Bash(gh repo view:*)",
       "Bash(gh issue comment:*)",
       "Bash(gh issue edit:*)",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "Bash(npm test *)"
     ]
   },
   "hooks": {

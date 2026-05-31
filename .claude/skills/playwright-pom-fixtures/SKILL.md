@@ -14,16 +14,23 @@ This skill exists to make sure any new Playwright test added to this project mat
 ### Directory layout
 
 ```
-tests/
-├── pages/           # One file per page or major component
-│   ├── LoginPage.ts
-│   ├── DashboardPage.ts
-│   └── components/  # Reusable component objects (nav bar, modals, etc.)
-├── fixtures/        # Custom test fixtures
-│   ├── pages.ts     # Page object fixtures
-│   ├── auth.ts      # Authentication / storageState fixture
-│   └── index.ts     # Combined `test` export
-└── *.spec.ts        # The actual tests
+tests/WidgetDepot.E2E/
+├── playwright.config.ts
+├── package.json
+└── tests/
+    ├── fixtures/
+    │   ├── pages.ts      # Page object fixtures (single source of truth)
+    │   ├── auth.ts       # Authentication / storageState fixture
+    │   └── index.ts      # Re-exports `test` and `expect`
+    ├── pages/            # One file per page
+    │   ├── CatalogImportPage.ts
+    │   ├── CatalogPage.ts
+    │   ├── HomePage.ts
+    │   ├── LoginPage.ts
+    │   ├── RegisterPage.ts
+    │   └── components/   # Reusable component objects (nav bar, modals, etc.)
+    ├── data/             # CSV and other test data files
+    └── *.spec.ts         # The actual tests
 ```
 
 When adding a new page object, place it in `tests/pages/`. When adding a reusable widget (e.g. a header used across many pages), place it in `tests/pages/components/`.
@@ -175,7 +182,7 @@ export const test = mergeTests(pagesTest, authTest);
 export { expect } from '@playwright/test';
 ```
 
-Tests import `test` and `expect` from `../fixtures` (or the appropriate relative path) — **never directly from `@playwright/test`**. This is the signal that you're in the project's test ecosystem.
+Tests import `test` and `expect` from `./fixtures` (or the appropriate relative path) — **never directly from `@playwright/test`**. This is the signal that you're in the project's test ecosystem.
 
 ## Writing a test
 
@@ -230,3 +237,4 @@ Default behavior:
 2. If `X` involves a page without a page object, create the page object first, then the fixture registration, then the test.
 3. If `X` is an authenticated flow, use the existing auth fixture rather than logging in inside the test.
 4. Show the user the new/modified files: the page object, the fixture update (if any), and the spec.
+5. Run `npm test --prefix tests/WidgetDepot.E2E` and report the results to the user.
