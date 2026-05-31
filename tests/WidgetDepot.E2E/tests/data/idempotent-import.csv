@@ -1,0 +1,3 @@
+SKU,Name,Description,Manufacturer,Weight,Price,Date Available
+E2E-AC8-001,Idempotent Widget One,Test widget for idempotency AC8,Acme Corp,1.0,9.99,2025-01-01
+E2E-AC8-002,Idempotent Widget Two,Test widget for idempotency AC8,Acme Corp,2.0,19.99,2025-01-01
