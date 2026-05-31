@@ -1,5 +1,5 @@
 ---
-name: playwright-pom-fixtures
+name: playwright-add-tests
 description: Use this skill whenever adding, modifying, or refactoring Playwright (TypeScript) end-to-end tests in this project. The project follows a strict Page Object Model + Playwright fixtures pattern with `tests/pages/` and `tests/fixtures/` directories, plus a reusable auth/storageState fixture. Apply this skill any time a new `.spec.ts` test is created, any time raw locators (`page.locator(...)`, `page.getByRole(...)`, etc.) appear in test code, any time a new page or component needs test coverage, or any time the user mentions "Playwright test", "e2e test", "page object", "POM", or "test fixture". Do not write Playwright tests in this project without consulting this skill first — the project's structural conventions matter and free-form tests will not match the existing codebase.
 ---
 
