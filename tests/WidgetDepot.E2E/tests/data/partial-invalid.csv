@@ -1,0 +1,5 @@
+SKU,Name,Description,Manufacturer,Weight,Price,Date Available
+E2E-AC5-001,Valid Widget One,Has all required fields,Acme Corp,1.0,9.99,2025-01-01
+E2E-AC5-002,Valid Widget Two,Has all required fields,Acme Corp,1.5,14.99,2025-01-01
+,,Missing SKU and Name,Acme Corp,0.5,5.00,2025-01-01
+E2E-AC5-004,,Missing Name,Acme Corp,0.5,,2025-01-01
