@@ -1,0 +1,18 @@
+# Normalize line endings on commit, use native endings on checkout
+*.cs     text=auto
+*.json   text=auto
+*.sln    text=auto
+*.csproj text=auto
+*.xml    text=auto
+*.config text=auto
+*.md     text=auto
+*.css    text=auto
+*.razor  text=auto
+*.txt    text=auto
+*.csv    text=auto
+*.ts     text=auto
+
+# Mark binary files explicitly
+*.png    binary
+*.jpg    binary
+*.pdf    binary
