@@ -1,7 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
-
-using Microsoft.Extensions.Logging;
 
 namespace WidgetDepot.Web.Features.Orders.Create.Step2;
 
