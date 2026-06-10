@@ -6,7 +6,8 @@ This document describes the planned solution structure for the Widget Depot Blaz
 
 ## Solution Overview
 
-The solution is a .NET 10 Blazor Web App using Vertical Slice Architecture. It is a single-page web application with a PostgreSQL database, hosted locally via .NET Aspire. Azure Entra provides authentication in production; authentication is disabled for local development.
+The solution is a .NET 10 Blazor Web App using Vertical Slice Architecture. It is a single-page web application with a PostgreSQL database, hosted locally via .NET Aspire.
+Microsoft ASP.NET Identity provides authentication.
 
 ---
 
@@ -82,7 +83,7 @@ Slices do not share services or models with each other. Each slice calls ApiServ
 | UI Framework | Blazor Web App (.NET 10) |
 | CSS | Bootstrap 5.3 |
 | Database | PostgreSQL via EF Core |
-| Authentication | Individual authentication (cookies) |
+| Authentication | ASP.NET Identity with cookie authentication |
 | Local hosting | .NET Aspire |
 | Logging / Tracing | OpenTelemetry + `ILogger<T>` |
 | Testing | xUnit |
@@ -99,4 +100,4 @@ Slices do not share services or models with each other. Each slice calls ApiServ
 - Health check endpoints are included in the application.
 - Trunk-based development on `main`.
 - ERP integration uses file-based FTP export (daily batch) — no real-time API.
-- Authentication is wired for Azure Entra in production but bypassed locally to simplify development.
+- Authentication uses ASP.NET Identity with cookie-based auth. There is no external identity provider.
