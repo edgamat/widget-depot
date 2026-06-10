@@ -36,7 +36,7 @@ This was split out of story 03 to keep that story self-contained.
 - Adds a data-model field (e.g. `MustChangePassword`) to the customer/account entity, with the accompanying migration.
 - Story 03's password-reset action sets this flag when it generates the temporary password.
 - The login flow must check the flag and redirect to a "set a new password" screen, reusing the existing password-change validation from the profile flow (`Features/Accounts/Profile/`) where possible.
-- Depends on the project auth scheme (still undecided — Azure Entra was denied) and on how the login flow is implemented; confirm with story owner before building.
+- Authentication/authorization uses ASP.NET Identity with cookie auth. Use Identity's built-in support where it fits — e.g. resetting the password via the `UserManager` APIs and storing the "must change" state alongside the Identity user — rather than rolling a custom mechanism.
 
 ## Acceptance Criteria
 

@@ -46,7 +46,7 @@ This story covers the editing actions on a customer's account, building on the r
 
 ### Dependencies & open questions (resolve with story owner; do not design here)
 
-- **Authorization:** these pages must be admin-gated. This depends on story 01-admin-area-setup and the project's auth scheme, which is still undecided (Azure Entra was denied). Do not design admin gating in this story.
+- **Authorization:** these pages must be admin-gated. Authentication/authorization uses ASP.NET Identity with cookie auth; gate these pages via the admin authorization established in story 01-admin-area-setup. Do not design admin gating in this story.
 - **Email-change side effects:** email is the login identity — confirm whether changing it should invalidate active sessions or trigger any notification.
 - **Audit logging** of password resets and role changes is out of scope unless the story owner says otherwise.
 
