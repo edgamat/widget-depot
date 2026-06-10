@@ -38,6 +38,14 @@ This is the read-only view of customer data in the admin area. Editing actions (
 - The list and profile view live under `Features/Admin/` and use the admin layout.
 - Pagination controls use Font Awesome free icons (e.g. `fa-angles-left`, `fa-angle-left`, `fa-angle-right`, `fa-angles-right`) instead of text labels. Add a `<link>` to the Font Awesome free CDN in `App.razor` (or the admin layout) — do not bundle or self-host.
 
+### Testing Pagination
+
+A local dev database rarely has 21+ customers, so two complementary strategies are recommended:
+
+- **Unit tests (Option A):** Use the existing `CreateDb()` + seed pattern in `WidgetDepot.Tests` to seed 25 customers in-memory and assert correct Skip/Take math, boundary conditions (0, 20, 21 rows), and page-count calculation. This is the primary correctness check and requires no extra infrastructure.
+
+- **Configurable page size for E2E (Option C):** Add a `Pagination:PageSize` key to `appsettings.json` (default `20`) in the Web project and pass it to the list query endpoint/handler in the ApiService. In `playwright.config.ts`, pass `--Pagination:PageSize=3` to the `webServer` command so the E2E suite only needs 5–6 customers (achievable with the existing registration flow) to exercise all four pagination buttons.
+
 ## Acceptance Criteria
 
 - [ ] Admin can navigate to the customer list from the admin navigation
