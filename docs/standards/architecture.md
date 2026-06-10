@@ -6,7 +6,8 @@ This document describes the planned solution structure for the Widget Depot Blaz
 
 ## Solution Overview
 
-The solution is a .NET 10 Blazor Web App using Vertical Slice Architecture. It is a single-page web application with a PostgreSQL database, hosted locally via .NET Aspire. Azure Entra provides authentication in production; authentication is disabled for local development.
+The solution is a .NET 10 Blazor Web App using Vertical Slice Architecture. It is a single-page web application with a PostgreSQL database, hosted locally via .NET Aspire.
+Microsoft ASP.NET Identity provides authentication.
 
 ---
 

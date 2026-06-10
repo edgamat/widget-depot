@@ -13,7 +13,7 @@
 - Postgres SQL database
 - Bootstrap 5.3 CSS Framework
 - xUnit unit tests
-- Azure Entra for user Authentication (disabled for local development)
+- ASP.NET Identity for user Authentication (cookies)
 - Use Aspire to host app locally
 
 ## Priorities

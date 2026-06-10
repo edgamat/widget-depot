@@ -12,8 +12,6 @@ Customers register with an email address and password (story #3). Their credenti
 
 Authentication uses ASP.NET Core cookie authentication. The login form submits credentials to a `POST /accounts/login` API endpoint; on success the Web app signs the customer in via a cookie. Logout clears the cookie and redirects to the home page.
 
-Azure Entra authentication is wired for production but bypassed locally. This story does not change that configuration.
-
 ## Scope
 
 **In scope:**
@@ -23,14 +21,13 @@ Azure Entra authentication is wired for production but bypassed locally. This st
 - Logout action that signs the customer out and redirects to `/`
 - Redirect unauthenticated users to `/accounts/login` when accessing a protected route (wired up but no protected routes yet)
 - "Invalid email or password" error message on failed login (no credential enumeration)
-- Customer's email address is dsplayed to the left of the "About" link after then have signed in.
+- Customer's email address is displayed to the left of the "About" link after then have signed in.
 
 **Out of scope:**
 - "Remember me" / persistent sessions
 - Password reset or forgot-password flow
 - Account lockout after failed attempts
 - Two-factor authentication
-- Azure Entra integration changes
 
 ## Developer Notes
 

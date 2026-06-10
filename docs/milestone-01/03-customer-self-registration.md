@@ -29,7 +29,6 @@ plain-text passwords must never be persisted.
 
 **Out of scope:**
 - Email verification / confirmation link
-- Social or federated login (Azure Entra is wired up separately and bypassed locally)
 - Admin-created or bulk-provisioned accounts
 - Password reset / forgot password (separate story)
 - Phone number or shipping address collection at registration time (covered in story 05)

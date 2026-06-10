@@ -41,6 +41,18 @@ Admin access is session-bound: if the `IsAdmin` flag is revoked in the database,
 - The seed migration must guard against duplicate user creation — check before inserting.
 - If the admin seed config is absent from `appsettings.json`, skip seeding and log a warning. The app must still start successfully.
 - The admin layout should be visually distinct from the main site layout (e.g., different header/nav).
+- Add the following to `appsettings.json` (or `appsettings.Development.json`) to enable admin seeding:
+
+```json
+{
+  "Admin": {
+    "SeedCredentials": {
+      "UserName": "admin",
+      "Password": "P@ssw0rd"
+    }
+  }
+}
+```
 
 ## Acceptance Criteria
 
