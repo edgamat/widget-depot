@@ -33,8 +33,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/accounts/login";
+        options.AccessDeniedPath = "/access-denied";
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsAdmin", policy =>
+        policy.RequireClaim("IsAdmin", "true"));
+});
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<CookieForwardingHandler>();
@@ -116,7 +121,7 @@ app.MapRazorComponents<App>()
 
 app.MapDefaultEndpoints();
 
-app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName, string? returnUrl) =>
+app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName, bool isAdmin, string? returnUrl) =>
 {
     var claims = new List<Claim>
     {
@@ -124,6 +129,10 @@ app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, st
         new(ClaimTypes.Email, email),
         new(ClaimTypes.Name, firstName)
     };
+
+    if (isAdmin)
+        claims.Add(new Claim("IsAdmin", "true"));
+
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
     var principal = new ClaimsPrincipal(identity);
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);

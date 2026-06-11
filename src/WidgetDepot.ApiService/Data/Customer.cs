@@ -8,6 +8,7 @@ public class Customer
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public bool IsAdmin { get; set; }
     public Address? ShippingAddress { get; set; }
     public Address? BillingAddress { get; set; }
 }

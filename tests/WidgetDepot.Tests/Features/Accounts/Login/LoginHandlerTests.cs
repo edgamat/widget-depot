@@ -48,6 +48,31 @@ public class LoginHandlerTests
         response.Email.ShouldBe("jane@example.com");
         response.FirstName.ShouldBe("Jane");
         response.CustomerId.ShouldBeGreaterThan(0);
+        response.IsAdmin.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task HandleAsync_AdminUser_ReturnsIsAdminTrue()
+    {
+        using var db = CreateDb();
+        var hasher = new PasswordHasher<Customer>();
+        var admin = new Customer
+        {
+            FirstName = "Admin",
+            LastName = "User",
+            Email = "admin@example.com",
+            IsAdmin = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        admin.PasswordHash = hasher.HashPassword(admin, "P@ssw0rd!");
+        db.Customers.Add(admin);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var handler = new LoginHandler(db);
+
+        var result = await handler.HandleAsync(new LoginRequest("admin@example.com", "P@ssw0rd!"), TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<LoginResponse>();
+        response.IsAdmin.ShouldBeTrue();
     }
 
     [Fact]

@@ -7,7 +7,7 @@ namespace WidgetDepot.ApiService.Features.Accounts.Login;
 
 public record LoginRequest(string Email, string Password);
 
-public record LoginResponse(int CustomerId, string Email, string FirstName);
+public record LoginResponse(int CustomerId, string Email, string FirstName, bool IsAdmin);
 
 public abstract record LoginError
 {
@@ -34,7 +34,7 @@ public class LoginHandler(AppDbContext db)
             if (result == PasswordVerificationResult.Failed)
                 return new LoginError.InvalidCredentials();
 
-            return new LoginResponse(customer.Id, customer.Email, customer.FirstName);
+            return new LoginResponse(customer.Id, customer.Email, customer.FirstName, customer.IsAdmin);
         }
         catch (Exception ex)
         {
