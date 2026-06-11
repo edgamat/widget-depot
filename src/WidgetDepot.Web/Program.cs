@@ -138,7 +138,7 @@ app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, st
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
     var target = !string.IsNullOrEmpty(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative)
         ? returnUrl
-        : "/";
+        : isAdmin ? "/admin" : "/";
     return Results.Redirect(target);
 });
 
