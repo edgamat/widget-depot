@@ -1,0 +1,4 @@
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Components.Layout
+@attribute [Authorize(Policy = "IsAdmin")]
+@layout AdminLayout

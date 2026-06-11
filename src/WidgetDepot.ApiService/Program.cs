@@ -6,6 +6,7 @@ using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
+using WidgetDepot.ApiService.Features.Admin.Seed;
 using WidgetDepot.ApiService.Features.Orders;
 using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.CreateDraft;
@@ -49,7 +50,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsAdmin", policy =>
+        policy.RequireClaim("IsAdmin", "true"));
+});
+
+builder.Services.Configure<AdminSeedOptions>(builder.Configuration.GetSection("Admin"));
+builder.Services.AddScoped<AdminSeeder>();
 
 builder.AddNpgsqlDbContext<AppDbContext>("widgetdepot");
 
@@ -90,11 +98,14 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Apply migrations at startup
+// Apply migrations and seed at startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+
+    var seeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+    await seeder.SeedAsync(CancellationToken.None);
 }
 
 // Configure the HTTP request pipeline.
