@@ -12,6 +12,11 @@
                     <span>@context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</span>
                 </Authorized>
             </AuthorizeView>
+            <AuthorizeView Policy="IsAdmin">
+                <Authorized>
+                    <span class="badge bg-warning text-dark ms-2">Admin</span>
+                </Authorized>
+            </AuthorizeView>
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
