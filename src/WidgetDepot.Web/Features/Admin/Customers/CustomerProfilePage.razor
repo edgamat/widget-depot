@@ -1,9 +1,16 @@
 @page "/admin/customers/{Id:int}"
 @rendermode InteractiveServer
+@attribute [Authorize]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @inject CustomerListService CustomerListService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Customer Profile</PageTitle>
+
+<a href="/admin/customers" class="btn btn-secondary mb-3">Back to Customer List</a>
 
 @if (isLoading)
 {
@@ -12,7 +19,6 @@
 else if (profile is null)
 {
     <div class="alert alert-warning">Customer not found.</div>
-    <a href="/admin/customers" class="btn btn-secondary">Back to Customers</a>
 }
 else
 {
@@ -24,7 +30,7 @@ else
         }
     </div>
 
-    <table class="table table-sm table-bordered w-auto">
+    <table class="table table-sm table-bordered w-auto mb-4">
         <tbody>
             <tr>
                 <th class="text-muted fw-normal pe-4">Email</th>
@@ -37,43 +43,168 @@ else
         </tbody>
     </table>
 
-    <h2 class="h5 mt-4">Shipping Address</h2>
-    @if (profile.ShippingAddress is null)
+    <h2 class="h5">Edit Email</h2>
+
+    @if (emailSuccess)
     {
-        <p class="text-muted">Not provided</p>
+        <div class="alert alert-success">Email address updated successfully.</div>
+    }
+
+    @if (emailError is not null)
+    {
+        <div class="alert alert-danger">@emailError</div>
+    }
+
+    <EditForm Model="emailForm" OnValidSubmit="HandleEmailSubmitAsync" class="mb-4">
+        <DataAnnotationsValidator />
+        <div class="mb-2" style="max-width: 400px">
+            <label class="form-label" for="emailInput">Email Address</label>
+            <InputText id="emailInput" type="email" class="form-control" @bind-Value="emailForm.Email" />
+            <ValidationMessage For="() => emailForm.Email" class="text-danger" />
+        </div>
+        <button type="submit" class="btn btn-primary" disabled="@isSubmittingEmail">
+            @(isSubmittingEmail ? "Saving..." : "Save Email")
+        </button>
+    </EditForm>
+
+    <h2 class="h5">Reset Password</h2>
+
+    @if (temporaryPassword is not null)
+    {
+        <div class="alert alert-success">
+            Password reset. Temporary password: <strong>@temporaryPassword</strong>
+        </div>
+    }
+
+    @if (passwordError is not null)
+    {
+        <div class="alert alert-danger">@passwordError</div>
+    }
+
+    @if (pendingPasswordReset)
+    {
+        <span class="me-2">Reset this customer's password?</span>
+        <button class="btn btn-sm btn-danger me-1"
+                @onclick="ConfirmPasswordResetAsync"
+                disabled="@isResettingPassword">
+            @(isResettingPassword ? "Resetting..." : "Yes, Reset")
+        </button>
+        <button class="btn btn-sm btn-secondary"
+                @onclick="CancelPasswordReset"
+                disabled="@isResettingPassword">
+            Cancel
+        </button>
     }
     else
     {
-        <address>
-            <strong>@profile.ShippingAddress.RecipientName</strong><br />
-            @profile.ShippingAddress.StreetLine1<br />
-            @if (!string.IsNullOrEmpty(profile.ShippingAddress.StreetLine2))
-            {
-                @profile.ShippingAddress.StreetLine2<br />
-            }
-            @profile.ShippingAddress.City, @profile.ShippingAddress.State @profile.ShippingAddress.ZipCode
-        </address>
+        <div class="mb-4">
+            <button class="btn btn-outline-danger" @onclick="RequestPasswordReset">Reset Password</button>
+        </div>
     }
 
-    <h2 class="h5 mt-3">Billing Address</h2>
-    @if (profile.BillingAddress is null)
+    <div class="mb-4"></div>
+
+    <h2 class="h5">Admin Access</h2>
+
+    @if (roleSuccess is not null)
     {
-        <p class="text-muted">Not provided</p>
+        <div class="alert alert-success">@roleSuccess</div>
+    }
+
+    @if (roleError is not null)
+    {
+        <div class="alert alert-danger">@roleError</div>
+    }
+
+    @if (profile.IsAdmin)
+    {
+        @if (pendingDemote)
+        {
+            <span class="me-2">Remove admin access from this customer?</span>
+            <button class="btn btn-sm btn-danger me-1"
+                    @onclick="ConfirmDemoteAsync"
+                    disabled="@isChangingRole">
+                @(isChangingRole ? "Updating..." : "Yes, Remove")
+            </button>
+            <button class="btn btn-sm btn-secondary"
+                    @onclick="CancelDemote"
+                    disabled="@isChangingRole">
+                Cancel
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-outline-danger"
+                    @onclick="RequestDemote"
+                    disabled="@isSelf"
+                    title="@(isSelf ? "You cannot remove your own admin access." : null)">
+                Remove Admin Access
+            </button>
+            @if (isSelf)
+            {
+                <span class="ms-2 text-muted small">You cannot remove your own admin access.</span>
+            }
+        }
     }
     else
     {
-        <address>
-            <strong>@profile.BillingAddress.RecipientName</strong><br />
-            @profile.BillingAddress.StreetLine1<br />
-            @if (!string.IsNullOrEmpty(profile.BillingAddress.StreetLine2))
-            {
-                @profile.BillingAddress.StreetLine2<br />
-            }
-            @profile.BillingAddress.City, @profile.BillingAddress.State @profile.BillingAddress.ZipCode
-        </address>
+        @if (pendingPromote)
+        {
+            <span class="me-2">Grant admin access to this customer?</span>
+            <button class="btn btn-sm btn-warning me-1"
+                    @onclick="ConfirmPromoteAsync"
+                    disabled="@isChangingRole">
+                @(isChangingRole ? "Updating..." : "Yes, Grant")
+            </button>
+            <button class="btn btn-sm btn-secondary"
+                    @onclick="CancelPromote"
+                    disabled="@isChangingRole">
+                Cancel
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-outline-warning" @onclick="RequestPromote">Grant Admin Access</button>
+        }
     }
 
-    <a href="/admin/customers" class="btn btn-secondary mt-3">Back to Customers</a>
+    <div class="mt-5">
+        <h2 class="h5">Shipping Address</h2>
+        @if (profile.ShippingAddress is null)
+        {
+            <p class="text-muted">Not provided</p>
+        }
+        else
+        {
+            <address>
+                <strong>@profile.ShippingAddress.RecipientName</strong><br />
+                @profile.ShippingAddress.StreetLine1<br />
+                @if (!string.IsNullOrEmpty(profile.ShippingAddress.StreetLine2))
+                {
+                    @profile.ShippingAddress.StreetLine2<br />
+                }
+                @profile.ShippingAddress.City, @profile.ShippingAddress.State @profile.ShippingAddress.ZipCode
+            </address>
+        }
+
+        <h2 class="h5 mt-3">Billing Address</h2>
+        @if (profile.BillingAddress is null)
+        {
+            <p class="text-muted">Not provided</p>
+        }
+        else
+        {
+            <address>
+                <strong>@profile.BillingAddress.RecipientName</strong><br />
+                @profile.BillingAddress.StreetLine1<br />
+                @if (!string.IsNullOrEmpty(profile.BillingAddress.StreetLine2))
+                {
+                    @profile.BillingAddress.StreetLine2<br />
+                }
+                @profile.BillingAddress.City, @profile.BillingAddress.State @profile.BillingAddress.ZipCode
+            </address>
+        }
+    </div>
 }
 
 @code {
@@ -81,11 +212,206 @@ else
     public int Id { get; set; }
 
     private CustomerProfileDto? profile;
+    private readonly EmailFormModel emailForm = new();
     private bool isLoading = true;
+    private bool isSelf;
+
+    private bool emailSuccess;
+    private string? emailError;
+    private bool isSubmittingEmail;
+
+    private bool pendingPasswordReset;
+    private bool isResettingPassword;
+    private string? temporaryPassword;
+    private string? passwordError;
+
+    private bool pendingPromote;
+    private bool pendingDemote;
+    private bool isChangingRole;
+    private string? roleSuccess;
+    private string? roleError;
 
     protected override async Task OnInitializedAsync()
     {
         profile = await CustomerListService.GetCustomerProfileAsync(Id);
+
+        if (profile is not null)
+        {
+            emailForm.Email = profile.Email;
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var currentUserIdStr = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            isSelf = int.TryParse(currentUserIdStr, out var currentUserId) && currentUserId == profile.Id;
+        }
+
         isLoading = false;
+    }
+
+    private async Task HandleEmailSubmitAsync()
+    {
+        isSubmittingEmail = true;
+        emailSuccess = false;
+        emailError = null;
+
+        try
+        {
+            var result = await CustomerListService.UpdateEmailAsync(Id, emailForm.Email);
+
+            switch (result)
+            {
+                case UpdateEmailResult.Success:
+                    profile = profile! with { Email = emailForm.Email };
+                    emailSuccess = true;
+                    break;
+                case UpdateEmailResult.EmailAlreadyInUse:
+                    emailError = "An account with this email address already exists.";
+                    break;
+                default:
+                    emailError = "An unexpected error occurred. Please try again.";
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            emailError = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isSubmittingEmail = false;
+        }
+    }
+
+    private void RequestPasswordReset()
+    {
+        pendingPasswordReset = true;
+        temporaryPassword = null;
+        passwordError = null;
+    }
+
+    private void CancelPasswordReset()
+    {
+        pendingPasswordReset = false;
+    }
+
+    private async Task ConfirmPasswordResetAsync()
+    {
+        isResettingPassword = true;
+        passwordError = null;
+
+        try
+        {
+            var result = await CustomerListService.ResetPasswordAsync(Id);
+
+            switch (result)
+            {
+                case ResetPasswordResult.Success success:
+                    temporaryPassword = success.TemporaryPassword;
+                    pendingPasswordReset = false;
+                    break;
+                default:
+                    passwordError = "An unexpected error occurred. Please try again.";
+                    pendingPasswordReset = false;
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            passwordError = "An unexpected error occurred. Please try again.";
+            pendingPasswordReset = false;
+        }
+        finally
+        {
+            isResettingPassword = false;
+        }
+    }
+
+    private void RequestPromote()
+    {
+        pendingPromote = true;
+        roleSuccess = null;
+        roleError = null;
+    }
+
+    private void CancelPromote()
+    {
+        pendingPromote = false;
+    }
+
+    private async Task ConfirmPromoteAsync()
+    {
+        isChangingRole = true;
+        roleError = null;
+
+        try
+        {
+            var result = await CustomerListService.PromoteAsync(Id);
+
+            switch (result)
+            {
+                case PromoteResult.Success:
+                    profile = profile! with { IsAdmin = true };
+                    roleSuccess = "Admin access granted.";
+                    pendingPromote = false;
+                    break;
+                default:
+                    roleError = "An unexpected error occurred. Please try again.";
+                    pendingPromote = false;
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            roleError = "An unexpected error occurred. Please try again.";
+            pendingPromote = false;
+        }
+        finally
+        {
+            isChangingRole = false;
+        }
+    }
+
+    private void RequestDemote()
+    {
+        pendingDemote = true;
+        roleSuccess = null;
+        roleError = null;
+    }
+
+    private void CancelDemote()
+    {
+        pendingDemote = false;
+    }
+
+    private async Task ConfirmDemoteAsync()
+    {
+        isChangingRole = true;
+        roleError = null;
+
+        try
+        {
+            var result = await CustomerListService.DemoteAsync(Id);
+
+            switch (result)
+            {
+                case DemoteResult.Success:
+                    profile = profile! with { IsAdmin = false };
+                    roleSuccess = "Admin access removed.";
+                    pendingDemote = false;
+                    break;
+                default:
+                    roleError = "An unexpected error occurred. Please try again.";
+                    pendingDemote = false;
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            roleError = "An unexpected error occurred. Please try again.";
+            pendingDemote = false;
+        }
+        finally
+        {
+            isChangingRole = false;
+        }
     }
 }
