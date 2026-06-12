@@ -8,7 +8,7 @@ export class CustomerProfilePage {
 
   constructor(page: Page) {
     this.page          = page;
-    this.adminBadge    = page.getByText('Admin', { exact: true });
+    this.adminBadge    = page.locator('span.badge.bg-warning');
     this.backButton    = page.getByRole('link', { name: 'Back to Customers' });
     this.notFoundAlert = page.locator('.alert-warning');
   }

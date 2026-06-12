@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
 
-namespace WidgetDepot.ApiService.Features.Admin.Customers;
+namespace WidgetDepot.ApiService.Features.Admin.Customers.GetCustomerList;
 
 public record CustomerListItem(int Id, string FirstName, string LastName, string Email, bool IsAdmin);
 

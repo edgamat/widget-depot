@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
 
-namespace WidgetDepot.ApiService.Features.Admin.Customers;
+namespace WidgetDepot.ApiService.Features.Admin.Customers.GetCustomerProfile;
 
 public record CustomerAddressDto(
     string RecipientName,

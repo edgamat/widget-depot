@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Shouldly;
 
 using WidgetDepot.ApiService.Data;
-using WidgetDepot.ApiService.Features.Admin.Customers;
+using WidgetDepot.ApiService.Features.Admin.Customers.GetCustomerProfile;
 
 namespace WidgetDepot.Tests.Features.Admin.Customers;
 
