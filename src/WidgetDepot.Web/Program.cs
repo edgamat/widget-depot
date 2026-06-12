@@ -10,6 +10,7 @@ using WidgetDepot.Web.Features.Accounts.PasswordChange;
 using WidgetDepot.Web.Features.Accounts.Profile;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
+using WidgetDepot.Web.Features.Admin.Customers;
 using WidgetDepot.Web.Features.Catalog;
 using WidgetDepot.Web.Features.Orders.Create;
 using WidgetDepot.Web.Features.Orders.Create.Step1;
@@ -53,6 +54,11 @@ builder.Services.AddHttpClient<CatalogService>(client =>
 
 builder.Services.AddHttpClient<CatalogImportService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));
+
+builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("Pagination"));
+builder.Services.AddHttpClient<CustomerListService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
 
 builder.Services.AddHttpClient<RegisterService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"));

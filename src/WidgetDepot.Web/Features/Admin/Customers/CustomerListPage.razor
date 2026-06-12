@@ -1,0 +1,114 @@
+@page "/admin/customers"
+@rendermode InteractiveServer
+@inject CustomerListService CustomerListService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Customers</PageTitle>
+
+<h1>Customers</h1>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (loadFailed)
+{
+    <div class="alert alert-danger">Unable to load customers. Please try again later.</div>
+}
+else if (customers.Count == 0)
+{
+    <p class="text-muted">No customers are registered yet.</p>
+}
+else
+{
+    <table class="table table-sm table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Email</th>
+                <th>Admin</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in customers)
+            {
+                <tr>
+                    <td>@customer.LastName</td>
+                    <td>@customer.FirstName</td>
+                    <td>@customer.Email</td>
+                    <td>@(customer.IsAdmin ? "Yes" : "")</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" @onclick="() => NavigateToProfile(customer.Id)">View</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex align-items-center gap-2 mt-2">
+        <button class="btn btn-outline-secondary btn-sm" title="First" @onclick="GoToFirstPage" disabled="@(currentPage <= 1)">
+            <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" title="Previous" @onclick="GoToPreviousPage" disabled="@(currentPage <= 1)">
+            <i class="fa-solid fa-angle-left"></i>
+        </button>
+        <span class="text-muted small">Page @currentPage of @totalPages</span>
+        <button class="btn btn-outline-secondary btn-sm" title="Next" @onclick="GoToNextPage" disabled="@(currentPage >= totalPages)">
+            <i class="fa-solid fa-angle-right"></i>
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" title="Last" @onclick="GoToLastPage" disabled="@(currentPage >= totalPages)">
+            <i class="fa-solid fa-angles-right"></i>
+        </button>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<CustomerListItem> customers = [];
+    private bool isLoading = true;
+    private bool loadFailed;
+    private int currentPage = 1;
+    private int totalPages = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPageAsync(1);
+    }
+
+    private async Task LoadPageAsync(int page)
+    {
+        isLoading = true;
+        loadFailed = false;
+
+        var result = await CustomerListService.GetCustomersAsync(page);
+
+        if (result is null)
+        {
+            loadFailed = true;
+        }
+        else
+        {
+            customers = result.Customers;
+            currentPage = result.Page;
+            totalPages = result.TotalCount == 0
+                ? 1
+                : (int)Math.Ceiling((double)result.TotalCount / result.PageSize);
+        }
+
+        isLoading = false;
+    }
+
+    private async Task GoToFirstPage() => await LoadPageAsync(1);
+
+    private async Task GoToPreviousPage() => await LoadPageAsync(currentPage - 1);
+
+    private async Task GoToNextPage() => await LoadPageAsync(currentPage + 1);
+
+    private async Task GoToLastPage() => await LoadPageAsync(totalPages);
+
+    private void NavigateToProfile(int customerId)
+    {
+        NavigationManager.NavigateTo($"/admin/customers/{customerId}");
+    }
+}

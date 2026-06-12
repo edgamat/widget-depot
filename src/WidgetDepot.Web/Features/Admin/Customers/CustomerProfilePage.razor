@@ -1,0 +1,91 @@
+@page "/admin/customers/{Id:int}"
+@rendermode InteractiveServer
+@inject CustomerListService CustomerListService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Customer Profile</PageTitle>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (profile is null)
+{
+    <div class="alert alert-warning">Customer not found.</div>
+    <a href="/admin/customers" class="btn btn-secondary">Back to Customers</a>
+}
+else
+{
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <h1 class="mb-0">@profile.FirstName @profile.LastName</h1>
+        @if (profile.IsAdmin)
+        {
+            <span class="badge bg-warning text-dark">Admin</span>
+        }
+    </div>
+
+    <table class="table table-sm table-bordered w-auto">
+        <tbody>
+            <tr>
+                <th class="text-muted fw-normal pe-4">Email</th>
+                <td>@profile.Email</td>
+            </tr>
+            <tr>
+                <th class="text-muted fw-normal pe-4">Member since</th>
+                <td>@profile.CreatedAt.ToString("d")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 class="h5 mt-4">Shipping Address</h2>
+    @if (profile.ShippingAddress is null)
+    {
+        <p class="text-muted">Not provided</p>
+    }
+    else
+    {
+        <address>
+            <strong>@profile.ShippingAddress.RecipientName</strong><br />
+            @profile.ShippingAddress.StreetLine1<br />
+            @if (!string.IsNullOrEmpty(profile.ShippingAddress.StreetLine2))
+            {
+                @profile.ShippingAddress.StreetLine2<br />
+            }
+            @profile.ShippingAddress.City, @profile.ShippingAddress.State @profile.ShippingAddress.ZipCode
+        </address>
+    }
+
+    <h2 class="h5 mt-3">Billing Address</h2>
+    @if (profile.BillingAddress is null)
+    {
+        <p class="text-muted">Not provided</p>
+    }
+    else
+    {
+        <address>
+            <strong>@profile.BillingAddress.RecipientName</strong><br />
+            @profile.BillingAddress.StreetLine1<br />
+            @if (!string.IsNullOrEmpty(profile.BillingAddress.StreetLine2))
+            {
+                @profile.BillingAddress.StreetLine2<br />
+            }
+            @profile.BillingAddress.City, @profile.BillingAddress.State @profile.BillingAddress.ZipCode
+        </address>
+    }
+
+    <a href="/admin/customers" class="btn btn-secondary mt-3">Back to Customers</a>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private CustomerProfileDto? profile;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        profile = await CustomerListService.GetCustomerProfileAsync(Id);
+        isLoading = false;
+    }
+}

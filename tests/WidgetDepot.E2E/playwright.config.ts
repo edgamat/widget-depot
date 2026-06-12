@@ -46,6 +46,10 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      // Smaller page size so pagination can be exercised with a handful of registered customers
+      Pagination__PageSize: '3',
+    },
   },
 });
 

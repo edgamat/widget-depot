@@ -1,6 +1,8 @@
 import { test as base } from '@playwright/test';
 import { CatalogImportPage } from '../pages/CatalogImportPage';
 import { CatalogPage } from '../pages/CatalogPage';
+import { CustomerListPage } from '../pages/CustomerListPage';
+import { CustomerProfilePage } from '../pages/CustomerProfilePage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
@@ -9,6 +11,8 @@ import { NavBarComponent } from '../pages/components/NavBarComponent';
 export type PageFixtures = {
   catalogImportPage: CatalogImportPage;
   catalogPage: CatalogPage;
+  customerListPage: CustomerListPage;
+  customerProfilePage: CustomerProfilePage;
   homePage: HomePage;
   loginPage: LoginPage;
   navBar: NavBarComponent;
@@ -21,6 +25,12 @@ export const pagesTest = base.extend<PageFixtures>({
   },
   catalogPage: async ({ page }, use) => {
     await use(new CatalogPage(page));
+  },
+  customerListPage: async ({ page }, use) => {
+    await use(new CustomerListPage(page));
+  },
+  customerProfilePage: async ({ page }, use) => {
+    await use(new CustomerProfilePage(page));
   },
   homePage: async ({ page }, use) => {
     await use(new HomePage(page));
