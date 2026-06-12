@@ -6,6 +6,7 @@ using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
 using WidgetDepot.ApiService.Features.Accounts.Register;
+using WidgetDepot.ApiService.Features.Admin.Customers;
 using WidgetDepot.ApiService.Features.Admin.Seed;
 using WidgetDepot.ApiService.Features.Orders;
 using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
@@ -90,6 +91,8 @@ builder.Services.AddScoped<IOrderTransmitter, FtpOrderTransmitter>();
 builder.Services.AddScoped<TransmitOrdersHandler>();
 builder.Services.AddScoped<RetransmitOrderHandler>();
 builder.Services.AddScoped<RecreateOrderHandler>();
+builder.Services.AddScoped<GetCustomerListHandler>();
+builder.Services.AddScoped<GetCustomerProfileHandler>();
 builder.Services.AddHostedService<ExpireDraftOrdersJob>();
 builder.Services.AddHostedService<TransmitOrdersJob>();
 

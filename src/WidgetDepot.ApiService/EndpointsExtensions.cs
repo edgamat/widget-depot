@@ -1,4 +1,5 @@
 using WidgetDepot.ApiService.Features.Accounts;
+using WidgetDepot.ApiService.Features.Admin;
 using WidgetDepot.ApiService.Features.Orders;
 using WidgetDepot.ApiService.Features.Widgets;
 
@@ -9,6 +10,7 @@ public static class EndpointsExtensions
         app.MapWidgetEndpoints();
         app.MapAccountEndpoints();
         app.MapOrderEndpoints();
+        app.MapAdminEndpoints();
 
         return app;
     }
