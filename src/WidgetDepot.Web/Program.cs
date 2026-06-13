@@ -11,6 +11,7 @@ using WidgetDepot.Web.Features.Accounts.Profile;
 using WidgetDepot.Web.Features.Accounts.Register;
 using WidgetDepot.Web.Features.Admin.CatalogImport;
 using WidgetDepot.Web.Features.Admin.Customers;
+using WidgetDepot.Web.Features.Admin.Orders;
 using WidgetDepot.Web.Features.Catalog;
 using WidgetDepot.Web.Features.Orders.Create;
 using WidgetDepot.Web.Features.Orders.Create.Step1;
@@ -99,6 +100,10 @@ builder.Services.AddHttpClient<HistoryService>(client =>
     .AddHttpMessageHandler<CookieForwardingHandler>();
 
 builder.Services.AddHttpClient<DetailService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
+
+builder.Services.AddHttpClient<AdminOrderLookupService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"))
     .AddHttpMessageHandler<CookieForwardingHandler>();
 

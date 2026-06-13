@@ -1,12 +1,12 @@
-@page "/orders/{orderNumber:int}"
+@page "/admin/orders/{orderNumber:int}"
 @rendermode InteractiveServer
-@attribute [Authorize]
-@using Microsoft.AspNetCore.Authorization
 @using WidgetDepot.Web.Features.Orders.Detail
 @using WidgetDepot.Web.Features.Orders.Shared
-@inject DetailService DetailService
+@inject AdminOrderLookupService LookupService
 
 <PageTitle>Order #@OrderNumber</PageTitle>
+
+<a href="/admin/orders" class="btn btn-secondary mb-3">Back to Order Lookup</a>
 
 @if (isLoading)
 {
@@ -14,7 +14,7 @@
 }
 else if (notFound)
 {
-    <div class="alert alert-warning">Order not found.</div>
+    <div class="alert alert-warning">Order @OrderNumber not found.</div>
 }
 else if (loadFailed)
 {
@@ -36,7 +36,7 @@ else if (order is not null)
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await DetailService.GetOrderDetailAsync(OrderNumber);
+        var result = await LookupService.GetOrderDetailAsync(OrderNumber);
 
         switch (result)
         {

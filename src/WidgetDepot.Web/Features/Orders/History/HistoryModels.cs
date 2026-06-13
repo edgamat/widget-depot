@@ -1,12 +1,6 @@
-namespace WidgetDepot.Web.Features.Orders.History;
+using WidgetDepot.Web.Features.Orders.Detail;
 
-public enum TransmissionStatus
-{
-    Pending = 0,
-    Transmitted = 1,
-    Failed = 2,
-    Missing = 3
-}
+namespace WidgetDepot.Web.Features.Orders.History;
 
 public record RecentOrderListItem(
     int Id,

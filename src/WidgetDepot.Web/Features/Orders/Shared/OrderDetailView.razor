@@ -1,0 +1,103 @@
+@using WidgetDepot.Web.Features.Orders.Detail
+
+<h1>Order #@Order.Id</h1>
+
+<dl class="row mb-4">
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9">@Order.Status</dd>
+    <dt class="col-sm-3">Created</dt>
+    <dd class="col-sm-9">@Order.CreatedAt.ToString("d")</dd>
+    @if (Order.SubmittedAt.HasValue)
+    {
+        <dt class="col-sm-3">Submitted</dt>
+        <dd class="col-sm-9">@Order.SubmittedAt.Value.ToString("d")</dd>
+    }
+    @if (Order.ShippingEstimate.HasValue)
+    {
+        <dt class="col-sm-3">Est. Shipping</dt>
+        <dd class="col-sm-9">@Order.ShippingEstimate.Value.ToString("C")</dd>
+    }
+    @if (Order.TransmissionStatus.HasValue)
+    {
+        <dt class="col-sm-3">ERP Status</dt>
+        <dd class="col-sm-9">
+            @Order.TransmissionStatus
+            @if (Order.TransmissionStatusChangedAt.HasValue)
+            {
+                <span class="text-muted ms-1">@Order.TransmissionStatusChangedAt.Value.ToString("g")</span>
+            }
+        </dd>
+    }
+</dl>
+
+<h2>Items</h2>
+@if (Order.Items.Count == 0)
+{
+    <p class="text-muted">No items on this order.</p>
+}
+else
+{
+    <table class="table table-sm table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Weight</th>
+                <th>Unit Cost</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Order.Items)
+            {
+                <tr>
+                    <td>@item.Sku</td>
+                    <td>@item.Name</td>
+                    <td>@item.Weight.ToString("F2")</td>
+                    <td>@item.UnitCost.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@((item.UnitCost * item.Quantity).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="row mt-4">
+    @if (Order.ShippingAddress is not null)
+    {
+        <div class="col-md-6">
+            <h2>Shipping Address</h2>
+            <address>
+                @Order.ShippingAddress.RecipientName<br />
+                @Order.ShippingAddress.StreetLine1<br />
+                @if (!string.IsNullOrEmpty(Order.ShippingAddress.StreetLine2))
+                {
+                    @Order.ShippingAddress.StreetLine2<br />
+                }
+                @Order.ShippingAddress.City, @Order.ShippingAddress.State @Order.ShippingAddress.ZipCode
+            </address>
+        </div>
+    }
+    @if (Order.BillingAddress is not null)
+    {
+        <div class="col-md-6">
+            <h2>Billing Address</h2>
+            <address>
+                @Order.BillingAddress.RecipientName<br />
+                @Order.BillingAddress.StreetLine1<br />
+                @if (!string.IsNullOrEmpty(Order.BillingAddress.StreetLine2))
+                {
+                    @Order.BillingAddress.StreetLine2<br />
+                }
+                @Order.BillingAddress.City, @Order.BillingAddress.State @Order.BillingAddress.ZipCode
+            </address>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required OrderDetail Order { get; set; }
+}

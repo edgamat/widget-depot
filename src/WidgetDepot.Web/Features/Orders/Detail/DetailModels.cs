@@ -2,6 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WidgetDepot.Web.Features.Orders.Detail;
 
+public enum TransmissionStatus
+{
+    Pending = 0,
+    Transmitted = 1,
+    Failed = 2,
+    Missing = 3
+}
+
 public record OrderDetailItem(int WidgetId, string Sku, string Name, decimal Weight, decimal UnitCost, int Quantity);
 
 public record OrderDetailAddress(
@@ -20,7 +28,9 @@ public record OrderDetail(
     IReadOnlyList<OrderDetailItem> Items,
     OrderDetailAddress? ShippingAddress,
     OrderDetailAddress? BillingAddress,
-    decimal? ShippingEstimate);
+    decimal? ShippingEstimate,
+    TransmissionStatus? TransmissionStatus,
+    DateTime? TransmissionStatusChangedAt);
 
 public abstract record GetOrderDetailResult
 {
@@ -54,4 +64,6 @@ internal record GetByOrderNumberResponse(
     IReadOnlyList<GetByOrderNumberItemResponse> Items,
     GetByOrderNumberAddressResponse? ShippingAddress,
     GetByOrderNumberAddressResponse? BillingAddress,
-    decimal? ShippingEstimate);
+    decimal? ShippingEstimate,
+    TransmissionStatus? TransmissionStatus,
+    DateTime? TransmissionStatusChangedAt);

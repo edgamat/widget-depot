@@ -1,26 +1,28 @@
 using System.Net;
 
-namespace WidgetDepot.Web.Features.Orders.Detail;
+using WidgetDepot.Web.Features.Orders.Detail;
 
-public class DetailService
+namespace WidgetDepot.Web.Features.Admin.Orders;
+
+public class AdminOrderLookupService
 {
     private readonly HttpClient _httpClient;
 
-    public DetailService(HttpClient httpClient)
+    public AdminOrderLookupService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
     public async Task<GetOrderDetailResult> GetOrderDetailAsync(int orderNumber, CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.GetAsync($"/orders/{orderNumber}", cancellationToken);
+        var response = await _httpClient.GetAsync($"/admin/orders/{orderNumber}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return new GetOrderDetailResult.NotFound();
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            var dto = await response.Content.ReadFromJsonAsync<GetByOrderNumberResponse>(cancellationToken);
+            var dto = await response.Content.ReadFromJsonAsync<GetAdminOrderByNumberResponse>(cancellationToken);
             if (dto is null)
                 return new GetOrderDetailResult.Failure();
 
@@ -42,7 +44,7 @@ public class DetailService
         return new GetOrderDetailResult.Failure();
     }
 
-    private static OrderDetailAddress? MapAddress(GetByOrderNumberAddressResponse? address) =>
+    private static OrderDetailAddress? MapAddress(GetAdminOrderByNumberAddressResponse? address) =>
         address is null ? null : new OrderDetailAddress(
             address.RecipientName,
             address.StreetLine1,
