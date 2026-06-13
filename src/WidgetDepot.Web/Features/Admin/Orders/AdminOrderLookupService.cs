@@ -13,18 +13,18 @@ public class AdminOrderLookupService
         _httpClient = httpClient;
     }
 
-    public async Task<GetOrderDetailResult> GetOrderDetailAsync(int orderNumber, CancellationToken cancellationToken = default)
+    public async Task<GetAdminOrderDetailResult> GetOrderDetailAsync(int orderNumber, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.GetAsync($"/admin/orders/{orderNumber}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return new GetOrderDetailResult.NotFound();
+            return new GetAdminOrderDetailResult.NotFound();
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var dto = await response.Content.ReadFromJsonAsync<GetAdminOrderByNumberResponse>(cancellationToken);
             if (dto is null)
-                return new GetOrderDetailResult.Failure();
+                return new GetAdminOrderDetailResult.Failure();
 
             var order = new OrderDetail(
                 dto.Id,
@@ -38,10 +38,14 @@ public class AdminOrderLookupService
                 dto.TransmissionStatus,
                 dto.TransmissionStatusChangedAt);
 
-            return new GetOrderDetailResult.Success(order);
+            AdminOrderCustomer? customer = dto.Customer is null
+                ? null
+                : new AdminOrderCustomer($"{dto.Customer.FirstName} {dto.Customer.LastName}", dto.Customer.Email);
+
+            return new GetAdminOrderDetailResult.Success(order, customer);
         }
 
-        return new GetOrderDetailResult.Failure();
+        return new GetAdminOrderDetailResult.Failure();
     }
 
     private static OrderDetailAddress? MapAddress(GetAdminOrderByNumberAddressResponse? address) =>

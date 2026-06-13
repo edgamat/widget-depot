@@ -22,6 +22,16 @@ else if (loadFailed)
 }
 else if (order is not null)
 {
+    @if (customer is not null)
+    {
+        <div class="card mb-3">
+            <div class="card-header">Customer</div>
+            <div class="card-body">
+                <p class="mb-1">@customer.FullName</p>
+                <p class="mb-0">@customer.Email</p>
+            </div>
+        </div>
+    }
     <OrderDetailView Order="order" />
 }
 
@@ -30,6 +40,7 @@ else if (order is not null)
     public int OrderNumber { get; set; }
 
     private OrderDetail? order;
+    private AdminOrderCustomer? customer;
     private bool isLoading = true;
     private bool notFound;
     private bool loadFailed;
@@ -40,10 +51,11 @@ else if (order is not null)
 
         switch (result)
         {
-            case GetOrderDetailResult.Success success:
+            case GetAdminOrderDetailResult.Success success:
                 order = success.Order;
+                customer = success.Customer;
                 break;
-            case GetOrderDetailResult.NotFound:
+            case GetAdminOrderDetailResult.NotFound:
                 notFound = true;
                 break;
             default:

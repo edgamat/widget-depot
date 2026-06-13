@@ -12,6 +12,7 @@ using WidgetDepot.ApiService.Features.Admin.Customers.GetCustomerProfile;
 using WidgetDepot.ApiService.Features.Admin.Customers.PromoteCustomer;
 using WidgetDepot.ApiService.Features.Admin.Customers.ResetCustomerPassword;
 using WidgetDepot.ApiService.Features.Admin.Customers.UpdateCustomerEmail;
+using WidgetDepot.ApiService.Features.Admin.Orders.GetAdminOrderByNumber;
 using WidgetDepot.ApiService.Features.Admin.Seed;
 using WidgetDepot.ApiService.Features.Orders;
 using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
@@ -102,6 +103,7 @@ builder.Services.AddScoped<DemoteCustomerHandler>();
 builder.Services.AddScoped<PromoteCustomerHandler>();
 builder.Services.AddScoped<ResetCustomerPasswordHandler>();
 builder.Services.AddScoped<UpdateCustomerEmailHandler>();
+builder.Services.AddScoped<GetAdminOrderByNumberHandler>();
 builder.Services.AddHostedService<ExpireDraftOrdersJob>();
 builder.Services.AddHostedService<TransmitOrdersJob>();
 

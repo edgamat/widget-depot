@@ -12,6 +12,8 @@ internal record GetAdminOrderByNumberAddressResponse(
     string State,
     string ZipCode);
 
+internal record GetAdminOrderByNumberCustomerResponse(string FirstName, string LastName, string Email);
+
 internal record GetAdminOrderByNumberResponse(
     int Id,
     string Status,
@@ -22,4 +24,14 @@ internal record GetAdminOrderByNumberResponse(
     GetAdminOrderByNumberAddressResponse? BillingAddress,
     decimal? ShippingEstimate,
     TransmissionStatus? TransmissionStatus,
-    DateTime? TransmissionStatusChangedAt);
+    DateTime? TransmissionStatusChangedAt,
+    GetAdminOrderByNumberCustomerResponse? Customer);
+
+public record AdminOrderCustomer(string FullName, string Email);
+
+public abstract record GetAdminOrderDetailResult
+{
+    public record Success(OrderDetail Order, AdminOrderCustomer? Customer) : GetAdminOrderDetailResult;
+    public record NotFound : GetAdminOrderDetailResult;
+    public record Failure : GetAdminOrderDetailResult;
+}

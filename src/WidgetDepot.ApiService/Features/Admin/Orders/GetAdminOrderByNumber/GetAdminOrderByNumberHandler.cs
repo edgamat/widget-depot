@@ -14,6 +14,8 @@ public record GetAdminOrderByNumberAddressResponse(
     string State,
     string ZipCode);
 
+public record GetAdminOrderByNumberCustomerResponse(string FirstName, string LastName, string Email);
+
 public record GetAdminOrderByNumberResponse(
     int Id,
     string Status,
@@ -24,7 +26,8 @@ public record GetAdminOrderByNumberResponse(
     GetAdminOrderByNumberAddressResponse? BillingAddress,
     decimal? ShippingEstimate,
     TransmissionStatus? TransmissionStatus,
-    DateTime? TransmissionStatusChangedAt);
+    DateTime? TransmissionStatusChangedAt,
+    GetAdminOrderByNumberCustomerResponse? Customer);
 
 public record GetAdminOrderByNumberNotFound;
 
@@ -40,6 +43,9 @@ public class GetAdminOrderByNumberHandler(AppDbContext db)
         if (order is null)
             return new GetAdminOrderByNumberNotFound();
 
+        var customer = await db.Customers
+            .FirstOrDefaultAsync(c => c.Id == order.CustomerId, cancellationToken);
+
         return new GetAdminOrderByNumberResponse(
             order.Id,
             order.Status.ToString(),
@@ -50,7 +56,8 @@ public class GetAdminOrderByNumberHandler(AppDbContext db)
             MapAddress(order.BillingAddress),
             order.ShippingEstimate,
             order.TransmissionStatus,
-            order.TransmissionStatusChangedAt);
+            order.TransmissionStatusChangedAt,
+            customer is null ? null : new GetAdminOrderByNumberCustomerResponse(customer.FirstName, customer.LastName, customer.Email));
     }
 
     private static GetAdminOrderByNumberAddressResponse? MapAddress(Address? address) =>
