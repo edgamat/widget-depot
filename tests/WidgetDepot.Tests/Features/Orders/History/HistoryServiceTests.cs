@@ -2,6 +2,7 @@ using System.Text;
 
 using Shouldly;
 
+using WidgetDepot.Web.Features.Orders.Detail;
 using WidgetDepot.Web.Features.Orders.History;
 
 namespace WidgetDepot.Tests.Features.Orders.History;

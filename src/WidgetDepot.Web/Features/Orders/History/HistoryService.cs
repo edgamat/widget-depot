@@ -1,5 +1,7 @@
 using System.Net;
 
+using WidgetDepot.Web.Features.Orders.Detail;
+
 namespace WidgetDepot.Web.Features.Orders.History;
 
 public class HistoryService

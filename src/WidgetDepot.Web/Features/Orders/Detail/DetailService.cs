@@ -32,7 +32,9 @@ public class DetailService
                 [.. dto.Items.Select(i => new OrderDetailItem(i.WidgetId, i.Sku, i.Name, i.Weight, i.UnitCost, i.Quantity))],
                 MapAddress(dto.ShippingAddress),
                 MapAddress(dto.BillingAddress),
-                dto.ShippingEstimate);
+                dto.ShippingEstimate,
+                dto.TransmissionStatus,
+                dto.TransmissionStatusChangedAt);
 
             return new GetOrderDetailResult.Success(order);
         }

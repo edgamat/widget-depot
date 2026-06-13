@@ -22,7 +22,9 @@ public record GetByOrderNumberResponse(
     IReadOnlyList<GetByOrderNumberItemResponse> Items,
     GetByOrderNumberAddressResponse? ShippingAddress,
     GetByOrderNumberAddressResponse? BillingAddress,
-    decimal? ShippingEstimate);
+    decimal? ShippingEstimate,
+    TransmissionStatus? TransmissionStatus,
+    DateTime? TransmissionStatusChangedAt);
 
 public record GetByOrderNumberNotFound;
 
@@ -46,7 +48,9 @@ public class GetByOrderNumberHandler(AppDbContext db)
             [.. order.Items.Select(i => new GetByOrderNumberItemResponse(i.WidgetId, i.Widget.Sku, i.Widget.Name, i.Widget.Weight, i.Widget.Price, i.Quantity))],
             MapAddress(order.ShippingAddress),
             MapAddress(order.BillingAddress),
-            order.ShippingEstimate);
+            order.ShippingEstimate,
+            order.TransmissionStatus,
+            order.TransmissionStatusChangedAt);
     }
 
     private static GetByOrderNumberAddressResponse? MapAddress(Address? address) =>
