@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 
 using WidgetDepot.Web.Components;
+using WidgetDepot.Web.Features.Accounts.ForcePasswordChange;
 using WidgetDepot.Web.Features.Accounts.Login;
 using WidgetDepot.Web.Features.Accounts.PasswordChange;
 using WidgetDepot.Web.Features.Accounts.Profile;
@@ -75,6 +76,10 @@ builder.Services.AddHttpClient<PasswordChangeService>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"))
     .AddHttpMessageHandler<CookieForwardingHandler>();
 
+builder.Services.AddHttpClient<ForcePasswordChangeService>(client =>
+    client.BaseAddress = new Uri("https+http://apiservice"))
+    .AddHttpMessageHandler<CookieForwardingHandler>();
+
 builder.Services.AddHttpClient<Step1Service>(client =>
     client.BaseAddress = new Uri("https+http://apiservice"))
     .AddHttpMessageHandler<CookieForwardingHandler>();
@@ -125,6 +130,28 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true
+        && context.User.HasClaim("MustChangePassword", "true"))
+    {
+        var path = context.Request.Path.Value ?? string.Empty;
+        var isExcluded = path.Equals("/accounts/force-password-change", StringComparison.OrdinalIgnoreCase)
+                      || path.Equals("/accounts/do-signin", StringComparison.OrdinalIgnoreCase)
+                      || path.Equals("/accounts/logout", StringComparison.OrdinalIgnoreCase)
+                      || path.Equals("/accounts/login", StringComparison.OrdinalIgnoreCase)
+                      || path.StartsWith("/_blazor", StringComparison.OrdinalIgnoreCase);
+
+        if (!isExcluded)
+        {
+            context.Response.Redirect("/accounts/force-password-change");
+            return;
+        }
+    }
+
+    await next();
+});
+
 app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
@@ -132,7 +159,7 @@ app.MapRazorComponents<App>()
 
 app.MapDefaultEndpoints();
 
-app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName, bool isAdmin, string? returnUrl) =>
+app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName, bool isAdmin, bool mustChangePassword, string? returnUrl) =>
 {
     var claims = new List<Claim>
     {
@@ -144,9 +171,16 @@ app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, st
     if (isAdmin)
         claims.Add(new Claim("IsAdmin", "true"));
 
+    if (mustChangePassword)
+        claims.Add(new Claim("MustChangePassword", "true"));
+
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
     var principal = new ClaimsPrincipal(identity);
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+    if (mustChangePassword)
+        return Results.Redirect("/accounts/force-password-change");
+
     var target = !string.IsNullOrEmpty(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative)
         ? returnUrl
         : "/";

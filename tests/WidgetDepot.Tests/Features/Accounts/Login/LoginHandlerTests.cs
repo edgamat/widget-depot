@@ -52,6 +52,44 @@ public class LoginHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_ValidCredentials_ReturnsMustChangePasswordFalseByDefault()
+    {
+        using var db = CreateDb();
+        await SeedCustomerAsync(db);
+        var handler = new LoginHandler(db);
+        var request = new LoginRequest("jane@example.com", "P@ssw0rd!");
+
+        var result = await handler.HandleAsync(request, TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<LoginResponse>();
+        response.MustChangePassword.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task HandleAsync_CustomerWithMustChangePassword_ReturnsMustChangePasswordTrue()
+    {
+        using var db = CreateDb();
+        var hasher = new PasswordHasher<Customer>();
+        var customer = new Customer
+        {
+            FirstName = "Jane",
+            LastName = "Doe",
+            Email = "jane@example.com",
+            MustChangePassword = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        customer.PasswordHash = hasher.HashPassword(customer, "P@ssw0rd!");
+        db.Customers.Add(customer);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var handler = new LoginHandler(db);
+
+        var result = await handler.HandleAsync(new LoginRequest("jane@example.com", "P@ssw0rd!"), TestContext.Current.CancellationToken);
+
+        var response = result.ShouldBeOfType<LoginResponse>();
+        response.MustChangePassword.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task HandleAsync_AdminUser_ReturnsIsAdminTrue()
     {
         using var db = CreateDb();

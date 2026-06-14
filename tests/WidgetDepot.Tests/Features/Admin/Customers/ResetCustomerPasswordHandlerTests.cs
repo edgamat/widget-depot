@@ -67,6 +67,19 @@ public class ResetCustomerPasswordHandlerTests
     }
 
     [Fact]
+    public async Task ResetAsync_ExistingCustomer_SetsMustChangePasswordTrue()
+    {
+        using var db = CreateDb();
+        SeedCustomer(db);
+        var handler = new ResetCustomerPasswordHandler(db);
+
+        await handler.ResetAsync(1, TestContext.Current.CancellationToken);
+
+        var updated = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
+        updated.MustChangePassword.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task ResetAsync_UnknownCustomer_ReturnsNotFound()
     {
         using var db = CreateDb();
