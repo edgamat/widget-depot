@@ -9,7 +9,7 @@ export class CustomerProfilePage {
   constructor(page: Page) {
     this.page          = page;
     this.adminBadge    = page.locator('span.badge.bg-warning');
-    this.backButton    = page.getByRole('link', { name: 'Back to Customers' });
+    this.backButton    = page.getByRole('link', { name: 'Back to Customer List' });
     this.notFoundAlert = page.locator('.alert-warning');
   }
 
