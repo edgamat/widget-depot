@@ -19,9 +19,9 @@
 
 Run all of the following before any `git commit`, in this order:
 
-1. `dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations` — format C# code (also enforced automatically by a hook, but run it here to catch failures before staging)
-2. `dotnet build` — confirm the solution compiles cleanly
-3. `dotnet test` — run the unit test suite
+1. `dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations` — format C# code first, so any file changes are picked up by the build
+2. `dotnet build` — compile the solution once
+3. `dotnet test --no-build` — run the unit test suite, skipping recompilation
 4. `CI=true npm test --prefix tests/WidgetDepot.E2E` — run all end-to-end tests in headless mode (`CI=true` prevents Playwright from auto-opening the HTML report)
 
 Do not commit if any step fails. Fix the failure first, then re-run the full sequence.
