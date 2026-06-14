@@ -1,3 +1,4 @@
+using WidgetDepot.ApiService.Features.Accounts.ForcePasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Login;
 using WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 using WidgetDepot.ApiService.Features.Accounts.Profile;
@@ -13,6 +14,7 @@ public static class AccountEndpointExtensions
         app.MapLogin();
         app.MapProfile();
         app.MapPasswordChange();
+        app.MapForcePasswordChange();
 
         return app;
     }

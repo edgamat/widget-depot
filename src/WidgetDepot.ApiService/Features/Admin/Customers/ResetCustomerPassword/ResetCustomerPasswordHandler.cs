@@ -28,6 +28,7 @@ public class ResetCustomerPasswordHandler(AppDbContext db)
 
         var temporaryPassword = GenerateTemporaryPassword();
         customer.PasswordHash = _passwordHasher.HashPassword(customer, temporaryPassword);
+        customer.MustChangePassword = true;
 
         await db.SaveChangesAsync(cancellationToken);
 

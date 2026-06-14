@@ -12,7 +12,7 @@ public class LoginFormModel
     public string Password { get; set; } = string.Empty;
 }
 
-public record LoginResponse(int CustomerId, string Email, string FirstName, bool IsAdmin);
+public record LoginResponse(int CustomerId, string Email, string FirstName, bool IsAdmin, bool MustChangePassword);
 
 public abstract record LoginResult
 {

@@ -74,7 +74,7 @@
             switch (result)
             {
                 case LoginResult.Success success:
-                    var url = $"/accounts/do-signin?customerId={success.Customer.CustomerId}&email={Uri.EscapeDataString(success.Customer.Email)}&firstName={Uri.EscapeDataString(success.Customer.FirstName)}&isAdmin={success.Customer.IsAdmin}";
+                    var url = $"/accounts/do-signin?customerId={success.Customer.CustomerId}&email={Uri.EscapeDataString(success.Customer.Email)}&firstName={Uri.EscapeDataString(success.Customer.FirstName)}&isAdmin={success.Customer.IsAdmin}&mustChangePassword={success.Customer.MustChangePassword}";
                     NavigationManager.NavigateTo(url, forceLoad: true);
                     break;
                 case LoginResult.InvalidCredentials:
