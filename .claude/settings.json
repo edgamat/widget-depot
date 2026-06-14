@@ -20,7 +20,9 @@
       "Bash(gh issue edit:*)",
       "Bash(gh pr *)",
       "Bash(npm test *)",
-      "Bash(npx playwright *)"
+      "Bash(npx playwright *)",
+      "Bash(grep *)",
+      "Bash(dotnet format *)"
     ]
   },
   "plansDirectory": ".plans"

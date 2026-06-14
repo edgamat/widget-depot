@@ -130,27 +130,7 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Use(async (context, next) =>
-{
-    if (context.User.Identity?.IsAuthenticated == true
-        && context.User.HasClaim("MustChangePassword", "true"))
-    {
-        var path = context.Request.Path.Value ?? string.Empty;
-        var isExcluded = path.Equals("/accounts/force-password-change", StringComparison.OrdinalIgnoreCase)
-                      || path.Equals("/accounts/do-signin", StringComparison.OrdinalIgnoreCase)
-                      || path.Equals("/accounts/logout", StringComparison.OrdinalIgnoreCase)
-                      || path.Equals("/accounts/login", StringComparison.OrdinalIgnoreCase)
-                      || path.StartsWith("/_blazor", StringComparison.OrdinalIgnoreCase);
-
-        if (!isExcluded)
-        {
-            context.Response.Redirect("/accounts/force-password-change");
-            return;
-        }
-    }
-
-    await next();
-});
+app.UseMiddleware<ForcePasswordChangeMiddleware>();
 
 app.MapStaticAssets();
 
