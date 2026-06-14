@@ -4,11 +4,13 @@ export class NavBarComponent {
   readonly page: Page;
   readonly emailDisplay: Locator;
   readonly signOutLink: Locator;
+  readonly catalogUploadLink: Locator;
 
   constructor(page: Page) {
-    this.page        = page;
-    this.emailDisplay = page.locator('.top-row span');
-    this.signOutLink  = page.getByRole('link', { name: 'Sign Out' });
+    this.page             = page;
+    this.emailDisplay     = page.locator('.top-row span');
+    this.signOutLink      = page.getByRole('link', { name: 'Sign Out' });
+    this.catalogUploadLink = page.getByRole('link', { name: 'Catalog Upload' });
   }
 
   async signOut() {
