@@ -23,21 +23,5 @@
       "Bash(npx playwright *)"
     ]
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "dotnet format --exclude src/WidgetDepot.ApiService/Data/Migrations && git add -u",
-            "if": "Bash(git commit*)",
-            "timeout": 60,
-            "statusMessage": "Running dotnet format..."
-          }
-        ]
-      }
-    ]
-  },
   "plansDirectory": ".plans"
 }
