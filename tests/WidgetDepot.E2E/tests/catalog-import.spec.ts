@@ -4,6 +4,16 @@ import { test, expect } from './fixtures';
 const data = (file: string) => path.resolve(__dirname, 'data', file);
 
 test.describe('Catalog import page', () => {
+  // AC-admin-nav: The catalog CSV upload page is accessible from the admin navigation
+  test('admin nav link navigates to the catalog import page', async ({ navBar, catalogImportPage }) => {
+    await catalogImportPage.goto();
+    await catalogImportPage.waitForReady();
+    await expect(navBar.catalogUploadLink).toBeVisible();
+    await navBar.catalogUploadLink.click();
+    await expect(catalogImportPage.page).toHaveURL(/\/admin\/catalog-import/);
+    await expect(catalogImportPage.heading).toBeVisible();
+  });
+
   // AC1: A warehouse staff member can navigate to the admin catalog import page
   test('can navigate to the catalog import page', async ({ catalogImportPage }) => {
     await catalogImportPage.goto();
