@@ -248,7 +248,9 @@
                 case UpdateProfileResult.Success success:
                     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                     var customerId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
-                    var url = $"/accounts/do-signin?customerId={Uri.EscapeDataString(customerId)}&email={Uri.EscapeDataString(success.Profile.Email)}&firstName={Uri.EscapeDataString(success.Profile.FirstName)}&returnUrl={Uri.EscapeDataString("/accounts/profile?saved=true")}";
+                    var isAdmin = authState.User.HasClaim("IsAdmin", "true");
+                    var mustChangePassword = authState.User.HasClaim("MustChangePassword", "true");
+                    var url = $"/accounts/do-signin?customerId={Uri.EscapeDataString(customerId)}&email={Uri.EscapeDataString(success.Profile.Email)}&firstName={Uri.EscapeDataString(success.Profile.FirstName)}&isAdmin={isAdmin}&mustChangePassword={mustChangePassword}&returnUrl={Uri.EscapeDataString("/accounts/profile?saved=true")}";
                     NavigationManager.NavigateTo(url, forceLoad: true);
                     break;
                 case UpdateProfileResult.DuplicateEmail:
