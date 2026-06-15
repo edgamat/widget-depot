@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.GetDrafts;
 
 public static class GetDraftsEndpoint
@@ -8,13 +10,13 @@ public static class GetDraftsEndpoint
     {
         app.MapGet(OrderEndpoints.GetDrafts, async (
             ClaimsPrincipal user,
-            GetDraftsHandler handler,
+            IRequestHandler<GetDraftsQuery, IReadOnlyList<GetDraftsOrderResponse>> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(customerId, cancellationToken);
+            var result = await handler.HandleAsync(new GetDraftsQuery(customerId), cancellationToken);
 
             return Results.Ok(result);
         })

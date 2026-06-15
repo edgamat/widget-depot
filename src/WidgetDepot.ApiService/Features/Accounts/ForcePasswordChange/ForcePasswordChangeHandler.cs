@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Accounts.ForcePasswordChange;
 
@@ -14,12 +15,17 @@ public abstract record ForcePasswordChangeError
     public record NotFound : ForcePasswordChangeError;
 }
 
-public class ForcePasswordChangeHandler(AppDbContext db)
+public record ForcePasswordChangeCommand(int CustomerId, ForcePasswordChangeRequest Request) : IRequest<object>;
+
+public class ForcePasswordChangeHandler(AppDbContext db) : IRequestHandler<ForcePasswordChangeCommand, object>
 {
     private readonly PasswordHasher<Customer> _passwordHasher = new();
 
-    public async Task<object> ChangeAsync(int customerId, ForcePasswordChangeRequest request, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(ForcePasswordChangeCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

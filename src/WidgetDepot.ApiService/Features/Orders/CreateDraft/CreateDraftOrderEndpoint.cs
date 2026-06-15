@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.CreateDraft;
 
 public static class CreateDraftOrderEndpoint
@@ -9,13 +11,13 @@ public static class CreateDraftOrderEndpoint
         app.MapPost(OrderEndpoints.CreateDraft, async (
             CreateDraftOrderRequest request,
             ClaimsPrincipal user,
-            CreateDraftOrderHandler handler,
+            IRequestHandler<CreateDraftOrderCommand, object> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(customerId, request, cancellationToken);
+            var result = await handler.HandleAsync(new CreateDraftOrderCommand(customerId, request), cancellationToken);
 
             return result switch
             {

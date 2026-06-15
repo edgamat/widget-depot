@@ -1,17 +1,19 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Accounts.Profile;
 
 public static class ProfileEndpoint
 {
     public static IEndpointRouteBuilder MapProfile(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/accounts/profile", async (ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
+        app.MapGet("/accounts/profile", async (ClaimsPrincipal user, IRequestHandler<GetProfileQuery, object> handler, CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.GetAsync(customerId, cancellationToken);
+            var result = await handler.HandleAsync(new GetProfileQuery(customerId), cancellationToken);
 
             return result switch
             {
@@ -23,12 +25,12 @@ public static class ProfileEndpoint
         .WithName("GetProfile")
         .RequireAuthorization();
 
-        app.MapPut("/accounts/profile", async (UpdateProfileRequest request, ClaimsPrincipal user, ProfileHandler handler, CancellationToken cancellationToken) =>
+        app.MapPut("/accounts/profile", async (UpdateProfileRequest request, ClaimsPrincipal user, IRequestHandler<UpdateProfileCommand, object> handler, CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.UpdateAsync(customerId, request, cancellationToken);
+            var result = await handler.HandleAsync(new UpdateProfileCommand(customerId, request), cancellationToken);
 
             return result switch
             {

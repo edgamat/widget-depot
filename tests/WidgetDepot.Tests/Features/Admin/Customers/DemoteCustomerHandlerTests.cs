@@ -41,7 +41,7 @@ public class DemoteCustomerHandlerTests
         SeedCustomer(db, id: 1, isAdmin: true);
         var handler = new DemoteCustomerHandler(db);
 
-        var result = await handler.DemoteAsync(customerId: 1, requestingAdminId: 2, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new DemoteCustomerCommand(CustomerId: 1, RequestingAdminId: 2), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<DemoteCustomerSuccess>();
 
@@ -56,7 +56,7 @@ public class DemoteCustomerHandlerTests
         SeedCustomer(db, id: 1, isAdmin: true);
         var handler = new DemoteCustomerHandler(db);
 
-        var result = await handler.DemoteAsync(customerId: 1, requestingAdminId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new DemoteCustomerCommand(CustomerId: 1, RequestingAdminId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<DemoteCustomerError.CannotDemoteSelf>();
     }
@@ -68,7 +68,7 @@ public class DemoteCustomerHandlerTests
         SeedCustomer(db, id: 1, isAdmin: true);
         var handler = new DemoteCustomerHandler(db);
 
-        await handler.DemoteAsync(customerId: 1, requestingAdminId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new DemoteCustomerCommand(CustomerId: 1, RequestingAdminId: 1), TestContext.Current.CancellationToken);
 
         var customer = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
         customer.IsAdmin.ShouldBeTrue();
@@ -80,7 +80,7 @@ public class DemoteCustomerHandlerTests
         using var db = CreateDb();
         var handler = new DemoteCustomerHandler(db);
 
-        var result = await handler.DemoteAsync(customerId: 99, requestingAdminId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new DemoteCustomerCommand(CustomerId: 99, RequestingAdminId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<DemoteCustomerError.NotFound>();
     }

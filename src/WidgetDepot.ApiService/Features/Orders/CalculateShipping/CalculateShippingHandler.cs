@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 
@@ -14,7 +15,9 @@ public abstract record CalculateShippingError
     public record ShippingApiFailure(string Reason) : CalculateShippingError;
 }
 
-public class CalculateShippingHandler
+public record CalculateShippingCommand(int OrderId, int CustomerId) : IRequest<object>;
+
+public class CalculateShippingHandler : IRequestHandler<CalculateShippingCommand, object>
 {
     private readonly AppDbContext _db;
     private readonly IShippingApiClient _shippingApiClient;
@@ -29,8 +32,11 @@ public class CalculateShippingHandler
         _originCountry = configuration["Shipping:OriginCountry"] ?? "US";
     }
 
-    public async Task<object> HandleAsync(int orderId, int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(CalculateShippingCommand command, CancellationToken cancellationToken)
     {
+        var orderId = command.OrderId;
+        var customerId = command.CustomerId;
+
         var order = await _db.Orders
             .Include(o => o.Items)
             .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);

@@ -3,10 +3,13 @@ using Microsoft.Extensions.Options;
 
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Orders.Submit;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.TransmitOrders;
 
-public class TransmitOrdersHandler
+public record TransmitOrdersCommand : IRequest<int>;
+
+public class TransmitOrdersHandler : IRequestHandler<TransmitOrdersCommand, int>
 {
     private readonly AppDbContext _db;
     private readonly IOrderTransmitter _transmitter;
@@ -25,7 +28,7 @@ public class TransmitOrdersHandler
         _logger = logger;
     }
 
-    public async Task<int> HandleAsync(CancellationToken cancellationToken)
+    public async Task<int> HandleAsync(TransmitOrdersCommand command, CancellationToken cancellationToken)
     {
         var orders = await _db.Orders
             .Where(o => o.TransmissionStatus == TransmissionStatus.Pending ||

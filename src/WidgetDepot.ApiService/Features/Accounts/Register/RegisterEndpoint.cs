@@ -1,10 +1,12 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Accounts.Register;
 
 public static class RegisterEndpoint
 {
     public static IEndpointRouteBuilder MapRegister(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/accounts/register", async (RegisterRequest request, RegisterHandler handler, CancellationToken cancellationToken) =>
+        app.MapPost("/accounts/register", async (RegisterRequest request, IRequestHandler<RegisterRequest, object> handler, CancellationToken cancellationToken) =>
         {
             var result = await handler.HandleAsync(request, cancellationToken);
 

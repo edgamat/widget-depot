@@ -89,7 +89,7 @@ public class RecreateOrderHandlerTests
         using var db = CreateDb();
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(999, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(999, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RecreateOrderNotFound>();
     }
@@ -101,7 +101,7 @@ public class RecreateOrderHandlerTests
         var (order, _) = await SeedMissingOrderAsync(db, customerId: 1);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 2, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 2), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RecreateOrderNotFound>();
     }
@@ -115,7 +115,7 @@ public class RecreateOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RecreateOrderInvalidStatus>();
     }
@@ -129,7 +129,7 @@ public class RecreateOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RecreateOrderInvalidStatus>();
     }
@@ -143,7 +143,7 @@ public class RecreateOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RecreateOrderInvalidStatus>();
     }
@@ -160,7 +160,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
@@ -178,7 +178,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<RecreateOrderResponse>();
         response.NewStatus.ShouldBe(TransmissionStatus.Transmitted);
@@ -198,7 +198,7 @@ public class RecreateOrderHandlerTests
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -220,7 +220,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, writer.Object, transmitter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         writer.Verify(w => w.WriteAsync(It.IsAny<OrderFile>(), It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -237,7 +237,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
@@ -255,7 +255,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<RecreateOrderResponse>();
         response.NewStatus.ShouldBe(TransmissionStatus.Failed);
@@ -274,7 +274,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
@@ -292,7 +292,7 @@ public class RecreateOrderHandlerTests
 
         var handler = CreateHandler(db, transmitter: transmitter.Object);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RecreateOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<RecreateOrderResponse>();
         response.NewStatus.ShouldBe(TransmissionStatus.Failed);

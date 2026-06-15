@@ -41,7 +41,7 @@ public class PromoteCustomerHandlerTests
         SeedCustomer(db, isAdmin: false);
         var handler = new PromoteCustomerHandler(db);
 
-        var result = await handler.PromoteAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new PromoteCustomerCommand(1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<PromoteCustomerSuccess>();
 
@@ -56,7 +56,7 @@ public class PromoteCustomerHandlerTests
         SeedCustomer(db, isAdmin: true);
         var handler = new PromoteCustomerHandler(db);
 
-        var result = await handler.PromoteAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new PromoteCustomerCommand(1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<PromoteCustomerSuccess>();
     }
@@ -67,7 +67,7 @@ public class PromoteCustomerHandlerTests
         using var db = CreateDb();
         var handler = new PromoteCustomerHandler(db);
 
-        var result = await handler.PromoteAsync(99, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new PromoteCustomerCommand(99), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<PromoteCustomerError.NotFound>();
     }

@@ -1,3 +1,5 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.ExpireDraftOrders;
 
 public class ExpireDraftOrdersJob : BackgroundService
@@ -40,9 +42,9 @@ public class ExpireDraftOrdersJob : BackgroundService
     private async Task RunJobAsync(CancellationToken cancellationToken)
     {
         using var scope = _scopeFactory.CreateScope();
-        var handler = scope.ServiceProvider.GetRequiredService<ExpireDraftOrdersHandler>();
+        var handler = scope.ServiceProvider.GetRequiredService<IRequestHandler<ExpireDraftOrdersCommand, int>>();
 
-        var deleted = await handler.HandleAsync(cancellationToken);
+        var deleted = await handler.HandleAsync(new ExpireDraftOrdersCommand(), cancellationToken);
         _logger.LogInformation("ExpireDraftOrdersJob: deleted {Count} expired draft order(s).", deleted);
     }
 

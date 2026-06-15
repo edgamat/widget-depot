@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Admin.Customers.GetCustomerProfile;
 
@@ -27,10 +28,14 @@ public abstract record CustomerProfileError
     public record NotFound : CustomerProfileError;
 }
 
-public class GetCustomerProfileHandler(AppDbContext db)
+public record GetCustomerProfileQuery(int CustomerId) : IRequest<object>;
+
+public class GetCustomerProfileHandler(AppDbContext db) : IRequestHandler<GetCustomerProfileQuery, object>
 {
-    public async Task<object> GetAsync(int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(GetCustomerProfileQuery query, CancellationToken cancellationToken)
     {
+        var customerId = query.CustomerId;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

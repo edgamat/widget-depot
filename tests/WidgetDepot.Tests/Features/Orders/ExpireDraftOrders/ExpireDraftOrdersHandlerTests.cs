@@ -35,7 +35,7 @@ public class ExpireDraftOrdersHandlerTests
         using var db = CreateDb();
         var handler = new ExpireDraftOrdersHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(0);
     }
@@ -47,7 +47,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Draft, DateTime.UtcNow.AddDays(-31));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(1);
     }
@@ -59,7 +59,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Draft, DateTime.UtcNow.AddDays(-31));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         var remaining = await db.Orders.CountAsync(TestContext.Current.CancellationToken);
         remaining.ShouldBe(0);
@@ -72,7 +72,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Draft, DateTime.UtcNow.AddDays(-30).AddMinutes(1));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(0);
     }
@@ -84,7 +84,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Submitted, DateTime.UtcNow.AddDays(-60));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(0);
     }
@@ -96,7 +96,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Submitted, DateTime.UtcNow.AddDays(-60));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         var remaining = await db.Orders.CountAsync(TestContext.Current.CancellationToken);
         remaining.ShouldBe(1);
@@ -109,7 +109,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Draft, DateTime.UtcNow.AddDays(-5));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(0);
     }
@@ -123,7 +123,7 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Submitted, DateTime.UtcNow.AddDays(-60)); // old submitted
         var handler = new ExpireDraftOrdersHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(1);
         var remaining = await db.Orders.CountAsync(TestContext.Current.CancellationToken);
@@ -137,8 +137,8 @@ public class ExpireDraftOrdersHandlerTests
         await SeedOrderAsync(db, OrderStatus.Draft, DateTime.UtcNow.AddDays(-31));
         var handler = new ExpireDraftOrdersHandler(db);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
-        var secondResult = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
+        var secondResult = await handler.HandleAsync(new ExpireDraftOrdersCommand(), TestContext.Current.CancellationToken);
 
         secondResult.ShouldBe(0);
     }

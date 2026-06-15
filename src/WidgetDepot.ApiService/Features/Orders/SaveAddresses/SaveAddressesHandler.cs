@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 
@@ -23,12 +24,18 @@ public abstract record SaveAddressesError
     public record InvalidRequest(Dictionary<string, string[]> Errors) : SaveAddressesError;
 }
 
-public class SaveAddressesHandler(AppDbContext db)
+public record SaveAddressesCommand(int OrderId, int CustomerId, SaveAddressesRequest Request) : IRequest<object?>;
+
+public class SaveAddressesHandler(AppDbContext db) : IRequestHandler<SaveAddressesCommand, object?>
 {
     private static readonly Regex ZipCodeRegex = new(@"^\d{5}(-\d{4})?$", RegexOptions.Compiled);
 
-    public async Task<object?> HandleAsync(int orderId, int customerId, SaveAddressesRequest request, CancellationToken cancellationToken)
+    public async Task<object?> HandleAsync(SaveAddressesCommand command, CancellationToken cancellationToken)
     {
+        var orderId = command.OrderId;
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
 
         if (order is null)

@@ -40,7 +40,7 @@ public class GetCustomerListHandlerTests
         using var db = CreateDb();
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(1, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(1, 20), TestContext.Current.CancellationToken);
 
         result.Customers.ShouldBeEmpty();
         result.TotalCount.ShouldBe(0);
@@ -55,7 +55,7 @@ public class GetCustomerListHandlerTests
         SeedCustomers(db, 5);
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(1, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(1, 20), TestContext.Current.CancellationToken);
 
         result.Customers.Count.ShouldBe(5);
         result.TotalCount.ShouldBe(5);
@@ -68,7 +68,7 @@ public class GetCustomerListHandlerTests
         SeedCustomers(db, 20);
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(1, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(1, 20), TestContext.Current.CancellationToken);
 
         result.Customers.Count.ShouldBe(20);
         result.TotalCount.ShouldBe(20);
@@ -81,7 +81,7 @@ public class GetCustomerListHandlerTests
         SeedCustomers(db, 25);
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(1, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(1, 20), TestContext.Current.CancellationToken);
 
         result.Customers.Count.ShouldBe(20);
         result.TotalCount.ShouldBe(25);
@@ -94,7 +94,7 @@ public class GetCustomerListHandlerTests
         SeedCustomers(db, 25);
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(2, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(2, 20), TestContext.Current.CancellationToken);
 
         result.Customers.Count.ShouldBe(5);
         result.TotalCount.ShouldBe(25);
@@ -108,7 +108,7 @@ public class GetCustomerListHandlerTests
         SeedCustomers(db, 20);
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(2, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(2, 20), TestContext.Current.CancellationToken);
 
         result.Customers.ShouldBeEmpty();
         result.TotalCount.ShouldBe(20);
@@ -126,7 +126,7 @@ public class GetCustomerListHandlerTests
         db.SaveChanges();
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(1, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(1, 20), TestContext.Current.CancellationToken);
 
         result.Customers[0].LastName.ShouldBe("Apple");
         result.Customers[0].FirstName.ShouldBe("Alice");
@@ -152,7 +152,7 @@ public class GetCustomerListHandlerTests
         db.SaveChanges();
         var handler = new GetCustomerListHandler(db);
 
-        var result = await handler.GetAsync(1, 20, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerListQuery(1, 20), TestContext.Current.CancellationToken);
 
         result.Customers[0].IsAdmin.ShouldBeTrue();
     }

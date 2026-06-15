@@ -53,7 +53,7 @@ public class GetDraftOrderHandlerTests
         using var db = CreateDb();
         var handler = new GetDraftOrderHandler(db);
 
-        var result = await handler.HandleAsync(999, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftOrderQuery(999, 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<GetDraftOrderError.OrderNotFound>();
     }
@@ -65,7 +65,7 @@ public class GetDraftOrderHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
         var handler = new GetDraftOrderHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 2, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftOrderQuery(order.Id, 2), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<GetDraftOrderError.Forbidden>();
     }
@@ -79,7 +79,7 @@ public class GetDraftOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = new GetDraftOrderHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftOrderQuery(order.Id, 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<GetDraftOrderError.NotDraft>();
     }
@@ -91,7 +91,7 @@ public class GetDraftOrderHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
         var handler = new GetDraftOrderHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftOrderQuery(order.Id, 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetDraftOrderResponse>();
         response.Id.ShouldBe(order.Id);
@@ -111,7 +111,7 @@ public class GetDraftOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = new GetDraftOrderHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftOrderQuery(order.Id, 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetDraftOrderResponse>();
         response.Items.Count.ShouldBe(1);

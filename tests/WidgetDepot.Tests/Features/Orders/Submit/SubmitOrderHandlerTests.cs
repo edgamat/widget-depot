@@ -77,7 +77,7 @@ public class SubmitOrderHandlerTests
         using var db = CreateDb();
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(999, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(999, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.OrderNotFound>();
     }
@@ -89,7 +89,7 @@ public class SubmitOrderHandlerTests
         var (order, _) = await SeedFullOrderAsync(db, customerId: 2);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.Forbidden>();
     }
@@ -103,7 +103,7 @@ public class SubmitOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.InvalidOrderState>();
     }
@@ -127,7 +127,7 @@ public class SubmitOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.IncompleteOrder>();
     }
@@ -153,7 +153,7 @@ public class SubmitOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.IncompleteOrder>();
     }
@@ -179,7 +179,7 @@ public class SubmitOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.IncompleteOrder>();
     }
@@ -205,7 +205,7 @@ public class SubmitOrderHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SubmitOrderError.IncompleteOrder>();
     }
@@ -217,7 +217,7 @@ public class SubmitOrderHandlerTests
         var (order, _) = await SeedFullOrderAsync(db);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<SubmitOrderResponse>();
         response.OrderId.ShouldBe(order.Id);
@@ -230,7 +230,7 @@ public class SubmitOrderHandlerTests
         var (order, _) = await SeedFullOrderAsync(db);
         var handler = CreateHandler(db);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.Status.ShouldBe(OrderStatus.Submitted);
@@ -244,7 +244,7 @@ public class SubmitOrderHandlerTests
         var handler = CreateHandler(db);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -260,7 +260,7 @@ public class SubmitOrderHandlerTests
         var (order, _) = await SeedFullOrderAsync(db);
         var handler = CreateHandler(db);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Pending);
@@ -273,7 +273,7 @@ public class SubmitOrderHandlerTests
         var (order, _) = await SeedFullOrderAsync(db);
         var handler = CreateHandler(db);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatusChangedAt.ShouldBeNull();
@@ -291,7 +291,7 @@ public class SubmitOrderHandlerTests
 
         var handler = CreateHandler(db, mockWriter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new SubmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         mockWriter.Verify(w => w.WriteAsync(It.IsAny<OrderFile>(), It.IsAny<CancellationToken>()), Times.Once);
     }

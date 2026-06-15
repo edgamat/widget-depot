@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.GetByOrderNumber;
 
@@ -28,10 +29,15 @@ public record GetByOrderNumberResponse(
 
 public record GetByOrderNumberNotFound;
 
-public class GetByOrderNumberHandler(AppDbContext db)
+public record GetByOrderNumberQuery(int OrderNumber, int CustomerId) : IRequest<object>;
+
+public class GetByOrderNumberHandler(AppDbContext db) : IRequestHandler<GetByOrderNumberQuery, object>
 {
-    public async Task<object> HandleAsync(int orderNumber, int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(GetByOrderNumberQuery query, CancellationToken cancellationToken)
     {
+        var orderNumber = query.OrderNumber;
+        var customerId = query.CustomerId;
+
         var order = await db.Orders
             .Include(o => o.Items)
             .ThenInclude(i => i.Widget)

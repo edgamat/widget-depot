@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.Submit;
 
 public static class SubmitOrderEndpoint
@@ -9,13 +11,13 @@ public static class SubmitOrderEndpoint
         app.MapPost(OrderEndpoints.SubmitOrder, async (
             int orderId,
             ClaimsPrincipal user,
-            SubmitOrderHandler handler,
+            IRequestHandler<SubmitOrderCommand, object> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(orderId, customerId, cancellationToken);
+            var result = await handler.HandleAsync(new SubmitOrderCommand(orderId, customerId), cancellationToken);
 
             return result switch
             {

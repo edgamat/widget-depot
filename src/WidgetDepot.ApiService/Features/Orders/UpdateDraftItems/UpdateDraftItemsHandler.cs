@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.UpdateDraftItems;
 
@@ -16,10 +17,16 @@ public abstract record UpdateDraftItemsError
     public record WidgetNotFound(int WidgetId) : UpdateDraftItemsError;
 }
 
-public class UpdateDraftItemsHandler(AppDbContext db)
+public record UpdateDraftItemsCommand(int OrderId, int CustomerId, UpdateDraftItemsRequest Request) : IRequest<object?>;
+
+public class UpdateDraftItemsHandler(AppDbContext db) : IRequestHandler<UpdateDraftItemsCommand, object?>
 {
-    public async Task<object?> HandleAsync(int orderId, int customerId, UpdateDraftItemsRequest request, CancellationToken cancellationToken)
+    public async Task<object?> HandleAsync(UpdateDraftItemsCommand command, CancellationToken cancellationToken)
     {
+        var orderId = command.OrderId;
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var order = await db.Orders
             .Include(o => o.Items)
             .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Accounts.Profile;
 
@@ -24,12 +25,17 @@ public abstract record ProfileError
     public record EmailAlreadyRegistered : ProfileError;
 }
 
+public record GetProfileQuery(int CustomerId) : IRequest<object>;
+
+public record UpdateProfileCommand(int CustomerId, UpdateProfileRequest Request) : IRequest<object>;
+
 public class ProfileHandler(AppDbContext db)
+    : IRequestHandler<GetProfileQuery, object>, IRequestHandler<UpdateProfileCommand, object>
 {
-    public async Task<object> GetAsync(int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(GetProfileQuery request, CancellationToken cancellationToken)
     {
         var customer = await db.Customers
-            .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
+            .SingleOrDefaultAsync(c => c.Id == request.CustomerId, cancellationToken);
 
         if (customer is null)
             return new ProfileError.NotFound();
@@ -42,8 +48,11 @@ public class ProfileHandler(AppDbContext db)
             MapAddress(customer.BillingAddress));
     }
 
-    public async Task<object> UpdateAsync(int customerId, UpdateProfileRequest request, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(UpdateProfileCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

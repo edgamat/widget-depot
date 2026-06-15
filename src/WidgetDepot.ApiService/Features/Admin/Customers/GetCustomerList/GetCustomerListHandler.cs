@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Admin.Customers.GetCustomerList;
 
@@ -8,10 +9,15 @@ public record CustomerListItem(int Id, string FirstName, string LastName, string
 
 public record GetCustomerListResponse(IReadOnlyList<CustomerListItem> Customers, int TotalCount, int Page, int PageSize);
 
-public class GetCustomerListHandler(AppDbContext db)
+public record GetCustomerListQuery(int Page, int PageSize) : IRequest<GetCustomerListResponse>;
+
+public class GetCustomerListHandler(AppDbContext db) : IRequestHandler<GetCustomerListQuery, GetCustomerListResponse>
 {
-    public async Task<GetCustomerListResponse> GetAsync(int page, int pageSize, CancellationToken cancellationToken)
+    public async Task<GetCustomerListResponse> HandleAsync(GetCustomerListQuery query, CancellationToken cancellationToken)
     {
+        var page = query.Page;
+        var pageSize = query.PageSize;
+
         var totalCount = await db.Customers.CountAsync(cancellationToken);
 
         var customers = await db.Customers

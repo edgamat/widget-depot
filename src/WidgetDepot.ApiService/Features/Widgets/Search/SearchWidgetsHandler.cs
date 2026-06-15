@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Widgets.Search;
 
-public record SearchWidgetsQuery(string? Term);
+public record SearchWidgetsQuery(string? Term) : IRequest<IReadOnlyList<WidgetResult>>;
 
 public record WidgetResult(
     int Id,
@@ -16,7 +17,7 @@ public record WidgetResult(
     decimal Price,
     DateOnly DateAvailable);
 
-public class SearchWidgetsHandler(AppDbContext db)
+public class SearchWidgetsHandler(AppDbContext db) : IRequestHandler<SearchWidgetsQuery, IReadOnlyList<WidgetResult>>
 {
     public async Task<IReadOnlyList<WidgetResult>> HandleAsync(SearchWidgetsQuery query, CancellationToken cancellationToken)
     {

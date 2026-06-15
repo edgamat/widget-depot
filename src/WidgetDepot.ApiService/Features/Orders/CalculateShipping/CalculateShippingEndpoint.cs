@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 
 public static class CalculateShippingEndpoint
@@ -9,13 +11,13 @@ public static class CalculateShippingEndpoint
         app.MapPost(OrderEndpoints.CalculateShipping, async (
             int orderId,
             ClaimsPrincipal user,
-            CalculateShippingHandler handler,
+            IRequestHandler<CalculateShippingCommand, object> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(orderId, customerId, cancellationToken);
+            var result = await handler.HandleAsync(new CalculateShippingCommand(orderId, customerId), cancellationToken);
 
             return result switch
             {

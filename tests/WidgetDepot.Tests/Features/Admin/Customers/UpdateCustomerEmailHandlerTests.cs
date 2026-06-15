@@ -41,7 +41,7 @@ public class UpdateCustomerEmailHandlerTests
         var handler = new UpdateCustomerEmailHandler(db);
         var request = new UpdateCustomerEmailRequest("new@example.com");
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateCustomerEmailCommand(1, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateCustomerEmailSuccess>();
 
@@ -57,7 +57,7 @@ public class UpdateCustomerEmailHandlerTests
         var handler = new UpdateCustomerEmailHandler(db);
         var request = new UpdateCustomerEmailRequest("jane@example.com");
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateCustomerEmailCommand(1, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateCustomerEmailSuccess>();
     }
@@ -71,7 +71,7 @@ public class UpdateCustomerEmailHandlerTests
         var handler = new UpdateCustomerEmailHandler(db);
         var request = new UpdateCustomerEmailRequest("other@example.com");
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateCustomerEmailCommand(1, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateCustomerEmailError.EmailAlreadyInUse>();
     }
@@ -83,7 +83,7 @@ public class UpdateCustomerEmailHandlerTests
         var handler = new UpdateCustomerEmailHandler(db);
         var request = new UpdateCustomerEmailRequest("new@example.com");
 
-        var result = await handler.UpdateAsync(99, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateCustomerEmailCommand(99, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateCustomerEmailError.NotFound>();
     }

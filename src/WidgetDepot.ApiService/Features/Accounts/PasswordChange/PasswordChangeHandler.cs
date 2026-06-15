@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Accounts.PasswordChange;
 
@@ -15,12 +16,17 @@ public abstract record PasswordChangeError
     public record IncorrectPassword : PasswordChangeError;
 }
 
-public class PasswordChangeHandler(AppDbContext db)
+public record ChangePasswordCommand(int CustomerId, ChangePasswordRequest Request) : IRequest<object>;
+
+public class PasswordChangeHandler(AppDbContext db) : IRequestHandler<ChangePasswordCommand, object>
 {
     private readonly PasswordHasher<Customer> _passwordHasher = new();
 
-    public async Task<object> ChangeAsync(int customerId, ChangePasswordRequest request, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

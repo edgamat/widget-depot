@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.UpdateDraftItems;
 
 public static class UpdateDraftItemsEndpoint
@@ -10,13 +12,13 @@ public static class UpdateDraftItemsEndpoint
             int orderId,
             UpdateDraftItemsRequest request,
             ClaimsPrincipal user,
-            UpdateDraftItemsHandler handler,
+            IRequestHandler<UpdateDraftItemsCommand, object?> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(orderId, customerId, request, cancellationToken);
+            var result = await handler.HandleAsync(new UpdateDraftItemsCommand(orderId, customerId, request), cancellationToken);
 
             return result switch
             {

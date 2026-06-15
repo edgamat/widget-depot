@@ -1,10 +1,12 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Accounts.Login;
 
 public static class LoginEndpoint
 {
     public static IEndpointRouteBuilder MapLogin(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/accounts/login", async (LoginRequest request, LoginHandler handler, CancellationToken cancellationToken) =>
+        app.MapPost("/accounts/login", async (LoginRequest request, IRequestHandler<LoginRequest, object> handler, CancellationToken cancellationToken) =>
         {
             var result = await handler.HandleAsync(request, cancellationToken);
 

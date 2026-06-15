@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.GetDraftOrder;
 
@@ -29,10 +30,15 @@ public abstract record GetDraftOrderError
     public record NotDraft : GetDraftOrderError;
 }
 
-public class GetDraftOrderHandler(AppDbContext db)
+public record GetDraftOrderQuery(int OrderId, int CustomerId) : IRequest<object>;
+
+public class GetDraftOrderHandler(AppDbContext db) : IRequestHandler<GetDraftOrderQuery, object>
 {
-    public async Task<object> HandleAsync(int orderId, int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(GetDraftOrderQuery query, CancellationToken cancellationToken)
     {
+        var orderId = query.OrderId;
+        var customerId = query.CustomerId;
+
         var order = await db.Orders
             .Include(o => o.Items)
             .ThenInclude(i => i.Widget)

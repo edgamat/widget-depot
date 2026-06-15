@@ -2,5 +2,5 @@ namespace WidgetDepot.ApiService.Shared;
 
 public interface IRequestHandler<in TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
-    Task<TResponse> HandleAsync(TRequest request);
+    Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
 }
