@@ -97,7 +97,7 @@ public class CalculateShippingHandlerTests
             .ReturnsAsync(new ShippingEstimateResult.Success(19.99m, "USD"));
 
         var handler = CreateHandler(db, mockClient.Object);
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<CalculateShippingResponse>();
         response.EstimatedCost.ShouldBe(19.99m);
@@ -115,7 +115,7 @@ public class CalculateShippingHandlerTests
             .ReturnsAsync(new ShippingEstimateResult.Success(14.50m, "USD"));
 
         var handler = CreateHandler(db, mockClient.Object);
-        await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.ShippingEstimate.ShouldBe(14.50m);
@@ -155,7 +155,7 @@ public class CalculateShippingHandlerTests
             .ReturnsAsync(new ShippingEstimateResult.Success(25.00m, "USD"));
 
         var handler = CreateHandler(db, mockClient.Object);
-        await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         // widget1: 2 × 2.0 = 4.0, widget2: 4 × 3.0 = 12.0 → total = 16.0
         capturedRequest.ShouldNotBeNull();
@@ -175,7 +175,7 @@ public class CalculateShippingHandlerTests
             .ReturnsAsync(new ShippingEstimateResult.Success(10.00m, "USD"));
 
         var handler = CreateHandler(db, mockClient.Object);
-        await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         capturedRequest.ShouldNotBeNull();
         capturedRequest.DestinationPostalCode.ShouldBe("62701");
@@ -189,7 +189,7 @@ public class CalculateShippingHandlerTests
         var mockClient = new Mock<IShippingApiClient>();
         var handler = CreateHandler(db, mockClient.Object);
 
-        var result = await handler.HandleAsync(999, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CalculateShippingCommand(999, 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<CalculateShippingError.OrderNotFound>();
     }
@@ -203,7 +203,7 @@ public class CalculateShippingHandlerTests
         var mockClient = new Mock<IShippingApiClient>();
         var handler = CreateHandler(db, mockClient.Object);
 
-        var result = await handler.HandleAsync(order.Id, 2, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CalculateShippingCommand(order.Id, 2), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<CalculateShippingError.Forbidden>();
     }
@@ -224,7 +224,7 @@ public class CalculateShippingHandlerTests
         var mockClient = new Mock<IShippingApiClient>();
         var handler = CreateHandler(db, mockClient.Object);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<CalculateShippingError.NoShippingAddress>();
     }
@@ -240,7 +240,7 @@ public class CalculateShippingHandlerTests
             .ReturnsAsync(new ShippingEstimateResult.Failure("Service unavailable"));
 
         var handler = CreateHandler(db, mockClient.Object);
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         var error = result.ShouldBeOfType<CalculateShippingError.ShippingApiFailure>();
         error.Reason.ShouldBe("Service unavailable");
@@ -257,7 +257,7 @@ public class CalculateShippingHandlerTests
             .ReturnsAsync(new ShippingEstimateResult.Failure("Timeout"));
 
         var handler = CreateHandler(db, mockClient.Object);
-        await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new CalculateShippingCommand(order.Id, 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.ShippingEstimate.ShouldBeNull();

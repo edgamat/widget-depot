@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Admin.Customers.UpdateCustomerEmail;
 
@@ -14,10 +15,15 @@ public abstract record UpdateCustomerEmailError
     public record EmailAlreadyInUse : UpdateCustomerEmailError;
 }
 
-public class UpdateCustomerEmailHandler(AppDbContext db)
+public record UpdateCustomerEmailCommand(int CustomerId, UpdateCustomerEmailRequest Request) : IRequest<object>;
+
+public class UpdateCustomerEmailHandler(AppDbContext db) : IRequestHandler<UpdateCustomerEmailCommand, object>
 {
-    public async Task<object> UpdateAsync(int customerId, UpdateCustomerEmailRequest request, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(UpdateCustomerEmailCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

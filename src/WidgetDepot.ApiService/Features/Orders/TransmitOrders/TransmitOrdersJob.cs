@@ -1,3 +1,5 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.TransmitOrders;
 
 public class TransmitOrdersJob : BackgroundService
@@ -40,9 +42,9 @@ public class TransmitOrdersJob : BackgroundService
     private async Task RunJobAsync(CancellationToken cancellationToken)
     {
         using var scope = _scopeFactory.CreateScope();
-        var handler = scope.ServiceProvider.GetRequiredService<TransmitOrdersHandler>();
+        var handler = scope.ServiceProvider.GetRequiredService<IRequestHandler<TransmitOrdersCommand, int>>();
 
-        var processed = await handler.HandleAsync(cancellationToken);
+        var processed = await handler.HandleAsync(new TransmitOrdersCommand(), cancellationToken);
         _logger.LogInformation("TransmitOrdersJob: processed {Count} order(s).", processed);
     }
 

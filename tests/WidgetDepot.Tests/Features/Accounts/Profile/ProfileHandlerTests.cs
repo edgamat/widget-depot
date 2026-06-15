@@ -42,7 +42,7 @@ public class ProfileHandlerTests
         SeedCustomer(db);
         var handler = new ProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetProfileQuery(1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetProfileResponse>();
         response.FirstName.ShouldBe("Jane");
@@ -57,7 +57,7 @@ public class ProfileHandlerTests
         SeedCustomer(db);
         var handler = new ProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetProfileQuery(1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetProfileResponse>();
         response.ShippingAddress.ShouldBeNull();
@@ -74,7 +74,7 @@ public class ProfileHandlerTests
         db.SaveChanges();
         var handler = new ProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetProfileQuery(1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetProfileResponse>();
         response.ShippingAddress.ShouldNotBeNull();
@@ -93,7 +93,7 @@ public class ProfileHandlerTests
         using var db = CreateDb();
         var handler = new ProfileHandler(db);
 
-        var result = await handler.GetAsync(99, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetProfileQuery(99), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ProfileError.NotFound>();
     }
@@ -108,7 +108,7 @@ public class ProfileHandlerTests
         var handler = new ProfileHandler(db);
         var request = new UpdateProfileRequest("Janet", "Smith", "janet@example.com", null, null);
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateProfileCommand(1, request), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<UpdateProfileResponse>();
         response.FirstName.ShouldBe("Janet");
@@ -131,7 +131,7 @@ public class ProfileHandlerTests
         var billingAddress = new AddressDto("Jane Doe", "456 Oak Ave", "Apt 2", "Shelbyville", "IL", "62565");
         var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", shippingAddress, billingAddress);
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateProfileCommand(1, request), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<UpdateProfileResponse>();
         response.ShippingAddress.ShouldNotBeNull();
@@ -159,7 +159,7 @@ public class ProfileHandlerTests
         var handler = new ProfileHandler(db);
         var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", null, null);
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateProfileCommand(1, request), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<UpdateProfileResponse>();
         response.ShippingAddress.ShouldBeNull();
@@ -176,7 +176,7 @@ public class ProfileHandlerTests
         var handler = new ProfileHandler(db);
         var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", null, null);
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateProfileCommand(1, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateProfileResponse>();
     }
@@ -190,7 +190,7 @@ public class ProfileHandlerTests
         var handler = new ProfileHandler(db);
         var request = new UpdateProfileRequest("Jane", "Doe", "other@example.com", null, null);
 
-        var result = await handler.UpdateAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateProfileCommand(1, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ProfileError.EmailAlreadyRegistered>();
     }
@@ -202,7 +202,7 @@ public class ProfileHandlerTests
         var handler = new ProfileHandler(db);
         var request = new UpdateProfileRequest("Jane", "Doe", "jane@example.com", null, null);
 
-        var result = await handler.UpdateAsync(99, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateProfileCommand(99, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ProfileError.NotFound>();
     }

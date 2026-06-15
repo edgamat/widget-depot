@@ -43,7 +43,7 @@ public class ForcePasswordChangeHandlerTests
         var handler = new ForcePasswordChangeHandler(db);
         var request = new ForcePasswordChangeRequest("NewP@ss1!");
 
-        var result = await handler.ChangeAsync(customer.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ForcePasswordChangeCommand(customer.Id, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ForcePasswordChangeSuccess>();
     }
@@ -57,7 +57,7 @@ public class ForcePasswordChangeHandlerTests
         var handler = new ForcePasswordChangeHandler(db);
         var request = new ForcePasswordChangeRequest("NewP@ss1!");
 
-        await handler.ChangeAsync(customer.Id, request, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ForcePasswordChangeCommand(customer.Id, request), TestContext.Current.CancellationToken);
 
         var updated = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
         updated.PasswordHash.ShouldNotBe(originalHash);
@@ -75,7 +75,7 @@ public class ForcePasswordChangeHandlerTests
         var handler = new ForcePasswordChangeHandler(db);
         var request = new ForcePasswordChangeRequest("NewP@ss1!");
 
-        await handler.ChangeAsync(customer.Id, request, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ForcePasswordChangeCommand(customer.Id, request), TestContext.Current.CancellationToken);
 
         var updated = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
         updated.MustChangePassword.ShouldBeFalse();
@@ -88,7 +88,7 @@ public class ForcePasswordChangeHandlerTests
         var handler = new ForcePasswordChangeHandler(db);
         var request = new ForcePasswordChangeRequest("NewP@ss1!");
 
-        var result = await handler.ChangeAsync(99, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ForcePasswordChangeCommand(99, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ForcePasswordChangeError.NotFound>();
     }

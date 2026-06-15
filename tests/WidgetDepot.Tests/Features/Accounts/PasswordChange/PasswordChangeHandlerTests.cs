@@ -43,7 +43,7 @@ public class PasswordChangeHandlerTests
         var handler = new PasswordChangeHandler(db);
         var request = new ChangePasswordRequest("OldP@ss1!", "NewP@ss2!");
 
-        var result = await handler.ChangeAsync(customer.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ChangePasswordCommand(customer.Id, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ChangePasswordSuccess>();
 
@@ -63,7 +63,7 @@ public class PasswordChangeHandlerTests
         var handler = new PasswordChangeHandler(db);
         var request = new ChangePasswordRequest("WrongPassword!", "NewP@ss2!");
 
-        var result = await handler.ChangeAsync(customer.Id, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ChangePasswordCommand(customer.Id, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<PasswordChangeError.IncorrectPassword>();
     }
@@ -75,7 +75,7 @@ public class PasswordChangeHandlerTests
         var handler = new PasswordChangeHandler(db);
         var request = new ChangePasswordRequest("OldP@ss1!", "NewP@ss2!");
 
-        var result = await handler.ChangeAsync(99, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ChangePasswordCommand(99, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<PasswordChangeError.NotFound>();
     }

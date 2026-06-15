@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.ExpireDraftOrders;
 
-public class ExpireDraftOrdersHandler
+public record ExpireDraftOrdersCommand : IRequest<int>;
+
+public class ExpireDraftOrdersHandler : IRequestHandler<ExpireDraftOrdersCommand, int>
 {
     private readonly AppDbContext _db;
 
@@ -13,7 +16,7 @@ public class ExpireDraftOrdersHandler
         _db = db;
     }
 
-    public async Task<int> HandleAsync(CancellationToken cancellationToken)
+    public async Task<int> HandleAsync(ExpireDraftOrdersCommand command, CancellationToken cancellationToken)
     {
         var cutoff = DateTime.UtcNow.AddDays(-30);
 

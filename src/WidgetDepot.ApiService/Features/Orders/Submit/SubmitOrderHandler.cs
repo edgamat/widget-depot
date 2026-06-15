@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.Submit;
 
@@ -14,7 +15,9 @@ public abstract record SubmitOrderError
     public record IncompleteOrder(string Reason) : SubmitOrderError;
 }
 
-public class SubmitOrderHandler
+public record SubmitOrderCommand(int OrderId, int CustomerId) : IRequest<object>;
+
+public class SubmitOrderHandler : IRequestHandler<SubmitOrderCommand, object>
 {
     private readonly AppDbContext _db;
     private readonly IOrderFileWriter _orderFileWriter;
@@ -25,8 +28,11 @@ public class SubmitOrderHandler
         _orderFileWriter = orderFileWriter;
     }
 
-    public async Task<object> HandleAsync(int orderId, int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(SubmitOrderCommand command, CancellationToken cancellationToken)
     {
+        var orderId = command.OrderId;
+        var customerId = command.CustomerId;
+
         var order = await _db.Orders
             .Include(o => o.Items)
                 .ThenInclude(i => i.Widget)

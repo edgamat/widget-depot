@@ -1,18 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Widgets.Import;
 
 public record ImportResult(int Inserted, int Updated, int Skipped);
 
-public class ImportWidgetsCsvHandler(AppDbContext db)
+public record ImportWidgetsCsvCommand(Stream Csv) : IRequest<ImportResult?>;
+
+public class ImportWidgetsCsvHandler(AppDbContext db) : IRequestHandler<ImportWidgetsCsvCommand, ImportResult?>
 {
     private static readonly string[] ExpectedHeaders = ["SKU", "Name", "Description", "Manufacturer", "Weight", "Price", "Date Available"];
 
-    public async Task<ImportResult?> HandleAsync(Stream csvStream, CancellationToken cancellationToken)
+    public async Task<ImportResult?> HandleAsync(ImportWidgetsCsvCommand command, CancellationToken cancellationToken)
     {
-        using var reader = new StreamReader(csvStream);
+        using var reader = new StreamReader(command.Csv);
 
         var headerLine = await reader.ReadLineAsync(cancellationToken);
         if (headerLine is null)

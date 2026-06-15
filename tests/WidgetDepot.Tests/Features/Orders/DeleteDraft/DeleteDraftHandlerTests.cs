@@ -36,7 +36,7 @@ public class DeleteDraftHandlerTests
         using var db = CreateDb();
         var handler = new DeleteDraftHandler(db);
 
-        var result = await handler.HandleAsync(999, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new DeleteDraftCommand(999, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<DeleteDraftError.OrderNotFound>();
     }
@@ -48,7 +48,7 @@ public class DeleteDraftHandlerTests
         var order = await SeedOrderAsync(db, customerId: 2);
         var handler = new DeleteDraftHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new DeleteDraftCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<DeleteDraftError.Forbidden>();
     }
@@ -60,7 +60,7 @@ public class DeleteDraftHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
         var handler = new DeleteDraftHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new DeleteDraftCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
     }
@@ -72,7 +72,7 @@ public class DeleteDraftHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
         var handler = new DeleteDraftHandler(db);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new DeleteDraftCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var deleted = await db.Orders.FindAsync([order.Id], TestContext.Current.CancellationToken);
         deleted.ShouldBeNull();
@@ -85,7 +85,7 @@ public class DeleteDraftHandlerTests
         var order = await SeedOrderAsync(db, customerId: 2);
         var handler = new DeleteDraftHandler(db);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new DeleteDraftCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var existing = await db.Orders.FindAsync([order.Id], TestContext.Current.CancellationToken);
         existing.ShouldNotBeNull();

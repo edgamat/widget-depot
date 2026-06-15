@@ -28,7 +28,7 @@ public class CreateDraftOrderHandlerTests
         var handler = new CreateDraftOrderHandler(db);
         var request = new CreateDraftOrderRequest([new CreateDraftOrderItemRequest(1, 2)]);
 
-        var result = await handler.HandleAsync(42, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CreateDraftOrderCommand(42, request), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<CreateDraftOrderResponse>();
         var order = await db.Orders.Include(o => o.Items).FirstAsync(TestContext.Current.CancellationToken);
@@ -47,7 +47,7 @@ public class CreateDraftOrderHandlerTests
         var handler = new CreateDraftOrderHandler(db);
         var request = new CreateDraftOrderRequest([new CreateDraftOrderItemRequest(1, 3)]);
 
-        await handler.HandleAsync(1, request, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new CreateDraftOrderCommand(1, request), TestContext.Current.CancellationToken);
 
         var order = await db.Orders.Include(o => o.Items).FirstAsync(TestContext.Current.CancellationToken);
         order.Items.Count.ShouldBe(1);
@@ -61,7 +61,7 @@ public class CreateDraftOrderHandlerTests
         var handler = new CreateDraftOrderHandler(db);
         var request = new CreateDraftOrderRequest([new CreateDraftOrderItemRequest(999, 1)]);
 
-        var result = await handler.HandleAsync(1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new CreateDraftOrderCommand(1, request), TestContext.Current.CancellationToken);
 
         var error = result.ShouldBeOfType<CreateDraftOrderError.WidgetNotFound>();
         error.WidgetId.ShouldBe(999);
@@ -83,7 +83,7 @@ public class CreateDraftOrderHandlerTests
             new CreateDraftOrderItemRequest(2, 5)
         ]);
 
-        await handler.HandleAsync(1, request, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new CreateDraftOrderCommand(1, request), TestContext.Current.CancellationToken);
 
         var order = await db.Orders.Include(o => o.Items).FirstAsync(TestContext.Current.CancellationToken);
         order.Items.Count.ShouldBe(2);

@@ -38,7 +38,7 @@ public class UpdateDraftItemsHandlerTests
         var handler = new UpdateDraftItemsHandler(db);
         var request = new UpdateDraftItemsRequest([new UpdateDraftItemRequest(2, 5)]);
 
-        var result = await handler.HandleAsync(1, 42, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateDraftItemsCommand(1, 42, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
         var updated = await db.Orders.Include(o => o.Items).FirstAsync(TestContext.Current.CancellationToken);
@@ -54,7 +54,7 @@ public class UpdateDraftItemsHandlerTests
         var handler = new UpdateDraftItemsHandler(db);
         var request = new UpdateDraftItemsRequest([new UpdateDraftItemRequest(1, 1)]);
 
-        var result = await handler.HandleAsync(999, 42, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateDraftItemsCommand(999, 42, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateDraftItemsError.OrderNotFound>();
     }
@@ -69,7 +69,7 @@ public class UpdateDraftItemsHandlerTests
         var handler = new UpdateDraftItemsHandler(db);
         var request = new UpdateDraftItemsRequest([new UpdateDraftItemRequest(1, 1)]);
 
-        var result = await handler.HandleAsync(1, 99, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateDraftItemsCommand(1, 99, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateDraftItemsError.Forbidden>();
     }
@@ -84,7 +84,7 @@ public class UpdateDraftItemsHandlerTests
         var handler = new UpdateDraftItemsHandler(db);
         var request = new UpdateDraftItemsRequest([new UpdateDraftItemRequest(1, 1)]);
 
-        var result = await handler.HandleAsync(1, 42, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateDraftItemsCommand(1, 42, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<UpdateDraftItemsError.NotDraft>();
     }
@@ -99,7 +99,7 @@ public class UpdateDraftItemsHandlerTests
         var handler = new UpdateDraftItemsHandler(db);
         var request = new UpdateDraftItemsRequest([new UpdateDraftItemRequest(999, 1)]);
 
-        var result = await handler.HandleAsync(1, 42, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new UpdateDraftItemsCommand(1, 42, request), TestContext.Current.CancellationToken);
 
         var error = result.ShouldBeOfType<UpdateDraftItemsError.WidgetNotFound>();
         error.WidgetId.ShouldBe(999);

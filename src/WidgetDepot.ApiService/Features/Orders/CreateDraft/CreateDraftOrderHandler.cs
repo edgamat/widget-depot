@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.CreateDraft;
 
@@ -15,10 +16,15 @@ public abstract record CreateDraftOrderError
     public record WidgetNotFound(int WidgetId) : CreateDraftOrderError;
 }
 
-public class CreateDraftOrderHandler(AppDbContext db)
+public record CreateDraftOrderCommand(int CustomerId, CreateDraftOrderRequest Request) : IRequest<object>;
+
+public class CreateDraftOrderHandler(AppDbContext db) : IRequestHandler<CreateDraftOrderCommand, object>
 {
-    public async Task<object> HandleAsync(int customerId, CreateDraftOrderRequest request, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(CreateDraftOrderCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+        var request = command.Request;
+
         var order = new Order
         {
             CustomerId = customerId,

@@ -75,7 +75,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         using var db = CreateDb();
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(999, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(999, 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RetransmitOrderNotFound>();
     }
@@ -87,7 +87,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, customerId: 1, TransmissionStatus.Failed);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 2, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 2), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RetransmitOrderNotFound>();
     }
@@ -99,7 +99,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, customerId: 1, TransmissionStatus.Pending);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RetransmitOrderInvalidStatus>();
     }
@@ -111,7 +111,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, customerId: 1, TransmissionStatus.Transmitted);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RetransmitOrderInvalidStatus>();
     }
@@ -123,7 +123,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, customerId: 1, TransmissionStatus.Missing);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<RetransmitOrderInvalidStatus>();
     }
@@ -135,7 +135,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, customerId: 1, TransmissionStatus.Failed);
         var handler = CreateHandler(db);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Missing);
@@ -148,7 +148,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, customerId: 1, TransmissionStatus.Failed);
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<RetransmitOrderResponse>();
         response.NewStatus.ShouldBe(TransmissionStatus.Missing);
@@ -162,7 +162,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var handler = CreateHandler(db);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -185,7 +185,7 @@ public class RetransmitOrderHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
@@ -205,7 +205,7 @@ public class RetransmitOrderHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        var result = await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<RetransmitOrderResponse>();
         response.NewStatus.ShouldBe(TransmissionStatus.Transmitted);
@@ -226,7 +226,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var handler = CreateHandler(db, transmitter.Object);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -250,7 +250,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var handler = CreateHandler(db, transmitter.Object);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -275,7 +275,7 @@ public class RetransmitOrderHandlerTests : IDisposable
         var handler = CreateHandler(db, transmitter.Object);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -299,7 +299,7 @@ public class RetransmitOrderHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(order.Id, customerId: 1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new RetransmitOrderCommand(order.Id, CustomerId: 1), TestContext.Current.CancellationToken);
 
         var expectedFileName = $"EXT-{order.Id.ToString().PadLeft(10, '0')}.TXT";
         transmitter.Verify(

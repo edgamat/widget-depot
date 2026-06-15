@@ -1,12 +1,14 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Admin.Customers.ResetCustomerPassword;
 
 public static class ResetCustomerPasswordEndpoint
 {
     public static IEndpointRouteBuilder MapResetCustomerPassword(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/admin/customers/{id:int}/reset-password", async (int id, ResetCustomerPasswordHandler handler, CancellationToken cancellationToken) =>
+        app.MapPost("/admin/customers/{id:int}/reset-password", async (int id, IRequestHandler<ResetCustomerPasswordCommand, object> handler, CancellationToken cancellationToken) =>
         {
-            var result = await handler.ResetAsync(id, cancellationToken);
+            var result = await handler.HandleAsync(new ResetCustomerPasswordCommand(id), cancellationToken);
 
             return result switch
             {

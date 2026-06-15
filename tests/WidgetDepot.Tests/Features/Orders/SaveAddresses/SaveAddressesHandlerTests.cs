@@ -41,7 +41,7 @@ public class SaveAddressesHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
 
         var handler = new SaveAddressesHandler(db);
-        var result = await handler.HandleAsync(order.Id, 1, ValidRequest(), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(order.Id, 1, ValidRequest()), TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -57,7 +57,7 @@ public class SaveAddressesHandlerTests
         using var db = CreateDb();
         var handler = new SaveAddressesHandler(db);
 
-        var result = await handler.HandleAsync(999, 1, ValidRequest(), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(999, 1, ValidRequest()), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SaveAddressesError.OrderNotFound>();
     }
@@ -69,7 +69,7 @@ public class SaveAddressesHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
 
         var handler = new SaveAddressesHandler(db);
-        var result = await handler.HandleAsync(order.Id, 2, ValidRequest(), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(order.Id, 2, ValidRequest()), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<SaveAddressesError.Forbidden>();
     }
@@ -93,7 +93,7 @@ public class SaveAddressesHandlerTests
         };
 
         var handler = new SaveAddressesHandler(db);
-        var result = await handler.HandleAsync(order.Id, 1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(order.Id, 1, request), TestContext.Current.CancellationToken);
 
         var error = result.ShouldBeOfType<SaveAddressesError.InvalidRequest>();
         error.Errors.ShouldContainKey(expectedErrorKey);
@@ -107,7 +107,7 @@ public class SaveAddressesHandlerTests
         var request = ValidRequest() with { ShippingAddress = ValidRequest().ShippingAddress with { StreetLine2 = new string('x', 101) } };
 
         var handler = new SaveAddressesHandler(db);
-        var result = await handler.HandleAsync(order.Id, 1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(order.Id, 1, request), TestContext.Current.CancellationToken);
 
         var error = result.ShouldBeOfType<SaveAddressesError.InvalidRequest>();
         error.Errors.ShouldContainKey("shippingAddress.streetLine2");
@@ -123,7 +123,7 @@ public class SaveAddressesHandlerTests
         var request = ValidRequest() with { ShippingAddress = ValidRequest().ShippingAddress with { ZipCode = zipCode } };
 
         var handler = new SaveAddressesHandler(db);
-        var result = await handler.HandleAsync(order.Id, 1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(order.Id, 1, request), TestContext.Current.CancellationToken);
 
         result.ShouldBeNull();
     }
@@ -141,7 +141,7 @@ public class SaveAddressesHandlerTests
         var request = ValidRequest() with { ShippingAddress = ValidRequest().ShippingAddress with { ZipCode = zipCode } };
 
         var handler = new SaveAddressesHandler(db);
-        var result = await handler.HandleAsync(order.Id, 1, request, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new SaveAddressesCommand(order.Id, 1, request), TestContext.Current.CancellationToken);
 
         var error = result.ShouldBeOfType<SaveAddressesError.InvalidRequest>();
         error.Errors.ShouldContainKey("shippingAddress.zipCode");

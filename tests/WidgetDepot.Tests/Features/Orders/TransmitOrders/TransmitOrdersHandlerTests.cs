@@ -74,7 +74,7 @@ public class TransmitOrdersHandlerTests : IDisposable
         using var db = CreateDb();
         var handler = CreateHandler(db);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(0);
     }
@@ -86,7 +86,7 @@ public class TransmitOrdersHandlerTests : IDisposable
         var order = await SeedOrderAsync(db, TransmissionStatus.Pending);
         var handler = CreateHandler(db);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Missing);
@@ -100,7 +100,7 @@ public class TransmitOrdersHandlerTests : IDisposable
         var handler = CreateHandler(db);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -123,7 +123,7 @@ public class TransmitOrdersHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
@@ -144,7 +144,7 @@ public class TransmitOrdersHandlerTests : IDisposable
         var handler = CreateHandler(db, transmitter.Object);
 
         var before = DateTime.UtcNow;
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
         var after = DateTime.UtcNow;
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
@@ -167,7 +167,7 @@ public class TransmitOrdersHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
@@ -187,7 +187,7 @@ public class TransmitOrdersHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
@@ -202,7 +202,7 @@ public class TransmitOrdersHandlerTests : IDisposable
         var transmitter = new Mock<IOrderTransmitter>();
         var handler = CreateHandler(db, transmitter.Object);
 
-        var result = await handler.HandleAsync(TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         result.ShouldBe(0);
         transmitter.Verify(
@@ -224,7 +224,7 @@ public class TransmitOrdersHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         var saved = await db.Orders.FirstAsync(TestContext.Current.CancellationToken);
         saved.TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
@@ -244,7 +244,7 @@ public class TransmitOrdersHandlerTests : IDisposable
 
         var handler = CreateHandler(db, transmitter.Object);
 
-        await handler.HandleAsync(TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new TransmitOrdersCommand(), TestContext.Current.CancellationToken);
 
         var expectedFileName = $"EXT-{order.Id.ToString().PadLeft(10, '0')}.TXT";
         transmitter.Verify(

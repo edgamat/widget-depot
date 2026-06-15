@@ -41,7 +41,7 @@ public class GetCustomerProfileHandlerTests
         SeedCustomer(db);
         var handler = new GetCustomerProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerProfileQuery(1), TestContext.Current.CancellationToken);
 
         var profile = result.ShouldBeOfType<CustomerProfileResponse>();
         profile.Id.ShouldBe(1);
@@ -58,7 +58,7 @@ public class GetCustomerProfileHandlerTests
         SeedCustomer(db, isAdmin: true);
         var handler = new GetCustomerProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerProfileQuery(1), TestContext.Current.CancellationToken);
 
         var profile = result.ShouldBeOfType<CustomerProfileResponse>();
         profile.IsAdmin.ShouldBeTrue();
@@ -71,7 +71,7 @@ public class GetCustomerProfileHandlerTests
         SeedCustomer(db);
         var handler = new GetCustomerProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerProfileQuery(1), TestContext.Current.CancellationToken);
 
         var profile = result.ShouldBeOfType<CustomerProfileResponse>();
         profile.ShippingAddress.ShouldBeNull();
@@ -88,7 +88,7 @@ public class GetCustomerProfileHandlerTests
         db.SaveChanges();
         var handler = new GetCustomerProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerProfileQuery(1), TestContext.Current.CancellationToken);
 
         var profile = result.ShouldBeOfType<CustomerProfileResponse>();
         profile.ShippingAddress.ShouldNotBeNull();
@@ -105,7 +105,7 @@ public class GetCustomerProfileHandlerTests
         using var db = CreateDb();
         var handler = new GetCustomerProfileHandler(db);
 
-        var result = await handler.GetAsync(99, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerProfileQuery(99), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<CustomerProfileError.NotFound>();
     }
@@ -117,7 +117,7 @@ public class GetCustomerProfileHandlerTests
         SeedCustomer(db);
         var handler = new GetCustomerProfileHandler(db);
 
-        var result = await handler.GetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetCustomerProfileQuery(1), TestContext.Current.CancellationToken);
 
         var profile = result.ShouldBeOfType<CustomerProfileResponse>();
         profile.CreatedAt.ShouldBe(new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc));

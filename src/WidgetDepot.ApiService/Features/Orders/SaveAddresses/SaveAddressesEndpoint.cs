@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.SaveAddresses;
 
 public static class SaveAddressesEndpoint
@@ -10,13 +12,13 @@ public static class SaveAddressesEndpoint
             int orderId,
             SaveAddressesRequest request,
             ClaimsPrincipal user,
-            SaveAddressesHandler handler,
+            IRequestHandler<SaveAddressesCommand, object?> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(orderId, customerId, request, cancellationToken);
+            var result = await handler.HandleAsync(new SaveAddressesCommand(orderId, customerId, request), cancellationToken);
 
             return result switch
             {

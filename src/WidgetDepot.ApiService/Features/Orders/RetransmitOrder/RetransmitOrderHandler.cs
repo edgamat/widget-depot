@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.RetransmitOrder;
 
@@ -11,7 +12,9 @@ public record RetransmitOrderResponse(TransmissionStatus NewStatus, DateTime Sta
 public record RetransmitOrderNotFound;
 public record RetransmitOrderInvalidStatus;
 
-public class RetransmitOrderHandler
+public record RetransmitOrderCommand(int OrderId, int CustomerId) : IRequest<object>;
+
+public class RetransmitOrderHandler : IRequestHandler<RetransmitOrderCommand, object>
 {
     private readonly AppDbContext _db;
     private readonly IOrderTransmitter _transmitter;
@@ -30,8 +33,11 @@ public class RetransmitOrderHandler
         _logger = logger;
     }
 
-    public async Task<object> HandleAsync(int orderId, int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(RetransmitOrderCommand command, CancellationToken cancellationToken)
     {
+        var orderId = command.OrderId;
+        var customerId = command.CustomerId;
+
         var order = await _db.Orders
             .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId, cancellationToken);
 

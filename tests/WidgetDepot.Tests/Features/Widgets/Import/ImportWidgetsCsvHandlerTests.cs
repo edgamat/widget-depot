@@ -34,7 +34,7 @@ public class ImportWidgetsCsvHandlerTests
             SKU002,Widget B,Desc B,MfrB,2.0,19.99,2026-02-01
             """;
 
-        var result = await handler.HandleAsync(ToCsvStream(csv), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(csv)), TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(2, result.Inserted);
@@ -54,14 +54,14 @@ public class ImportWidgetsCsvHandlerTests
             SKU001,Widget A,Desc A,MfrA,1.0,9.99,2026-01-01
             """;
 
-        await handler.HandleAsync(ToCsvStream(csv), TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(csv)), TestContext.Current.CancellationToken);
 
         var updatedCsv = $"""
             {ValidHeader}
             SKU001,Widget A Updated,Desc A Updated,MfrA,1.5,14.99,2026-06-01
             """;
 
-        var result = await handler.HandleAsync(ToCsvStream(updatedCsv), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(updatedCsv)), TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(0, result.Inserted);
@@ -85,7 +85,7 @@ public class ImportWidgetsCsvHandlerTests
             SKU002,Widget B,Desc B,MfrB,2.0,19.99,2026-02-01
             """;
 
-        var result = await handler.HandleAsync(ToCsvStream(csv), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(csv)), TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(1, result.Inserted);
@@ -104,7 +104,7 @@ public class ImportWidgetsCsvHandlerTests
             SKU002,Widget B,Desc B,MfrB,2.0,19.99,2026-02-01
             """;
 
-        var result = await handler.HandleAsync(ToCsvStream(csv), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(csv)), TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(1, result.Inserted);
@@ -123,7 +123,7 @@ public class ImportWidgetsCsvHandlerTests
             SKU002,Widget B,Desc B,MfrB,2.0,19.99,2026-02-01
             """;
 
-        var result = await handler.HandleAsync(ToCsvStream(csv), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(csv)), TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(1, result.Inserted);
@@ -141,7 +141,7 @@ public class ImportWidgetsCsvHandlerTests
             SKU001,Widget A,Desc A,MfrA,1.0,9.99
             """;
 
-        var result = await handler.HandleAsync(ToCsvStream(csv), TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(ToCsvStream(csv)), TestContext.Current.CancellationToken);
 
         Assert.Null(result);
         Assert.Equal(0, await db.Widgets.CountAsync(TestContext.Current.CancellationToken));

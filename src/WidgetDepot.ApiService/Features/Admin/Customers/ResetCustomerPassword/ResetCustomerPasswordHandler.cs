@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Admin.Customers.ResetCustomerPassword;
 
@@ -14,12 +15,16 @@ public abstract record ResetCustomerPasswordError
     public record NotFound : ResetCustomerPasswordError;
 }
 
-public class ResetCustomerPasswordHandler(AppDbContext db)
+public record ResetCustomerPasswordCommand(int CustomerId) : IRequest<object>;
+
+public class ResetCustomerPasswordHandler(AppDbContext db) : IRequestHandler<ResetCustomerPasswordCommand, object>
 {
     private readonly PasswordHasher<Customer> _passwordHasher = new();
 
-    public async Task<object> ResetAsync(int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(ResetCustomerPasswordCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

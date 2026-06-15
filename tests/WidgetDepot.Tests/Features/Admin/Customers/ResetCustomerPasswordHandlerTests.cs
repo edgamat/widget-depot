@@ -41,7 +41,7 @@ public class ResetCustomerPasswordHandlerTests
         SeedCustomer(db);
         var handler = new ResetCustomerPasswordHandler(db);
 
-        var result = await handler.ResetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ResetCustomerPasswordCommand(1), TestContext.Current.CancellationToken);
 
         var success = result.ShouldBeOfType<ResetCustomerPasswordSuccess>();
         success.TemporaryPassword.ShouldNotBeNullOrEmpty();
@@ -54,7 +54,7 @@ public class ResetCustomerPasswordHandlerTests
         SeedCustomer(db);
         var handler = new ResetCustomerPasswordHandler(db);
 
-        var result = await handler.ResetAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ResetCustomerPasswordCommand(1), TestContext.Current.CancellationToken);
 
         var success = result.ShouldBeOfType<ResetCustomerPasswordSuccess>();
 
@@ -73,7 +73,7 @@ public class ResetCustomerPasswordHandlerTests
         SeedCustomer(db);
         var handler = new ResetCustomerPasswordHandler(db);
 
-        await handler.ResetAsync(1, TestContext.Current.CancellationToken);
+        await handler.HandleAsync(new ResetCustomerPasswordCommand(1), TestContext.Current.CancellationToken);
 
         var updated = await db.Customers.SingleAsync(TestContext.Current.CancellationToken);
         updated.MustChangePassword.ShouldBeTrue();
@@ -85,7 +85,7 @@ public class ResetCustomerPasswordHandlerTests
         using var db = CreateDb();
         var handler = new ResetCustomerPasswordHandler(db);
 
-        var result = await handler.ResetAsync(99, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new ResetCustomerPasswordCommand(99), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<ResetCustomerPasswordError.NotFound>();
     }

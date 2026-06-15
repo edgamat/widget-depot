@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Admin.Customers.PromoteCustomer;
 
@@ -11,10 +12,14 @@ public abstract record PromoteCustomerError
     public record NotFound : PromoteCustomerError;
 }
 
-public class PromoteCustomerHandler(AppDbContext db)
+public record PromoteCustomerCommand(int CustomerId) : IRequest<object>;
+
+public class PromoteCustomerHandler(AppDbContext db) : IRequestHandler<PromoteCustomerCommand, object>
 {
-    public async Task<object> PromoteAsync(int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(PromoteCustomerCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+
         var customer = await db.Customers
             .SingleOrDefaultAsync(c => c.Id == customerId, cancellationToken);
 

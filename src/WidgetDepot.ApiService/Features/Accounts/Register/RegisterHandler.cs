@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Accounts.Register;
 
-public record RegisterRequest(string FirstName, string LastName, string Email, string Password);
+public record RegisterRequest(string FirstName, string LastName, string Email, string Password) : IRequest<object>;
 
 public record RegisterResponse(int CustomerId);
 
@@ -14,7 +15,7 @@ public abstract record RegisterError
     public record EmailAlreadyRegistered : RegisterError;
 }
 
-public class RegisterHandler(AppDbContext db)
+public class RegisterHandler(AppDbContext db) : IRequestHandler<RegisterRequest, object>
 {
     private readonly PasswordHasher<Customer> _passwordHasher = new();
 

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Admin.Customers.DemoteCustomer;
 
@@ -12,10 +13,15 @@ public abstract record DemoteCustomerError
     public record CannotDemoteSelf : DemoteCustomerError;
 }
 
-public class DemoteCustomerHandler(AppDbContext db)
+public record DemoteCustomerCommand(int CustomerId, int RequestingAdminId) : IRequest<object>;
+
+public class DemoteCustomerHandler(AppDbContext db) : IRequestHandler<DemoteCustomerCommand, object>
 {
-    public async Task<object> DemoteAsync(int customerId, int requestingAdminId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(DemoteCustomerCommand command, CancellationToken cancellationToken)
     {
+        var customerId = command.CustomerId;
+        var requestingAdminId = command.RequestingAdminId;
+
         if (customerId == requestingAdminId)
             return new DemoteCustomerError.CannotDemoteSelf();
 

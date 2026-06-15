@@ -54,7 +54,7 @@ public class GetByOrderNumberHandlerTests
         using var db = CreateDb();
         var handler = new GetByOrderNumberHandler(db);
 
-        var result = await handler.HandleAsync(999, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetByOrderNumberQuery(999, 1), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<GetByOrderNumberNotFound>();
     }
@@ -66,7 +66,7 @@ public class GetByOrderNumberHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1);
         var handler = new GetByOrderNumberHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 2, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetByOrderNumberQuery(order.Id, 2), TestContext.Current.CancellationToken);
 
         result.ShouldBeOfType<GetByOrderNumberNotFound>();
     }
@@ -78,7 +78,7 @@ public class GetByOrderNumberHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1, status: OrderStatus.Draft);
         var handler = new GetByOrderNumberHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetByOrderNumberQuery(order.Id, 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetByOrderNumberResponse>();
         response.Id.ShouldBe(order.Id);
@@ -96,7 +96,7 @@ public class GetByOrderNumberHandlerTests
         var order = await SeedOrderAsync(db, customerId: 1, status: OrderStatus.Submitted);
         var handler = new GetByOrderNumberHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetByOrderNumberQuery(order.Id, 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetByOrderNumberResponse>();
         response.Status.ShouldBe("Submitted");
@@ -113,7 +113,7 @@ public class GetByOrderNumberHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = new GetByOrderNumberHandler(db);
 
-        var result = await handler.HandleAsync(order.Id, 1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetByOrderNumberQuery(order.Id, 1), TestContext.Current.CancellationToken);
 
         var response = result.ShouldBeOfType<GetByOrderNumberResponse>();
         response.Items.Count.ShouldBe(1);

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using WidgetDepot.ApiService.Data;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.RecreateOrder;
 
@@ -11,7 +12,9 @@ public record RecreateOrderResponse(TransmissionStatus NewStatus, DateTime Statu
 public record RecreateOrderNotFound;
 public record RecreateOrderInvalidStatus;
 
-public class RecreateOrderHandler
+public record RecreateOrderCommand(int OrderId, int CustomerId) : IRequest<object>;
+
+public class RecreateOrderHandler : IRequestHandler<RecreateOrderCommand, object>
 {
     private readonly AppDbContext _db;
     private readonly IOrderFileWriter _orderFileWriter;
@@ -33,8 +36,11 @@ public class RecreateOrderHandler
         _logger = logger;
     }
 
-    public async Task<object> HandleAsync(int orderId, int customerId, CancellationToken cancellationToken)
+    public async Task<object> HandleAsync(RecreateOrderCommand command, CancellationToken cancellationToken)
     {
+        var orderId = command.OrderId;
+        var customerId = command.CustomerId;
+
         var order = await _db.Orders
             .Include(o => o.Items)
                 .ThenInclude(i => i.Widget)

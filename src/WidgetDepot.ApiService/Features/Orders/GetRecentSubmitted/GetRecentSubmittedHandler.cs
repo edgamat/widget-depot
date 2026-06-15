@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Orders.GetRecentSubmitted;
 
@@ -12,10 +13,14 @@ public record GetRecentSubmittedOrderResponse(
     TransmissionStatus TransmissionStatus,
     DateTime? TransmissionStatusChangedAt);
 
-public class GetRecentSubmittedHandler(AppDbContext db)
+public record GetRecentSubmittedQuery(int CustomerId) : IRequest<IReadOnlyList<GetRecentSubmittedOrderResponse>>;
+
+public class GetRecentSubmittedHandler(AppDbContext db) : IRequestHandler<GetRecentSubmittedQuery, IReadOnlyList<GetRecentSubmittedOrderResponse>>
 {
-    public async Task<IReadOnlyList<GetRecentSubmittedOrderResponse>> HandleAsync(int customerId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<GetRecentSubmittedOrderResponse>> HandleAsync(GetRecentSubmittedQuery query, CancellationToken cancellationToken)
     {
+        var customerId = query.CustomerId;
+
         return await db.Orders
             .Where(o => o.CustomerId == customerId && o.Status == OrderStatus.Submitted)
             .OrderByDescending(o => o.SubmittedAt)

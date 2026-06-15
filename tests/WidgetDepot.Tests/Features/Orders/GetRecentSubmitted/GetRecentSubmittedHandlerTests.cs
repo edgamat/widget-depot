@@ -45,7 +45,7 @@ public class GetRecentSubmittedHandlerTests
         using var db = CreateDb();
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result.ShouldBeEmpty();
     }
@@ -61,7 +61,7 @@ public class GetRecentSubmittedHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(1);
         result[0].Id.ShouldBe(order.Id);
@@ -77,7 +77,7 @@ public class GetRecentSubmittedHandlerTests
         var submitted = await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(1);
         result[0].Id.ShouldBe(submitted.Id);
@@ -91,7 +91,7 @@ public class GetRecentSubmittedHandlerTests
         var ownOrder = await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(1);
         result[0].Id.ShouldBe(ownOrder.Id);
@@ -107,7 +107,7 @@ public class GetRecentSubmittedHandlerTests
         }
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(10);
     }
@@ -120,7 +120,7 @@ public class GetRecentSubmittedHandlerTests
         var newer = await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc));
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result[0].Id.ShouldBe(newer.Id);
         result[1].Id.ShouldBe(older.Id);
@@ -135,7 +135,7 @@ public class GetRecentSubmittedHandlerTests
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result[0].ShippingEstimate.ShouldBe(19.99m);
     }
@@ -147,7 +147,7 @@ public class GetRecentSubmittedHandlerTests
         await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Pending);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Pending);
         result[0].TransmissionStatusChangedAt.ShouldBeNull();
@@ -161,7 +161,7 @@ public class GetRecentSubmittedHandlerTests
         await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Transmitted, changedAt);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Transmitted);
         result[0].TransmissionStatusChangedAt.ShouldBe(changedAt);
@@ -175,7 +175,7 @@ public class GetRecentSubmittedHandlerTests
         await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Failed, changedAt);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Failed);
         result[0].TransmissionStatusChangedAt.ShouldBe(changedAt);
@@ -189,7 +189,7 @@ public class GetRecentSubmittedHandlerTests
         await SeedOrderAsync(db, customerId: 1, OrderStatus.Submitted, DateTime.UtcNow, TransmissionStatus.Missing, changedAt);
         var handler = new GetRecentSubmittedHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetRecentSubmittedQuery(1), TestContext.Current.CancellationToken);
 
         result[0].TransmissionStatus.ShouldBe(TransmissionStatus.Missing);
         result[0].TransmissionStatusChangedAt.ShouldBe(changedAt);

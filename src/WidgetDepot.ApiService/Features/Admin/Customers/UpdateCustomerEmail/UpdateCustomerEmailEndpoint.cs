@@ -1,12 +1,14 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Admin.Customers.UpdateCustomerEmail;
 
 public static class UpdateCustomerEmailEndpoint
 {
     public static IEndpointRouteBuilder MapUpdateCustomerEmail(this IEndpointRouteBuilder app)
     {
-        app.MapPut("/admin/customers/{id:int}/email", async (int id, UpdateCustomerEmailRequest request, UpdateCustomerEmailHandler handler, CancellationToken cancellationToken) =>
+        app.MapPut("/admin/customers/{id:int}/email", async (int id, UpdateCustomerEmailRequest request, IRequestHandler<UpdateCustomerEmailCommand, object> handler, CancellationToken cancellationToken) =>
         {
-            var result = await handler.UpdateAsync(id, request, cancellationToken);
+            var result = await handler.HandleAsync(new UpdateCustomerEmailCommand(id, request), cancellationToken);
 
             return result switch
             {

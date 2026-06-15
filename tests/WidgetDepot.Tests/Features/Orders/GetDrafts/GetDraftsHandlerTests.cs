@@ -36,7 +36,7 @@ public class GetDraftsHandlerTests
         using var db = CreateDb();
         var handler = new GetDraftsHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftsQuery(1), TestContext.Current.CancellationToken);
 
         result.ShouldBeEmpty();
     }
@@ -52,7 +52,7 @@ public class GetDraftsHandlerTests
 
         var handler = new GetDraftsHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftsQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(1);
         result[0].Id.ShouldBe(order.Id);
@@ -68,7 +68,7 @@ public class GetDraftsHandlerTests
         var ownOrder = await SeedOrderAsync(db, customerId: 1);
         var handler = new GetDraftsHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftsQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(1);
         result[0].Id.ShouldBe(ownOrder.Id);
@@ -82,7 +82,7 @@ public class GetDraftsHandlerTests
         var draftOrder = await SeedOrderAsync(db, customerId: 1, status: OrderStatus.Draft);
         var handler = new GetDraftsHandler(db);
 
-        var result = await handler.HandleAsync(1, TestContext.Current.CancellationToken);
+        var result = await handler.HandleAsync(new GetDraftsQuery(1), TestContext.Current.CancellationToken);
 
         result.Count.ShouldBe(1);
         result[0].Id.ShouldBe(draftOrder.Id);

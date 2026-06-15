@@ -1,3 +1,5 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Admin.Orders.GetAdminOrderByNumber;
 
 public static class GetAdminOrderByNumberEndpoint
@@ -6,10 +8,10 @@ public static class GetAdminOrderByNumberEndpoint
     {
         app.MapGet("/admin/orders/{orderNumber:int}", async (
             int orderNumber,
-            GetAdminOrderByNumberHandler handler,
+            IRequestHandler<GetAdminOrderByNumberQuery, object> handler,
             CancellationToken cancellationToken) =>
         {
-            var result = await handler.HandleAsync(orderNumber, cancellationToken);
+            var result = await handler.HandleAsync(new GetAdminOrderByNumberQuery(orderNumber), cancellationToken);
 
             return result switch
             {

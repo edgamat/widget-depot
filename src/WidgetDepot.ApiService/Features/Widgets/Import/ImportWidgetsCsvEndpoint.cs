@@ -1,13 +1,15 @@
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Widgets.Import;
 
 public static class ImportWidgetsCsvEndpoint
 {
     public static IEndpointRouteBuilder MapImportWidgetsCsv(this IEndpointRouteBuilder app)
     {
-        app.MapPost(WidgetEndpoints.Import, async (IFormFile file, ImportWidgetsCsvHandler handler, CancellationToken cancellationToken) =>
+        app.MapPost(WidgetEndpoints.Import, async (IFormFile file, IRequestHandler<ImportWidgetsCsvCommand, ImportResult?> handler, CancellationToken cancellationToken) =>
         {
             await using var stream = file.OpenReadStream();
-            var result = await handler.HandleAsync(stream, cancellationToken);
+            var result = await handler.HandleAsync(new ImportWidgetsCsvCommand(stream), cancellationToken);
 
             if (result is null)
                 return Results.Problem("The CSV file is missing expected column headers.", statusCode: 400);

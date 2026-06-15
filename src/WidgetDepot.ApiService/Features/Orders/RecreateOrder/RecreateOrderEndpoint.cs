@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using WidgetDepot.ApiService.Shared;
+
 namespace WidgetDepot.ApiService.Features.Orders.RecreateOrder;
 
 public static class RecreateOrderEndpoint
@@ -9,13 +11,13 @@ public static class RecreateOrderEndpoint
         app.MapPost(OrderEndpoints.RecreateOrder, async (
             int orderId,
             ClaimsPrincipal user,
-            RecreateOrderHandler handler,
+            IRequestHandler<RecreateOrderCommand, object> handler,
             CancellationToken cancellationToken) =>
         {
             if (!user.TryGetCustomerId(out var customerId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(orderId, customerId, cancellationToken);
+            var result = await handler.HandleAsync(new RecreateOrderCommand(orderId, customerId), cancellationToken);
 
             return result switch
             {

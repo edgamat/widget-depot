@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.Accounts.Login;
 
-public record LoginRequest(string Email, string Password);
+public record LoginRequest(string Email, string Password) : IRequest<object>;
 
 public record LoginResponse(int CustomerId, string Email, string FirstName, bool IsAdmin, bool MustChangePassword);
 
@@ -15,7 +16,7 @@ public abstract record LoginError
     public record Failure(string Message) : LoginError;
 }
 
-public class LoginHandler(AppDbContext db)
+public class LoginHandler(AppDbContext db) : IRequestHandler<LoginRequest, object>
 {
     private readonly PasswordHasher<Customer> _passwordHasher = new();
 
