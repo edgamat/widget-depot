@@ -1,0 +1,92 @@
+@page "/problem-reports/order-lookup"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.ProblemReports.OrderLookup
+@inject OrderLookupService OrderLookupService
+
+<PageTitle>Report a Problem</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1>Report a Problem</h1>
+        <p class="text-muted">Enter your order number to begin filing a problem report.</p>
+
+        <EditForm Model="form" OnValidSubmit="HandleSubmitAsync">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label" for="orderNumber">Order Number</label>
+                <InputNumber id="orderNumber" class="form-control" @bind-Value="form.OrderNumber" />
+                <ValidationMessage For="() => form.OrderNumber" class="text-danger" />
+            </div>
+
+            <button type="submit" class="btn btn-primary" disabled="@isLoading">Look Up Order</button>
+        </EditForm>
+
+        @if (errorMessage is not null)
+        {
+            <div class="alert alert-danger mt-3" role="alert">@errorMessage</div>
+        }
+
+        @if (orderItems is not null)
+        {
+            <div class="mt-4">
+                <h2 class="h5">Order #@foundOrderId — Items</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Widget</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in orderItems)
+                        {
+                            <tr>
+                                <td>@item.WidgetName</td>
+                                <td>@item.Quantity</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private readonly OrderLookupFormModel form = new();
+    private bool isLoading;
+    private string? errorMessage;
+    private IReadOnlyList<ProblemReportOrderItem>? orderItems;
+    private int foundOrderId;
+
+    private async Task HandleSubmitAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        orderItems = null;
+
+        var result = await OrderLookupService.LookupOrderAsync(form.OrderNumber!.Value);
+
+        switch (result)
+        {
+            case LookupOrderResult.Success success:
+                foundOrderId = success.OrderId;
+                orderItems = success.Items;
+                break;
+            case LookupOrderResult.NotFound:
+                errorMessage = "Order not found. Please check the order number and try again.";
+                break;
+            case LookupOrderResult.NotSubmitted:
+                errorMessage = "This order is not in a submitted state and cannot have a problem report filed against it.";
+                break;
+            default:
+                errorMessage = "An error occurred. Please try again later.";
+                break;
+        }
+
+        isLoading = false;
+    }
+}
