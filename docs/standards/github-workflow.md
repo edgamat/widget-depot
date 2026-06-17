@@ -8,10 +8,25 @@
 - Claude Code creates a branch named `issue-<number>-short-description` **before any Edit or Write tool call**.
 - Claude code runs `gh repo view --json nameWithOwner -q .nameWithOwner` to get the repo name, then pass it as a literal value to the next `gh` command — never use `$(...)` subshell substitution and never parse the repo name from `git remote get-url origin`
 - Claude Code reads the issue with `gh issue view 12`, understands the task, and starts working
+- Implementing the issue includes writing Playwright E2E tests that cover the acceptance criteria, following the `playwright-add-tests` skill (see [Definition of Done](#definition-of-done))
 - As work progresses, it (or you) can post progress updates as issue comments with `gh issue comment`
 - When done, Claude Code pushes the commits to the remote repo and then Claude Code opens a PR linked to the issue with `gh pr create`
 - You review, merge, and the issue closes automatically
 - Once the PR is merged, you say **"run post merge cleanup"** and Claude Code runs the [Post-merge cleanup](#post-merge-cleanup) sequence.
+
+---
+
+## Definition of Done
+
+An issue is not complete until all of the following are true:
+
+- The acceptance criteria are implemented.
+- Unit tests cover the new/changed behavior (see [testing](./testing.md)).
+- **Playwright E2E tests cover the issue's acceptance criteria.** For each acceptance criterion that is observable in the UI, there is a corresponding end-to-end test (or an assertion within one) under `tests/WidgetDepot.E2E`. When writing these tests you MUST follow the `playwright-add-tests` skill — do not write free-form specs.
+- All checks in [Before Creating a Commit](#before-creating-a-commit) pass.
+- Acceptance-criteria checkboxes are ticked off on the issue.
+
+If a criterion genuinely cannot be exercised end-to-end (e.g. a pure backend/data concern with no UI surface), note why in an issue comment instead of silently skipping it.
 
 ---
 
