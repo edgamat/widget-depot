@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<ProblemReport> ProblemReports => Set<ProblemReport>();
+    public DbSet<ProblemReportItem> ProblemReportItems => Set<ProblemReportItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -96,5 +98,24 @@ public class AppDbContext : DbContext
             entity.Property(o => o.ShippingEstimate).HasPrecision(10, 2);
         });
 
+        modelBuilder.Entity<ProblemReport>(entity =>
+        {
+            entity.HasOne(pr => pr.Order)
+                  .WithMany()
+                  .HasForeignKey(pr => pr.OrderId);
+
+            entity.HasMany(pr => pr.Items)
+                  .WithOne()
+                  .HasForeignKey(pri => pri.ProblemReportId);
+
+            entity.Property(pr => pr.Notes).HasColumnType("text");
+        });
+
+        modelBuilder.Entity<ProblemReportItem>(entity =>
+        {
+            entity.HasOne(pri => pri.OrderItem)
+                  .WithMany()
+                  .HasForeignKey(pri => pri.OrderItemId);
+        });
     }
 }

@@ -1,0 +1,209 @@
+@page "/problem-reports/create/{OrderId:int}"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.ProblemReports.OrderLookup
+@using WidgetDepot.Web.Features.ProblemReports.Wizard
+@inject OrderLookupService OrderLookupService
+@inject SubmitProblemReportService SubmitProblemReportService
+
+<PageTitle>Report a Problem</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1>Report a Problem</h1>
+
+        @if (isLoading)
+        {
+            <p>Loading order details…</p>
+        }
+        else if (loadError is not null)
+        {
+            <div class="alert alert-danger" role="alert">@loadError</div>
+        }
+        else if (isSubmitted)
+        {
+            <div class="alert alert-success" role="alert">
+                Your problem report has been submitted successfully. Thank you for letting us know.
+            </div>
+        }
+        else if (currentStep == WizardStep.StepA)
+        {
+            <p class="text-muted">Select the items affected by the problem.</p>
+
+            @if (stepAError is not null)
+            {
+                <div class="alert alert-danger" role="alert">@stepAError</div>
+            }
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Widget</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in selectionItems)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input"
+                                       id="item-@item.OrderItemId"
+                                       checked="@item.IsSelected"
+                                       @onchange="e => item.IsSelected = (bool)(e.Value ?? false)" />
+                            </td>
+                            <td>
+                                <label for="item-@item.OrderItemId">@item.WidgetName</label>
+                            </td>
+                            <td>@item.Quantity</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button class="btn btn-primary" @onclick="AdvanceToStepB">Next</button>
+        }
+        else if (currentStep == WizardStep.StepB)
+        {
+            <p class="text-muted">Specify the issue type for each affected item.</p>
+
+            @if (stepBError is not null)
+            {
+                <div class="alert alert-danger" role="alert">@stepBError</div>
+            }
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Widget</th>
+                        <th>Quantity</th>
+                        <th>Issue Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in issueItems)
+                    {
+                        <tr>
+                            <td>@item.WidgetName</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                <select class="form-select" aria-label="Issue type for @item.WidgetName"
+                                        value="@item.IssueType"
+                                        @onchange="e => item.IssueType = e.Value?.ToString()">
+                                    <option value="">— Select issue type —</option>
+                                    <option value="UnderRequested">Under-requested</option>
+                                    <option value="OverRequested">Over-requested</option>
+                                    <option value="Damaged">Damaged</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mb-3">
+                <label class="form-label" for="notes">Notes (optional)</label>
+                <textarea id="notes" class="form-control" rows="3" @bind="notes"></textarea>
+            </div>
+
+            <button class="btn btn-primary" disabled="@isSubmitting" @onclick="HandleSubmitAsync">Submit</button>
+        }
+    </div>
+</div>
+
+@code {
+    private enum WizardStep { StepA, StepB }
+
+    [Parameter] public int OrderId { get; set; }
+
+    private bool isLoading = true;
+    private string? loadError;
+    private bool isSubmitting;
+    private bool isSubmitted;
+
+    private WizardStep currentStep = WizardStep.StepA;
+    private string? stepAError;
+    private string? stepBError;
+
+    private List<ItemSelectionModel> selectionItems = [];
+    private List<IssueSpecificationModel> issueItems = [];
+    private string? notes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await OrderLookupService.LookupOrderAsync(OrderId);
+
+        switch (result)
+        {
+            case LookupOrderResult.Success success:
+                selectionItems = [.. success.Items.Select(i => new ItemSelectionModel
+                {
+                    OrderItemId = i.OrderItemId,
+                    WidgetName = i.WidgetName,
+                    Quantity = i.Quantity
+                })];
+                break;
+            case LookupOrderResult.NotFound:
+                loadError = "Order not found. Please go back and look up your order number.";
+                break;
+            case LookupOrderResult.NotSubmitted:
+                loadError = "This order is not in a submitted state and cannot have a problem report filed against it.";
+                break;
+            default:
+                loadError = "An error occurred loading the order. Please try again later.";
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private void AdvanceToStepB()
+    {
+        stepAError = null;
+
+        if (!selectionItems.Any(i => i.IsSelected))
+        {
+            stepAError = "Please select at least one item to report.";
+            return;
+        }
+
+        issueItems = [.. selectionItems
+            .Where(i => i.IsSelected)
+            .Select(i => new IssueSpecificationModel
+            {
+                OrderItemId = i.OrderItemId,
+                WidgetName = i.WidgetName,
+                Quantity = i.Quantity
+            })];
+
+        currentStep = WizardStep.StepB;
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        stepBError = null;
+
+        if (issueItems.Any(i => string.IsNullOrEmpty(i.IssueType)))
+        {
+            stepBError = "Please select an issue type for every item.";
+            return;
+        }
+
+        isSubmitting = true;
+
+        var result = await SubmitProblemReportService.SubmitAsync(OrderId, issueItems, notes);
+
+        if (result is SubmitProblemReportResult.Success)
+        {
+            isSubmitted = true;
+        }
+        else
+        {
+            stepBError = "An error occurred submitting the report. Please try again.";
+        }
+
+        isSubmitting = false;
+    }
+}

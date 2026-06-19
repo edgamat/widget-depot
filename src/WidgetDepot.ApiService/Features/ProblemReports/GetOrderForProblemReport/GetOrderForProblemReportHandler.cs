@@ -5,7 +5,7 @@ using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.ProblemReports.GetOrderForProblemReport;
 
-public record GetOrderForProblemReportItemResponse(string WidgetName, int Quantity);
+public record GetOrderForProblemReportItemResponse(int OrderItemId, string WidgetName, int Quantity);
 
 public record GetOrderForProblemReportResponse(int OrderId, IReadOnlyList<GetOrderForProblemReportItemResponse> Items);
 
@@ -39,6 +39,6 @@ public class GetOrderForProblemReportHandler : IRequestHandler<GetOrderForProble
 
         return new GetOrderForProblemReportResponse(
             order.Id,
-            [.. order.Items.Select(i => new GetOrderForProblemReportItemResponse(i.Widget.Name, i.Quantity))]);
+            [.. order.Items.Select(i => new GetOrderForProblemReportItemResponse(i.Id, i.Widget.Name, i.Quantity))]);
     }
 }
