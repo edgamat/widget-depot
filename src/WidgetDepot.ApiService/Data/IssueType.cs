@@ -2,7 +2,7 @@ namespace WidgetDepot.ApiService.Data;
 
 public enum IssueType
 {
-    UnderRequested = 0,
-    OverRequested = 1,
-    Damaged = 2
+    UnderRequested = 1,
+    OverRequested = 2,
+    Damaged = 3
 }

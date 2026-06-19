@@ -22,6 +22,7 @@ This document describes the approach and conventions for code design in the Widg
 
 ## C# Specifics
 
+- Enumerations must start at 1, never 0. Zero is reserved as the default uninitialized value and should not map to a valid domain concept.
 - Use file-scoped namespaces
 - Don't use primary constructors
 - Don't use the null-forgiving operator (!) where possible (obey the compiler).

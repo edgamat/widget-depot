@@ -1,0 +1,55 @@
+<p class="text-muted">Select the items affected by the problem.</p>
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Widget</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" class="form-check-input"
+                           id="item-@item.OrderItemId"
+                           checked="@item.IsSelected"
+                           @onchange="e => item.IsSelected = (bool)(e.Value ?? false)" />
+                </td>
+                <td>
+                    <label for="item-@item.OrderItemId">@item.WidgetName</label>
+                </td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="HandleNext">Next</button>
+
+@code {
+    [Parameter] public List<ItemSelectionModel> Items { get; set; } = [];
+    [Parameter] public EventCallback OnNext { get; set; }
+
+    private string? _error;
+
+    private async Task HandleNext()
+    {
+        _error = null;
+
+        if (!Items.Any(i => i.IsSelected))
+        {
+            _error = "Please select at least one item to report.";
+            return;
+        }
+
+        await OnNext.InvokeAsync();
+    }
+}
