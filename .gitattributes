@@ -11,6 +11,7 @@
 *.txt    text=auto
 *.csv    text=auto
 *.ts     text=auto
+*.sh     text=auto
 
 # Mark binary files explicitly
 *.png    binary
