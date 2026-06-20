@@ -29,7 +29,7 @@ public class OrderLookupService
 
             return new LookupOrderResult.Success(
                 dto.OrderId,
-                [.. dto.Items.Select(i => new ProblemReportOrderItem(i.WidgetName, i.Quantity))]);
+                [.. dto.Items.Select(i => new ProblemReportOrderItem(i.OrderItemId, i.WidgetName, i.Quantity))]);
         }
 
         return new LookupOrderResult.Failure();

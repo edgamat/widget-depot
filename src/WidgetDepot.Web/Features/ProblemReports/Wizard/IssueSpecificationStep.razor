@@ -1,0 +1,69 @@
+<p class="text-muted">Specify the issue type for each affected item.</p>
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+@if (SubmitError is not null)
+{
+    <div class="alert alert-danger" role="alert">@SubmitError</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Widget</th>
+            <th>Quantity</th>
+            <th>Issue Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr>
+                <td>@item.WidgetName</td>
+                <td>@item.Quantity</td>
+                <td>
+                    <select class="form-select" aria-label="Issue type for @item.WidgetName"
+                            value="@item.IssueType"
+                            @onchange="e => item.IssueType = e.Value?.ToString()">
+                        <option value="">— Select issue type —</option>
+                        <option value="UnderRequested">Under-requested</option>
+                        <option value="OverRequested">Over-requested</option>
+                        <option value="Damaged">Damaged</option>
+                    </select>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mb-3">
+    <label class="form-label" for="notes">Notes (optional)</label>
+    <textarea id="notes" class="form-control" rows="3" @bind="_notes"></textarea>
+</div>
+
+<button class="btn btn-primary" disabled="@IsSubmitting" @onclick="HandleSubmit">Submit</button>
+
+@code {
+    [Parameter] public List<IssueSpecificationModel> Items { get; set; } = [];
+    [Parameter] public bool IsSubmitting { get; set; }
+    [Parameter] public string? SubmitError { get; set; }
+    [Parameter] public EventCallback<string?> OnSubmit { get; set; }
+
+    private string? _error;
+    private string? _notes;
+
+    private async Task HandleSubmit()
+    {
+        _error = null;
+
+        if (Items.Any(i => string.IsNullOrEmpty(i.IssueType)))
+        {
+            _error = "Please select an issue type for every item.";
+            return;
+        }
+
+        await OnSubmit.InvokeAsync(_notes);
+    }
+}

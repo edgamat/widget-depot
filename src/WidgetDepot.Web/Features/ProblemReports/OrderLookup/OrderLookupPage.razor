@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using WidgetDepot.Web.Features.ProblemReports.OrderLookup
 @inject OrderLookupService OrderLookupService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Report a Problem</PageTitle>
 
@@ -50,6 +51,7 @@
                         }
                     </tbody>
                 </table>
+                <button class="btn btn-primary" @onclick="ProceedToWizard">Next: Select Items to Report</button>
             </div>
         }
     </div>
@@ -61,6 +63,11 @@
     private string? errorMessage;
     private IReadOnlyList<ProblemReportOrderItem>? orderItems;
     private int foundOrderId;
+
+    private void ProceedToWizard()
+    {
+        NavigationManager.NavigateTo($"/problem-reports/create/{foundOrderId}");
+    }
 
     private async Task HandleSubmitAsync()
     {

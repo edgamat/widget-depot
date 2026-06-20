@@ -9,7 +9,7 @@ public class OrderLookupFormModel
     public int? OrderNumber { get; set; }
 }
 
-public record ProblemReportOrderItem(string WidgetName, int Quantity);
+public record ProblemReportOrderItem(int OrderItemId, string WidgetName, int Quantity);
 
 public abstract record LookupOrderResult
 {
@@ -19,6 +19,6 @@ public abstract record LookupOrderResult
     public record Failure : LookupOrderResult;
 }
 
-internal record GetOrderForProblemReportItemResponse(string WidgetName, int Quantity);
+internal record GetOrderForProblemReportItemResponse(int OrderItemId, string WidgetName, int Quantity);
 
 internal record GetOrderForProblemReportResponse(int OrderId, IReadOnlyList<GetOrderForProblemReportItemResponse> Items);

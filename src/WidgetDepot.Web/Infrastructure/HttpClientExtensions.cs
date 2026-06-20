@@ -15,6 +15,7 @@ using WidgetDepot.Web.Features.Orders.History;
 using WidgetDepot.Web.Features.Orders.List;
 using WidgetDepot.Web.Features.Orders.Submit;
 using WidgetDepot.Web.Features.ProblemReports.OrderLookup;
+using WidgetDepot.Web.Features.ProblemReports.Wizard;
 
 namespace WidgetDepot.Web.Infrastructure;
 
@@ -43,6 +44,7 @@ internal static class HttpClientExtensions
         services.AddHttpClient<DetailService>(withBase).AddHttpMessageHandler<CookieForwardingHandler>();
         services.AddHttpClient<AdminOrderLookupService>(withBase).AddHttpMessageHandler<CookieForwardingHandler>();
         services.AddHttpClient<OrderLookupService>(withBase).AddHttpMessageHandler<CookieForwardingHandler>();
+        services.AddHttpClient<SubmitProblemReportService>(withBase).AddHttpMessageHandler<CookieForwardingHandler>();
 
         return services;
     }

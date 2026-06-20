@@ -1,0 +1,117 @@
+@page "/problem-reports/create/{OrderId:int}"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.ProblemReports.OrderLookup
+@using WidgetDepot.Web.Features.ProblemReports.Wizard
+@inject OrderLookupService OrderLookupService
+@inject SubmitProblemReportService SubmitProblemReportService
+
+<PageTitle>Report a Problem</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1>Report a Problem</h1>
+
+        @if (isLoading)
+        {
+            <p>Loading order details…</p>
+        }
+        else if (loadError is not null)
+        {
+            <div class="alert alert-danger" role="alert">@loadError</div>
+        }
+        else if (isSubmitted)
+        {
+            <div class="alert alert-success" role="alert">
+                Your problem report has been submitted successfully. Thank you for letting us know.
+            </div>
+        }
+        else if (currentStep == WizardStep.StepA)
+        {
+            <ItemSelectionStep Items="selectionItems" OnNext="AdvanceToStepB" />
+        }
+        else if (currentStep == WizardStep.StepB)
+        {
+            <IssueSpecificationStep Items="issueItems" IsSubmitting="isSubmitting" SubmitError="@submitError" OnSubmit="HandleSubmitAsync" />
+        }
+    </div>
+</div>
+
+@code {
+    private enum WizardStep { StepA, StepB }
+
+    [Parameter] public int OrderId { get; set; }
+
+    private bool isLoading = true;
+    private string? loadError;
+    private bool isSubmitting;
+    private bool isSubmitted;
+    private string? submitError { get; set; }
+
+    private WizardStep currentStep = WizardStep.StepA;
+
+    private List<ItemSelectionModel> selectionItems = [];
+    private List<IssueSpecificationModel> issueItems = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await OrderLookupService.LookupOrderAsync(OrderId);
+
+        switch (result)
+        {
+            case LookupOrderResult.Success success:
+                selectionItems = [.. success.Items.Select(i => new ItemSelectionModel
+                {
+                    OrderItemId = i.OrderItemId,
+                    WidgetName = i.WidgetName,
+                    Quantity = i.Quantity
+                })];
+                break;
+            case LookupOrderResult.NotFound:
+                loadError = "Order not found. Please go back and look up your order number.";
+                break;
+            case LookupOrderResult.NotSubmitted:
+                loadError = "This order is not in a submitted state and cannot have a problem report filed against it.";
+                break;
+            default:
+                loadError = "An error occurred loading the order. Please try again later.";
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private void AdvanceToStepB()
+    {
+        issueItems = [.. selectionItems
+            .Where(i => i.IsSelected)
+            .Select(i => new IssueSpecificationModel
+            {
+                OrderItemId = i.OrderItemId,
+                WidgetName = i.WidgetName,
+                Quantity = i.Quantity
+            })];
+
+        currentStep = WizardStep.StepB;
+    }
+
+    private async Task HandleSubmitAsync(string? notes)
+    {
+        submitError = null;
+        isSubmitting = true;
+
+        var result = await SubmitProblemReportService.SubmitAsync(OrderId, issueItems, notes);
+
+        if (result is SubmitProblemReportResult.Success)
+        {
+            isSubmitted = true;
+        }
+        else
+        {
+            submitError = "An error occurred submitting the report. Please try again.";
+        }
+
+        isSubmitting = false;
+    }
+}
