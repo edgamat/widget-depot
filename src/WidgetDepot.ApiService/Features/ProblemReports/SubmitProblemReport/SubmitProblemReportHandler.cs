@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.ProblemReports.Email;
 using WidgetDepot.ApiService.Shared;
 
 namespace WidgetDepot.ApiService.Features.ProblemReports.SubmitProblemReport;
@@ -24,16 +25,18 @@ public record SubmitProblemReportInvalidItems;
 public class SubmitProblemReportHandler : IRequestHandler<SubmitProblemReportRequest, object>
 {
     private readonly AppDbContext _db;
+    private readonly IProblemReportEmailSender _emailSender;
 
-    public SubmitProblemReportHandler(AppDbContext db)
+    public SubmitProblemReportHandler(AppDbContext db, IProblemReportEmailSender emailSender)
     {
         _db = db;
+        _emailSender = emailSender;
     }
 
     public async Task<object> HandleAsync(SubmitProblemReportRequest request, CancellationToken cancellationToken)
     {
         var order = await _db.Orders
-            .Include(o => o.Items)
+            .Include(o => o.Items).ThenInclude(i => i.Widget)
             .FirstOrDefaultAsync(o => o.Id == request.OrderId && o.CustomerId == request.CustomerId, cancellationToken);
 
         if (order is null)
@@ -63,6 +66,25 @@ public class SubmitProblemReportHandler : IRequestHandler<SubmitProblemReportReq
         _db.ProblemReports.Add(report);
         await _db.SaveChangesAsync(cancellationToken);
 
+        var emailMessage = BuildEmailMessage(request, order);
+        var emailSent = await _emailSender.SendAsync(emailMessage, cancellationToken);
+
+        if (emailSent)
+        {
+            report.EmailSent = true;
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+
         return new SubmitProblemReportResponse(report.Id);
+    }
+
+    private static ProblemReportEmailMessage BuildEmailMessage(SubmitProblemReportRequest request, Order order)
+    {
+        var itemLookup = order.Items.ToDictionary(i => i.Id);
+        var emailItems = request.Items
+            .Select(i => new ProblemReportEmailItem(itemLookup[i.OrderItemId].Widget.Name, i.IssueType))
+            .ToList();
+
+        return new ProblemReportEmailMessage(request.OrderId, emailItems, request.Notes);
     }
 }

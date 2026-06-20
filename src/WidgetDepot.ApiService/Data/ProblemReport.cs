@@ -7,5 +7,6 @@ public class ProblemReport
     public Order Order { get; set; } = null!;
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool EmailSent { get; set; }
     public ICollection<ProblemReportItem> Items { get; set; } = [];
 }

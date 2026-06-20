@@ -5,6 +5,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var ftp = builder.AddFakeFtp();
 
+var mailpit = builder.AddMailpit();
+
 var postgres = builder.AddPostgres("postgres")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithContainerName("postgres")
@@ -28,11 +30,14 @@ var apiService = builder.AddProject<Projects.WidgetDepot_ApiService>("apiservice
     .WithReference(fakeShippingApi)
     .WaitFor(fakeShippingApi)
     .WaitFor(ftp)
+    .WaitFor(mailpit)
     .WithEnvironment("FtpTransmission__Host", "127.0.0.1")
     .WithEnvironment("FtpTransmission__Port", FtpContainerExtensions.FtpHostPort.ToString())
     .WithEnvironment("FtpTransmission__Username", "devftp")
     .WithEnvironment("FtpTransmission__Password", "devftp")
-    .WithEnvironment("FtpTransmission__RemoteDirectory", "/home/devftp");
+    .WithEnvironment("FtpTransmission__RemoteDirectory", "/home/devftp")
+    .WithEnvironment("Email__SmtpHost", "127.0.0.1")
+    .WithEnvironment("Email__SmtpPort", MailpitContainerExtensions.SmtpHostPort.ToString());
 
 builder.AddProject<Projects.WidgetDepot_Web>("webfrontend")
     .WithExternalHttpEndpoints()

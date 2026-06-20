@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 
+using Moq;
+
 using Shouldly;
 
 using WidgetDepot.ApiService.Data;
+using WidgetDepot.ApiService.Features.ProblemReports.Email;
 using WidgetDepot.ApiService.Features.ProblemReports.SubmitProblemReport;
 
 namespace WidgetDepot.Tests.Features.ProblemReports.SubmitProblemReport;
@@ -15,6 +18,14 @@ public class SubmitProblemReportHandlerTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         return new AppDbContext(options);
+    }
+
+    private static Mock<IProblemReportEmailSender> CreateEmailSender(bool returns = true)
+    {
+        var mock = new Mock<IProblemReportEmailSender>();
+        mock.Setup(s => s.SendAsync(It.IsAny<ProblemReportEmailMessage>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(returns);
+        return mock;
     }
 
     private static async Task<(Order Order, OrderItem Item)> SeedSubmittedOrderWithItemAsync(
@@ -61,7 +72,7 @@ public class SubmitProblemReportHandlerTests
     public async Task HandleAsync_OrderNotFound_ReturnsOrderNotFound()
     {
         using var db = CreateDb();
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
 
         var result = await handler.HandleAsync(BuildRequest(999, 1), TestContext.Current.CancellationToken);
 
@@ -73,7 +84,7 @@ public class SubmitProblemReportHandlerTests
     {
         using var db = CreateDb();
         var (order, _) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
 
         var result = await handler.HandleAsync(BuildRequest(order.Id, 2), TestContext.Current.CancellationToken);
 
@@ -87,7 +98,7 @@ public class SubmitProblemReportHandlerTests
         var order = new Order { CustomerId = 1, Status = OrderStatus.Draft, CreatedAt = DateTime.UtcNow };
         db.Orders.Add(order);
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
 
         var result = await handler.HandleAsync(BuildRequest(order.Id, 1), TestContext.Current.CancellationToken);
 
@@ -99,7 +110,7 @@ public class SubmitProblemReportHandlerTests
     {
         using var db = CreateDb();
         var (order, _) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
         var items = new List<SubmitProblemReportItemRequest>
         {
             new(99999, "Damaged")
@@ -115,7 +126,7 @@ public class SubmitProblemReportHandlerTests
     {
         using var db = CreateDb();
         var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
         var items = new List<SubmitProblemReportItemRequest>
         {
             new(item.Id, "Damaged")
@@ -139,7 +150,7 @@ public class SubmitProblemReportHandlerTests
     {
         using var db = CreateDb();
         var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
         var items = new List<SubmitProblemReportItemRequest> { new(item.Id, "Damaged") };
 
         await handler.HandleAsync(BuildRequest(order.Id, 1, items), TestContext.Current.CancellationToken);
@@ -154,12 +165,75 @@ public class SubmitProblemReportHandlerTests
     {
         using var db = CreateDb();
         var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
-        var handler = new SubmitProblemReportHandler(db);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender().Object);
         var items = new List<SubmitProblemReportItemRequest> { new(item.Id, "UnderRequested") };
 
         await handler.HandleAsync(BuildRequest(order.Id, 1, items), TestContext.Current.CancellationToken);
 
         var saved = await db.ProblemReports.FirstAsync(TestContext.Current.CancellationToken);
         saved.CreatedAt.ShouldNotBe(default);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ValidRequest_SendsEmailWithOrderDetails()
+    {
+        using var db = CreateDb();
+        var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
+        var emailSender = CreateEmailSender();
+        var handler = new SubmitProblemReportHandler(db, emailSender.Object);
+        var items = new List<SubmitProblemReportItemRequest> { new(item.Id, "Damaged") };
+
+        await handler.HandleAsync(BuildRequest(order.Id, 1, items, "Broken on arrival"), TestContext.Current.CancellationToken);
+
+        emailSender.Verify(s => s.SendAsync(
+            It.Is<ProblemReportEmailMessage>(m =>
+                m.OrderId == order.Id &&
+                m.Notes == "Broken on arrival" &&
+                m.Items.Count == 1 &&
+                m.Items[0].IssueType == "Damaged"),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task HandleAsync_EmailSendSucceeds_EmailSentSetToTrue()
+    {
+        using var db = CreateDb();
+        var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender(returns: true).Object);
+        var items = new List<SubmitProblemReportItemRequest> { new(item.Id, "Damaged") };
+
+        await handler.HandleAsync(BuildRequest(order.Id, 1, items), TestContext.Current.CancellationToken);
+
+        var saved = await db.ProblemReports.FirstAsync(TestContext.Current.CancellationToken);
+        saved.EmailSent.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task HandleAsync_EmailSendFails_ReportSavedWithEmailSentFalse()
+    {
+        using var db = CreateDb();
+        var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender(returns: false).Object);
+        var items = new List<SubmitProblemReportItemRequest> { new(item.Id, "Damaged") };
+
+        var result = await handler.HandleAsync(BuildRequest(order.Id, 1, items), TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<SubmitProblemReportResponse>();
+        var saved = await db.ProblemReports.FirstAsync(TestContext.Current.CancellationToken);
+        saved.EmailSent.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task HandleAsync_EmailSendFails_StillReturnsSuccessResponse()
+    {
+        using var db = CreateDb();
+        var (order, item) = await SeedSubmittedOrderWithItemAsync(db, customerId: 1);
+        var handler = new SubmitProblemReportHandler(db, CreateEmailSender(returns: false).Object);
+        var items = new List<SubmitProblemReportItemRequest> { new(item.Id, "Damaged") };
+
+        var result = await handler.HandleAsync(BuildRequest(order.Id, 1, items), TestContext.Current.CancellationToken);
+
+        result.ShouldBeOfType<SubmitProblemReportResponse>();
     }
 }
