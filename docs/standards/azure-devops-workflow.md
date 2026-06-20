@@ -24,6 +24,8 @@ AUTH="Authorization: Basic $(printf ':%s' "$ADO_PAT" | base64)"
 > **IMPORTANT** Never hardcode the PAT in commands, scripts, or commit it to the repo. Always read it
 > from `$ADO_PAT`. Never read or print the contents of a `.env` file.
 
+See [azure-devops-pat.md](./azure-devops-pat.md) for how to generate the PAT and which scopes it needs.
+
 ---
 
 ## Concept Mapping (GitHub → Azure DevOps)
