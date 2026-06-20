@@ -1,5 +1,3 @@
-using System.Text;
-
 using MailKit.Net.Smtp;
 
 using Microsoft.Extensions.Options;
@@ -29,7 +27,7 @@ public class MailKitProblemReportEmailSender : IProblemReportEmailSender
             email.From.Add(MailboxAddress.Parse(_options.FromAddress));
             email.To.Add(MailboxAddress.Parse(_options.WarehouseStaffAddress));
             email.Subject = $"Problem Report for Order #{message.OrderId}";
-            email.Body = new TextPart("plain") { Text = BuildEmailBody(message) };
+            email.Body = new TextPart("plain") { Text = ProblemReportEmailBodyBuilder.Build(message) };
 
             using var client = new SmtpClient();
             await client.ConnectAsync(_options.SmtpHost, _options.SmtpPort, MailKit.Security.SecureSocketOptions.None, cancellationToken);
@@ -43,23 +41,5 @@ public class MailKitProblemReportEmailSender : IProblemReportEmailSender
             _logger.LogError(ex, "Failed to send problem report email for order {OrderId}", message.OrderId);
             return false;
         }
-    }
-
-    private static string BuildEmailBody(ProblemReportEmailMessage message)
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine($"Order: #{message.OrderId}");
-        sb.AppendLine();
-        sb.AppendLine("Reported Items:");
-        foreach (var item in message.Items)
-        {
-            sb.AppendLine($"  - {item.WidgetName}: {item.IssueType}");
-        }
-        if (!string.IsNullOrEmpty(message.Notes))
-        {
-            sb.AppendLine();
-            sb.AppendLine($"Notes: {message.Notes}");
-        }
-        return sb.ToString();
     }
 }
