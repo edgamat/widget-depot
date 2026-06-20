@@ -16,7 +16,9 @@ export class ProfilePage {
   }
 
   async goto() {
-    await this.page.goto('/accounts/profile');
+    // waitUntil: 'commit' avoids net::ERR_ABORTED when Blazor's NavigationManager
+    // intercepts the request as a client-side route change before the load event fires.
+    await this.page.goto('/accounts/profile', { waitUntil: 'commit' });
   }
 
   async waitForReady() {
