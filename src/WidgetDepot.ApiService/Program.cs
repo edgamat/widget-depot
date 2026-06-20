@@ -8,6 +8,7 @@ using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.ExpireDraftOrders;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
+using WidgetDepot.ApiService.Features.ProblemReports.Email;
 using WidgetDepot.ApiService.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +54,9 @@ builder.Services.AddHttpClient<IShippingApiClient, AcmeShippingApiClient>(client
     client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
 });
 builder.Services.AddRequestHandlers();
+
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.AddScoped<IProblemReportEmailSender, MailKitProblemReportEmailSender>();
 
 builder.Services.Configure<OrdersOptions>(builder.Configuration.GetSection("Orders"));
 builder.Services.AddScoped<IOrderFileWriter, OrderFileWriter>();
