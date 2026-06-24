@@ -30,6 +30,13 @@
     }
 </dl>
 
+@if (Order.Status == "Submitted")
+{
+    <div class="mb-4">
+        <a href="/problem-reports/create/@Order.Id" class="btn btn-outline-warning">Report a Problem</a>
+    </div>
+}
+
 <h2>Items</h2>
 @if (Order.Items.Count == 0)
 {
