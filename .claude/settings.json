@@ -1,5 +1,16 @@
 {
   "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Bash(* .env*)",
+      "Bash(cat */.env*)",
+      "Bash(cat .env*)"
+    ],
     "allow": [
       "Skill(update-config)",
       "Skill(update-config:*)",

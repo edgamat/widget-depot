@@ -61,7 +61,7 @@ When working on a GitHub issue, you MUST read and follow [github-workflow](./doc
 
 All project source lives under `src/`. The main web app is `src/WidgetDepot.Web/`. See [architecture](./docs/standards/architecture.md) for the full folder structure.
 
-**IMPORTANT** Never read the contents of a `.env` file.
+**IMPORTANT** Never read, write, edit, or pass to any Bash command any `.env` file or `.env.*` file (e.g. `.env.local`, `.env.production`). This applies to all tools: Read, Edit, Write, and Bash. No exceptions.
 
 ---
 
