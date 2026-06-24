@@ -5,6 +5,7 @@ import { CustomerListPage } from '../pages/CustomerListPage';
 import { CustomerProfilePage } from '../pages/CustomerProfilePage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { MyProblemReportsPage } from '../pages/MyProblemReportsPage';
 import { ProblemReportOrderLookupPage } from '../pages/ProblemReportOrderLookupPage';
 import { ProblemReportWizardPage } from '../pages/ProblemReportWizardPage';
 import { ProfilePage } from '../pages/ProfilePage';
@@ -18,6 +19,7 @@ export type PageFixtures = {
   customerProfilePage: CustomerProfilePage;
   homePage: HomePage;
   loginPage: LoginPage;
+  myProblemReportsPage: MyProblemReportsPage;
   problemReportOrderLookupPage: ProblemReportOrderLookupPage;
   problemReportWizardPage: ProblemReportWizardPage;
   profilePage: ProfilePage;
@@ -43,6 +45,9 @@ export const pagesTest = base.extend<PageFixtures>({
   },
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
+  },
+  myProblemReportsPage: async ({ page }, use) => {
+    await use(new MyProblemReportsPage(page));
   },
   problemReportOrderLookupPage: async ({ page }, use) => {
     await use(new ProblemReportOrderLookupPage(page));
