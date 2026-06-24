@@ -8,6 +8,7 @@ using WidgetDepot.ApiService.Features.Orders.CalculateShipping;
 using WidgetDepot.ApiService.Features.Orders.ExpireDraftOrders;
 using WidgetDepot.ApiService.Features.Orders.Submit;
 using WidgetDepot.ApiService.Features.Orders.TransmitOrders;
+using WidgetDepot.ApiService.Features.ProblemReports.CreateTestProblemReport;
 using WidgetDepot.ApiService.Features.ProblemReports.Email;
 using WidgetDepot.ApiService.Shared;
 
@@ -88,6 +89,7 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapCreateTestProblemReport();
 }
 
 app.MapGet("/", () => "API service is running.");

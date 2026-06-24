@@ -11,6 +11,13 @@ test.describe('My Problem Reports (unauthenticated)', () => {
 });
 
 test.describe('My Problem Reports', () => {
+  test.beforeEach(async ({ page }) => {
+    if (!process.env.E2E_SUBMITTED_ORDER_NUMBER) return;
+    await page.request.post('/test/problem-reports', {
+      data: { orderId: Number(process.env.E2E_SUBMITTED_ORDER_NUMBER) },
+    });
+  });
+
   // AC: An authenticated customer can access the "My Problem Reports" page
   test('authenticated user can access the page', async ({ myProblemReportsPage }) => {
     await myProblemReportsPage.goto();
@@ -36,7 +43,7 @@ test.describe('My Problem Reports', () => {
 
   // AC: Reports where EmailSent = false display a "Resend email" button
   test('shows Resend email button for reports with email not sent', async ({ myProblemReportsPage }) => {
-    test.skip(!process.env.E2E_PROBLEM_REPORT_UNSENT_EMAIL, 'E2E_PROBLEM_REPORT_UNSENT_EMAIL not set');
+    test.skip(!process.env.E2E_SUBMITTED_ORDER_NUMBER, 'E2E_SUBMITTED_ORDER_NUMBER not set');
 
     await myProblemReportsPage.goto();
     await myProblemReportsPage.waitForReady();

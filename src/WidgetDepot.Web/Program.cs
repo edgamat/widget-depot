@@ -41,6 +41,13 @@ builder.Services.AddApiHttpClients();
 
 builder.Services.AddScoped<OrderWizardState>();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services
+        .AddHttpClient("test-api", c => c.BaseAddress = new Uri("https+http://apiservice"))
+        .AddHttpMessageHandler<CookieForwardingHandler>();
+}
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -65,6 +72,21 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.MapDefaultEndpoints();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapPost("/test/problem-reports", async (
+        TestProblemReportBody body,
+        IHttpClientFactory httpClientFactory,
+        CancellationToken cancellationToken) =>
+    {
+        var client = httpClientFactory.CreateClient("test-api");
+        var response = await client.PostAsJsonAsync("/test/problem-reports", body, cancellationToken);
+        return response.IsSuccessStatusCode
+            ? Results.Ok(await response.Content.ReadFromJsonAsync<object>(cancellationToken))
+            : Results.Problem();
+    }).RequireAuthorization();
+}
 
 app.MapGet("/accounts/do-signin", async (HttpContext context, int customerId, string email, string firstName, bool isAdmin, bool mustChangePassword, string? returnUrl) =>
 {
@@ -101,3 +123,5 @@ app.MapGet("/accounts/logout", async (HttpContext context) =>
 });
 
 app.Run();
+
+record TestProblemReportBody(int OrderId);
