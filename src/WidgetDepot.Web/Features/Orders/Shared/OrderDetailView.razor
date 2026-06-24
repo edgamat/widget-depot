@@ -64,6 +64,13 @@ else
     </table>
 }
 
+@if (Order.Status == "Submitted")
+{
+    <div class="mt-4">
+        <a href="/problem-reports/create/@Order.Id" class="btn btn-sm btn-warning">Report a Problem</a>
+    </div>
+}
+
 <div class="row mt-4">
     @if (Order.ShippingAddress is not null)
     {
