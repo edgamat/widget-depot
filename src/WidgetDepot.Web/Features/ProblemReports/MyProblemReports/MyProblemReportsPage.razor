@@ -1,0 +1,132 @@
+@page "/problem-reports"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using WidgetDepot.Web.Features.ProblemReports.MyProblemReports
+@inject MyProblemReportsService MyProblemReportsService
+
+<PageTitle>My Problem Reports</PageTitle>
+
+<h1>My Problem Reports</h1>
+
+@if (resendMessage is not null)
+{
+    <div class="alert @resendMessageClass alert-dismissible" role="alert">
+        @resendMessage
+        <button type="button" class="btn-close" @onclick="DismissMessage" aria-label="Close"></button>
+    </div>
+}
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (loadFailed)
+{
+    <div class="alert alert-danger" role="alert">Unable to load your problem reports. Please try again later.</div>
+}
+else if (reports.Count == 0)
+{
+    <p class="text-muted">You have no problem reports yet.</p>
+}
+else
+{
+    <table class="table table-sm table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Order #</th>
+                <th>Order Submitted</th>
+                <th>Report Filed</th>
+                <th>Email Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in reports)
+            {
+                <tr>
+                    <td>@report.OrderId</td>
+                    <td>@report.OrderSubmittedAt.ToString("d")</td>
+                    <td>@report.ReportFiledAt.ToString("d")</td>
+                    <td>@(report.EmailSent ? "Sent" : "Not sent")</td>
+                    <td>
+                        @if (!report.EmailSent)
+                        {
+                            @if (resendingId == report.Id)
+                            {
+                                <span>Sending…</span>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-warning" @onclick="() => ResendEmailAsync(report.Id)">
+                                    Resend email
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<ProblemReportListItem> reports = [];
+    private bool isLoading = true;
+    private bool loadFailed;
+    private string? resendMessage;
+    private string resendMessageClass = "alert-success";
+    private int? resendingId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await MyProblemReportsService.GetMyProblemReportsAsync();
+
+        switch (result)
+        {
+            case GetMyProblemReportsResult.Success success:
+                reports = success.Reports;
+                break;
+            default:
+                loadFailed = true;
+                break;
+        }
+
+        isLoading = false;
+    }
+
+    private async Task ResendEmailAsync(int reportId)
+    {
+        resendingId = reportId;
+        resendMessage = null;
+
+        var result = await MyProblemReportsService.ResendEmailAsync(reportId);
+
+        switch (result)
+        {
+            case ResendEmailResult.Success:
+                resendMessageClass = "alert-success";
+                resendMessage = "Email sent successfully.";
+                await RefreshReportsAsync();
+                break;
+            default:
+                resendMessageClass = "alert-danger";
+                resendMessage = "Failed to send the email. Please try again.";
+                break;
+        }
+
+        resendingId = null;
+    }
+
+    private async Task RefreshReportsAsync()
+    {
+        var result = await MyProblemReportsService.GetMyProblemReportsAsync();
+        if (result is GetMyProblemReportsResult.Success success)
+            reports = success.Reports;
+    }
+
+    private void DismissMessage()
+    {
+        resendMessage = null;
+    }
+}
